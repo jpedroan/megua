@@ -190,9 +190,13 @@ class Exercise:
     def rewrite(self,text):
         """
         Derive this function and implement rewritting rules to change latex expressions for example.
+        
+        Example::
+
+           exp_pattern = re.compile(ur'e\^\{\\left\((.+?)\\right\)\}',re.U)
+           out_text = re.sub(exp_pattern, r'e^{\1}', text)
+
         """
-        exp_pattern = re.compile(ur'e\^\{\\left\((.+?)\\right\)\}',re.U)
-        out_text = re.sub(exp_pattern, r'e^{\1}', text)
         return text
 
     def summary(self):
