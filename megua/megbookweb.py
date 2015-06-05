@@ -291,6 +291,106 @@ class MegBookWeb(MegBookBase):
         MoodleExporter(self, where, debug)  
 
 
+    def siacuapreview(self,exname,ekeys=[]):
+        r"""
+
+        INPUT:
+
+        - ``exname``: problem name (name in "class E12X34_something_001(Exercise):").
+
+        - ``ekeys``: list of numbers that generate the same problem instance.
+
+        OUTPUT:
+
+        - this command writes an html file with all instances.
+
+        NOTE:
+
+        - you can export between 3 and 6 wrong options and 1 right.
+
+        EXAMPLE:
+
+            sage: meg.siacuapreview(exname="E12X34",ekeys=[1,2,5])
+
+
+        Algorithm:
+            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
+
+        """
+
+# FROM HERE
+
+        #Create exercise instance
+        row = self.megbook_store.get_classrow(exname)
+        if not row:
+            print "Exercise %s not found." % exname
+            return
+
+        (concept_dict,concept_list) = self._siacua_extract(row['summary_text'])
+
+        #While POST is working do not need to print SQL statments in output.
+        #For _siacua_sqlprint
+        #f = codecs.open(exname+'.html', mode='w', encoding='utf-8')
+        #f.write(u"<html><body><h2>Copy/paste do conte\xFAdo e enviar ao Sr. Si\xE1cua por email. Obrigado.</h2>")
+        
+        for e_number in ekeys:
+
+            #Create exercise instance
+            ex_instance = exerciseinstance(row, ekey=e_number)
+
+            problem = ex_instance.problem()
+            answer = ex_instance.answer()
+    
+            #Adapt for appropriate URL for images
+            if ex_instance.image_list != []:
+                problem = self._adjust_images_url(problem)
+                answer = self._adjust_images_url(answer)
+                self.send_images()
+    
+
+            #TODO: pass this to ex.py
+            if ex_instance.has_multiplechoicetag:
+                if ex_instance.image_list != []:
+                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in self._siacua_answer_frominstance(ex_instance)]
+                else:
+                    answer_list = self._siacua_answer_frominstance(ex_instance)
+            else:
+                print ex_instance.name,"has [CDATA] field. Please change to <showone> ... </showone> markers."
+                answer_list = self._siacua_answer_extract(answer)
+
+            #Create images for graphics (if they exist) 
+                #for problem
+                #for each answer
+                #collect consecutive image numbers.
+
+            #build json string
+            send_dict =  self._siacua_json(course, exname, e_number, problem, answer_list, concept_list)
+            send_dict.update(dict({'usernamesiacua': usernamesiacua, 'grid2x2': grid2x2}))
+            send_dict.update(concept_dict)
+
+            #Call siacua for store.
+            if sendpost:
+                send_dict.update(dict({'usernamesiacua': usernamesiacua}))
+                self._siacua_send(send_dict)
+            else:
+                print "Not sending to siacua. Dictionary is", send_dict
+
+            #While POST is working do not need this.
+            #self._siacua_sqlprint(send_dict,concept_list,f)
+
+
+        #When producing instances of exercise a folder images is created.
+        os.system("rm -r images")
+
+        #While POST is working do not need this.
+        #Ending _siacua_sqlprint
+        #f.write(r"</body></html>")
+        #f.close()
+        #print r"Copy/paste of contents and send to Sr. Siacua using email. Merci."
+
+
+
+
     def siacua(self,exname,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0):
         r"""
 
