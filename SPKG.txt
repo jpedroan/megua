@@ -1,8 +1,11 @@
-= meg  =
+= MEGUA  =
+
+BETA
 
 == Description ==
 
-Create your own database of mathematical exercises and generate new exercises based on random parameters.
+With this packages, one creates your own database of mathematical exercises and generate 
+new exercises based on random parameters.
 
 == License ==
 
