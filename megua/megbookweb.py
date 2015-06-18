@@ -380,7 +380,7 @@ class MegBookWeb(MegBookBase):
         f.write(all_html)
         f.close()
 
-        print "Find the .html file and click on it."
+        os.system("rm *.tex")	
 
 
 
