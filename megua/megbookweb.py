@@ -318,8 +318,6 @@ class MegBookWeb(MegBookBase):
 
         """
 
-# FROM HERE
-
         #Create exercise instance
         row = self.megbook_store.get_classrow(exname)
         if not row:
@@ -328,11 +326,10 @@ class MegBookWeb(MegBookBase):
 
         (concept_dict,concept_list) = self._siacua_extract(row['summary_text'])
 
-        #While POST is working do not need to print SQL statments in output.
-        #For _siacua_sqlprint
-        #f = codecs.open(exname+'.html', mode='w', encoding='utf-8')
-        #f.write(u"<html><body><h2>Copy/paste do conte\xFAdo e enviar ao Sr. Si\xE1cua por email. Obrigado.</h2>")
-        
+        self.siacuaoption_template = self.env.get_template("siacuapreview_option.html")
+
+        allexercises = u''
+
         for e_number in ekeys:
 
             #Create exercise instance
@@ -342,51 +339,48 @@ class MegBookWeb(MegBookBase):
             answer = ex_instance.answer()
     
             #Adapt for appropriate URL for images
-            if ex_instance.image_list != []:
-                problem = self._adjust_images_url(problem)
-                answer = self._adjust_images_url(answer)
-                self.send_images()
+            #if ex_instance.image_list != []:
+            #    problem = self._adjust_images_url(problem)
+            #    answer = self._adjust_images_url(answer)
+            #    self.send_images()
     
-
             #TODO: pass this to ex.py
             if ex_instance.has_multiplechoicetag:
-                if ex_instance.image_list != []:
-                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in self._siacua_answer_frominstance(ex_instance)]
-                else:
-                    answer_list = self._siacua_answer_frominstance(ex_instance)
+                answer_list = self._siacua_answer_frominstance(ex_instance)
             else:
                 print ex_instance.name,"has [CDATA] field. Please change to <showone> ... </showone> markers."
                 answer_list = self._siacua_answer_extract(answer)
 
-            #Create images for graphics (if they exist) 
-                #for problem
-                #for each answer
-                #collect consecutive image numbers.
+            all_options = u'<table style="width:100%;">\n'
 
-            #build json string
-            send_dict =  self._siacua_json(course, exname, e_number, problem, answer_list, concept_list)
-            send_dict.update(dict({'usernamesiacua': usernamesiacua, 'grid2x2': grid2x2}))
-            send_dict.update(concept_dict)
+            for a in answer_list[:-1]:
+                option_html = self.siacuaoption_template.render(optiontext=a)
+                all_options += option_html
+            
+            all_options += u'</table>\n'
 
-            #Call siacua for store.
-            if sendpost:
-                send_dict.update(dict({'usernamesiacua': usernamesiacua}))
-                self._siacua_send(send_dict)
-            else:
-                print "Not sending to siacua. Dictionary is", send_dict
+            ex_text = u'<h3>Concretizac\xe3o: ekey=' + str(e_number) + '</h3>'
+            ex_text += problem + '<br/>'
+            ex_text += all_options 
+            ex_text += answer_list[-1]
 
-            #While POST is working do not need this.
-            #self._siacua_sqlprint(send_dict,concept_list,f)
+            #Add one more instance with ekey
+            allexercises += ex_text
+
+        self.siacuapreview_header = self.env.get_template("siacuapreview_header.html")
+
+        all_html = self.siacuapreview_header.render(
+                exname = exname,
+                allexercises = allexercises
+            )
 
 
-        #When producing instances of exercise a folder images is created.
-        os.system("rm -r images")
+        #write all to an html file.
+        f = codecs.open(exname+'.html', mode='w', encoding='utf-8')
+        f.write(all_html)
+        f.close()
 
-        #While POST is working do not need this.
-        #Ending _siacua_sqlprint
-        #f.write(r"</body></html>")
-        #f.close()
-        #print r"Copy/paste of contents and send to Sr. Siacua using email. Merci."
+        print "Find the .html file and click on it."
 
 
 

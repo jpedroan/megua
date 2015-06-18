@@ -1,12 +1,4 @@
-\.swp$
-\.hg$
-\.py[co]$
-ceoc.lftp
-/_images/.*
-/_sources/.*
-/.+sqlite.*
-/_build/.*
-/src/.*
+*.pyc
 \.testoutput/
 \.vim
 mconfig.py
