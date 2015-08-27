@@ -574,7 +574,8 @@ class MegBookWeb(MegBookBase):
         This routine applies when using <multiplechoice>...</multiplechoice>.
         """
         #Elements must be in same order as in function "_siacua_answer_extract"
-        l = ex.all_choices + [ex.detailed_answer] #join two lists
+        centered_all_choices = [ "<center>"+choice+"</center>" for choice in ex.all_choices]
+        l = centered_all_choices + [ex.detailed_answer] #join two lists
 
         if len(l)<5:
             raise NameError('Missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')

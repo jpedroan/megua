@@ -526,7 +526,7 @@ class Exercise:
 
         #Collects all <choice>...</choice> pairs
         match_iter = re.finditer(choice_pattern,choice_text) #create an iterator
-        self.all_choices = [ "<center>"+match.group(1)+"</center>" for match in match_iter]
+        self.all_choices = [ match.group(1) for match in match_iter] #TODO: do this better
         #print "=========================="
         #print self.all_choices
         #print "=========================="
@@ -535,6 +535,7 @@ class Exercise:
         #Find detailed answer and save it
         self.detailed_answer = input_text[choices_match.end():].strip("\t\n ")
         #print "=========================="
+        #print "Detailed answer"
         #print self.detailed_answer
         #print "=========================="
 

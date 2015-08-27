@@ -48,7 +48,7 @@ No segmento de reta $[AE]$ está assinalado um ponto $C$.
 O triângulo $[ABC]$ é retângulo em $C$ e $\overline{AC}=a1$ e $\overline{CB}=a2$.
 
 
-Indique o valor do produto escalar $\overrightarrow{AD} \centerdot \overrightarrow{AE}$.
+Indique o valor do produto escalar $\overrightarrow{AD} \cdot \overrightarrow{AE}$.
 
     
 
@@ -57,17 +57,17 @@ Indique o valor do produto escalar $\overrightarrow{AD} \centerdot \overrightarr
 <multiplechoice>
 
 <choice>
-$$  \overrightarrow{AD} \centerdot \overrightarrow{AE}=c6  $$
+$$  \overrightarrow{AD} \cdot \overrightarrow{AE}=c6  $$
 </choice>
 
 <choice>
 <showone errada1>
 <thisone 0>
-$$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=c7 $$
+$$ \overrightarrow{AD} \cdot \overrightarrow{AE}=c7 $$
 </thisone>
 
 <thisone 1>
-$$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=e1 $$
+$$ \overrightarrow{AD} \cdot \overrightarrow{AE}=e1 $$
 </thisone>
 </showone>
 </choice>
@@ -75,11 +75,11 @@ $$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=e1 $$
 <choice>
 <showone errada2>
 <thisone 0>
-$$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=c8 $$
+$$ \overrightarrow{AD} \cdot \overrightarrow{AE}=c8 $$
 </thisone>
 
 <thisone 1>
-$$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=e2 $$
+$$ \overrightarrow{AD} \cdot \overrightarrow{AE}=e2 $$
 </thisone>
 </showone>
 </choice>
@@ -87,11 +87,11 @@ $$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=e2 $$
 <choice>
 <showone errada3>
 <thisone 0>
-$$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=c9 $$
+$$ \overrightarrow{AD} \cdot \overrightarrow{AE}=c9 $$
 </thisone>
 
 <thisone 1>
-$$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=e3 $$
+$$ \overrightarrow{AD} \cdot \overrightarrow{AE}=e3 $$
 </thisone>
 </showone>
 </choice>
@@ -101,7 +101,7 @@ $$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=e3 $$
 
 Resolução:
 Por definição de produto escalar, sabe-se que
-$$ \overrightarrow{AD} \centerdot \overrightarrow{AE}=||\overrightarrow{AD}|| \, ||\overrightarrow{AE}|| \, \cos\alpha,$$
+$$ \overrightarrow{AD} \cdot \overrightarrow{AE}=||\overrightarrow{AD}|| \, ||\overrightarrow{AE}|| \, \cos\alpha,$$
 em que $\alpha$ é o ângulo formado pelos dois vetores.<p>
 Uma vez que é dada a norma de cada um dos vetores, é necessária a determinação do valor de $\cos\alpha$ para posterior cálculo do produto escalar.<p>
 Num triângulo retângulo, o cosseno de um ângulo agudo pode ser determinado pela razão entre a medida do cateto que lhe é adjacente e a medida da hipotenusa. Sendo $[ABC]$ um triângulo retângulo, para $\alpha=\angle CAB$, tem-se que $\displaystyle \cos \alpha =\frac{\overline{AC}}{\overline{AB}}$.<p> Determine-se, aplicando o Teorema de Pitágoras, $\overline{AB}$:
@@ -114,7 +114,7 @@ Assim,
 
 
 \begin{eqnarray*}
-    \overrightarrow{AD} \centerdot \overrightarrow{AE}&=& ||\overrightarrow{AD}|| \,||\overrightarrow{AE}|| \, \cos\alpha \\
+    \overrightarrow{AD} \cdot \overrightarrow{AE}&=& ||\overrightarrow{AD}|| \,||\overrightarrow{AE}|| \, \cos\alpha \\
                                            &=& b1 \times b2\times c5 \\
                                            &=& c6. \\
 \end{eqnarray*} 
@@ -169,6 +169,81 @@ class E97G40_produto_escalar2_R2_008(Exercise):
             s.e2=s.c6*2
         
 ''')
+
+
+
+meg.save(r'''
+
+%SUMMARY Exercício Descritivo
+
+uma soma
+
+Palavras chave: Produto escalar
+
+Autor: Ana Palmeira, 2014
+
+
+%PROBLEM Exercício Descritivo
+
+
+Calcule: $a1 + a2 = $    
+
+%ANSWER
+
+$a1 + a2 = res$   pois ....
+
+
+class E97G40_soma_001(Exercise):
+   
+    def make_random(s):
+        
+        s.a1=ur.iunif(1,5)
+        s.a2=ur.iunif(1,5)
+                            
+            
+    def solve(s):
+        
+        s.res=s.a1 + s.a2
+        
+''')
+
+
+
+fs = r''' 
+
+\documentclass{article}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+
+{{put_here("E97G40_produto_escalar2_R2_008",ekey=10)}}
+
+{{put_here("E97G40_soma_001",ekey=10)}}
+
+\end{document}
+
+'''
+
+rowtemplate=r'''
+
+
+{{problem}}
+
+Resposta:
+
+{{answer}}
+
+'''
+
+
+
+meg.template_fromstring(fs,rowtemplate=r'{{problem}}\n{{answer}}')
+
+#meg.template_fromstring(fs)
 
 
 

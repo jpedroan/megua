@@ -48,6 +48,7 @@ import sqlite3 #for row objects as result from localstore.py
 import shutil
 import os
 import StringIO
+from random import sample
 #import codecs
 
 
@@ -608,7 +609,7 @@ class MegBook:
 
 
 
-    def put_here(self,owner_keystring, ekey=None, edict=None, elabel="NoLabel"):
+    def put_here(self,owner_keystring, ekey=None, edict=None, elabel="NoLabel", em=True):
         r"""
         Create an instance based on a template with key=owner_keystring.
         This routine is used on templates only.
@@ -619,6 +620,7 @@ class MegBook:
         - ``ekey`` -- random seed.
         - ``edict`` -- dictionary to be used after random initialization of ex parameters.
         - ``elabel`` -- to be used for "\label" or "\ref" in LaTeX.
+        - ``automc`` -- automatic multiple choice (chooses possibilities and prints them) (true ou false).
 
         OUTPUT:
             text string.
@@ -638,18 +640,60 @@ class MegBook:
         #Get summary, problem and answer and class_text
         ex_instance = exerciseinstance(row,ekey,edict)
 
-        #See template_create for template_row definition.
-        utxt = self.template_row.render(
+
+        problem = ex_instance.problem()
+        answer  = ex_instance.answer()
+
+
+        print "?================================"
+        print "ex_instance.has_multiplechoicetag"
+        print ex_instance.has_multiplechoicetag
+        print "?================================"
+
+        if ex_instance.has_multiplechoicetag and em:
+            
+            """
+               * cada exercicio E.M. pode ter mais que 4 opcoes: como fazer para selecionar ?
+                    * igual ao siacua: tirar 3 a sorte, das erradas (que podem ser so tres)
+                    * baralhar as opcoes
+            """
+            #create options and shuffle
+            wrong_options_len = len(ex_instance.all_choices)-1
+            wrong_options_set = sample(xrange(wrong_options_len),3)
+            options_list = [ to_unicode(ex_instance.all_choices[i+1]) for i in wrong_options_set ]
+
+            pos = randint(0,3)  
+            options_list.insert( pos, ex_instance.all_choices[0] )
+
+            utxt = self.template("em_question_template.tex",
+                exname=owner_keystring,
+                ekey=ekey,
+                problem  = to_unicode( problem ), 
+                option1  = options_list[0],
+                comment1 = "wrong" if pos!=0 else "correct",
+                option2  = options_list[1],
+                comment2 = "wrong" if pos!=1 else "correct",
+                option3  = options_list[2],
+                comment3 = "wrong" if pos!=2 else "correct",
+                option4  = options_list[3],
+                comment4 = "wrong" if pos!=3 else "correct",
+                answer   =  to_unicode( ex_instance.detailed_answer ),
+            )            
+
+
+        else:
+            #See template_create for template_row definition.
+            utxt = self.template_row.render(
                 exname=owner_keystring,
                 summary = to_unicode( ex_instance.summary() ), 
                 problemtemplate = to_unicode( ex_instance._problem_text ), 
                 answertemplate  = to_unicode( ex_instance._answer_text ), 
                 codetxt =  to_unicode( row['class_text'] ), 
-                problem =  to_unicode( ex_instance.problem() ), 
-                answer  =  to_unicode( ex_instance.answer() ),
+                problem =  to_unicode( problem ), 
+                answer  =  to_unicode( answer ),
                 elabel  =  elabel,
                 ekey = ekey
-            )
+                )
 
         return utxt
 
@@ -1097,7 +1141,7 @@ class MegBook:
     
 
     def getexercise(self,exname,ekey):
-        """Puts the contents of an exercise in memory"""
+        """Put the contents of an exercise in megbook variables."""
 
         #Create exercise instance
         row = self.megbook_store.get_classrow(exname)

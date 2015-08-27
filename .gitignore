@@ -3,4 +3,6 @@
 \.testoutput/
 \.vim
 mconfig.py
+*.aux
+*.log
 
