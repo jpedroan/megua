@@ -1,4 +1,6 @@
 
+readme
+======
 
 1. Esta pasta tem exemplos para teste das novas funções em megbook.py e ex.py (mais algum?)
 

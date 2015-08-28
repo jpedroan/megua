@@ -22,7 +22,7 @@ AUTHORS:
 #*****************************************************************************
   
 
-#Meg modules:
+#megua modules:
 from localstore import LocalStore,ExIter
 from ex import *
 from exerparse import exerc_parse
@@ -30,6 +30,7 @@ from xsphinx import SphinxExporter
 #from xair import AirExporter, BookmarkList
 from platex import pcompile
 from xsws import SWSExporter
+from xlatex import html2latex,latexcommentthis
 
 #Because sage.plot.plot.EMBEDDED_MODE
 #This variable indicates if notebook is present.
@@ -48,7 +49,7 @@ import sqlite3 #for row objects as result from localstore.py
 import shutil
 import os
 import StringIO
-from random import sample
+from random import sample,randint
 #import codecs
 
 
@@ -699,17 +700,11 @@ class MegBook:
 
 
     def template_fromstring(self,templatestring, ekey=None, rowtemplate=None,filename=None):
-        #Get unicode and make a jinja2 template
-        utxt = unicode(templatestring,'utf-8')
-        template = jinja2.Template(utxt)
-
-        #Create a new file for output
-        if not filename:
-            filename = os.path.join(SAGE_TMP,'modelo_out.tex')
-
-        self.template_create(filename, template, ekey, rowtemplate)
+        #Kept for compatibilty. See latex_document() below.
+        self.latex_document(latexdocument=templatestring, exercisetemplate=rowtemplate, ofilename=filename, ekey=ekey)
 
 
+    r""" Keep this until proven not needed.
     def template_fromfile(self,templefilename, ekey=None, rowtemplate=None):
 
         #Get template file and make a jinja2 template
@@ -726,18 +721,51 @@ class MegBook:
         ofilename = os.path.join(head,bname+'_out.tex')
 
         self.template_create(ofilename, template, ekey, rowtemplate)
+    """
 
 
-    def template_create(self,ofilename, template, ekey=None, rowtemplate=None):
-        #Another possibility: {{ put_here("E65D05_forwarddifference_001",ekey=10,meg.SUMMARY|meg.PROBLEM|meg.ANSWER|meg.CODE) }}
-        #http://jinja.pocoo.org/docs/templates/#assignments
+    def latex_document(self, latexdocument, exercisetemplate=None, ofilename=None, ekey=None):
+        r"""
+        Create LaTeX documents. Exercises are obtained with  `{{ put_here(...) }}` commands.
+
+        INPUT:
+
+        - ``latexdocument``: (string) contains the LaTeX to be compiled. Each exercise is obtained from database with `{{ put_here(...) }}` commands.
+
+        - ``exercisetemplate``: (string) defines how and what is to be shown from each exercise.
+
+        - ``ofilename``: (string) output filename (some .tex filename)
+
+        - ``ekey``: if `{{ put_here(...) }}`` commands do not mention ekey then generate ekeys setting this. 
+
+        EXAMPLE:
+
+            sage: ltdoc = r'''\documentclass{article} ....  {{ put_here("E12X34_soma_001",10) }} ....'''
+            sage: meg.latex_document(ltdoc)
+
+        NOTES:
+        
+            - Another possibility: {{ put_here("E65D05_forwarddifference_001",ekey=10,meg.SUMMARY|meg.PROBLEM|meg.ANSWER|meg.CODE) }}
+
+            - http://jinja.pocoo.org/docs/templates/#assignments
+
+        """
+
+
+        #Get unicode and make a jinja2 template
+        utxt = unicode(latexdocument,'utf-8')
+        template = jinja2.Template(utxt)
+
+        #Create a new file for output
+        if not ofilename:
+            ofilename = os.path.join(SAGE_TMP,'modelo_out.tex')
 
         #Set seed
         if ekey:
             ur.set_seed(ekey)
 
         #Render output using the given template for each exercise.
-        if rowtemplate is None:
+        if exercisetemplate is None:
             try:
                 self.template_row = self.env.get_template("row_template.tex")
             except jinja2.exceptions.TemplateNotFound:
@@ -745,10 +773,10 @@ class MegBook:
         else:
             #Check or convert rowtemplate to unicode
             try:
-                self.rowtemplate = unicode(rowtemplate,'utf-8')
+                self.rowtemplate = unicode(exercisetemplate,'utf-8')
             except TypeError:
-                self.rowtemplate = rowtemplate
-            self.template_row = jinja2.Template(rowtemplate)
+                self.rowtemplate = exercisetemplate
+            self.template_row = jinja2.Template(exercisetemplate)
 
 
         #Create a latex string s ready to compile.
@@ -798,7 +826,7 @@ class MegBook:
 
             print "Compile using:   pdflatex %s" % ofilename
             os.system("pdflatex %s" % ofilename)
-            shutil.copy(ofilename,'.')
+            #What for: shutil.copy(ofilename,'.')
 
 
 
@@ -1038,7 +1066,7 @@ class MegBook:
         n = len(problem_list)
         paired_list = []
         #print random.__module__
-        rn = randomlib.randint(0,10**5) #if user did not supplied an ekey.
+        rn = randint(0,10**5) #if user did not supplied an ekey.
         while i < (n-1):
             if type(problem_list[i])==str and type(problem_list[i+1])==str: #two problems
                 paired_list.append( (problem_list[i], rn) ) 
@@ -1065,7 +1093,7 @@ class MegBook:
             #Create and print the instance
             ex_instance = exerciseinstance(row, int(ekey) )
 
-            summary =  ex_instance.summary() 
+            summary =  ex_instance.summary()
             problem = ex_instance.problem()
             answer = ex_instance.answer()
             problem_name =  ex_instance.name
@@ -1080,11 +1108,11 @@ class MegBook:
             #TODO: this lines are a copy of code in "siacua()".
             if ex_instance.has_multiplechoicetag:
                 if ex_instance.image_list != []:
-                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in self._siacua_answer_frominstance(ex_instance)]
+                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
                 else:
-                    answer_list = self._siacua_answer_frominstance(ex_instance)
+                    answer_list = ex_instance.collect_options_and_answer()
             else:
-                answer_list = self._siacua_answer_extract(answer)
+                answer_list = ex_instance.answer_extract_options()
 
 
             #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
@@ -1098,7 +1126,7 @@ class MegBook:
                     wrongtext1=html2latex(answer_list[1]),
                     wrongtext2=html2latex(answer_list[2]),
                     wrongtext3=html2latex(answer_list[3]),
-                    summtxt=self._latexcommentthis(summary),
+                    summtxt=latexcommentthis(summary),
                     detailedanswer=latexcommentthis(html2latex(answer_list[4])) 
                       #expected at position 4 the full answer.
             )
@@ -1164,6 +1192,19 @@ class MegBook:
     def getoption(self,pos):
         return self.c_allchoices[pos]
 
+
+    def _adjust_images_url(self, input_text):
+        #This is a clone of the MegBookWeb function.
+        #Check that for changes.
+        """the url in problem() and answer() is <img src='images/filename.png'>
+        Here we replace images/ by the public dropbox folder"""
+
+        target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
+        img_pattern = re.compile(r"src='images/", re.DOTALL|re.UNICODE)
+
+        (new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
+        #print "===> Replacement for %d url images." % number
+        return new_text
 
 
 #end class MegBook
