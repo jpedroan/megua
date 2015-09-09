@@ -646,10 +646,10 @@ class MegBook:
         answer  = ex_instance.answer()
 
 
-        print "?================================"
-        print "ex_instance.has_multiplechoicetag"
-        print ex_instance.has_multiplechoicetag
-        print "?================================"
+        #print "?================================"
+        #print "ex_instance.has_multiplechoicetag"
+        #print ex_instance.has_multiplechoicetag
+        #print "?================================"
 
         if ex_instance.has_multiplechoicetag and em:
             
