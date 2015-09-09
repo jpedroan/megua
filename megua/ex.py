@@ -217,7 +217,8 @@ class Exercise:
         Use class text self._answer_text and replace for parameters on dictionary. Nothing is saved.
         """
         text1 = parameter_change(self._answer_text,self.__dict__)
-        return self._change_text(text1)
+        self.c_answer = self._change_text(text1)
+        return self.c_answer
 
 
     def _change_text(self,text1):
@@ -526,7 +527,7 @@ class Exercise:
 
         #Collects all <choice>...</choice> pairs
         match_iter = re.finditer(choice_pattern,choice_text) #create an iterator
-        self.all_choices = [ "<center>"+match.group(1)+"</center>" for match in match_iter]
+        self.all_choices = [ match.group(1) for match in match_iter] #TODO: do this better
         #print "=========================="
         #print self.all_choices
         #print "=========================="
@@ -535,11 +536,39 @@ class Exercise:
         #Find detailed answer and save it
         self.detailed_answer = input_text[choices_match.end():].strip("\t\n ")
         #print "=========================="
+        #print "Detailed answer"
         #print self.detailed_answer
         #print "=========================="
 
         #For sending it's important to know where options are stored.
         self.has_multiplechoicetag = True
+
+
+    def collect_options_and_answer(self):
+        r"""
+        This routine applies when using <multiplechoice>...</multiplechoice>.
+        """
+        #Elements must be in same order as in function "_siacua_answer_extract"
+        centered_all_choices = [ "<center>"+choice+"</center>" for choice in self.all_choices]
+        l = centered_all_choices + [self.detailed_answer] #join two lists
+
+        if len(l)<5:
+            raise NameError('Missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
+
+        #print "==========="
+        #print "For _siacua_answer:",l
+        #print "=========="
+        return l
+
+    def answer_extract_options(self):
+        r"""
+        Does the parsing of answer to extract options and complete answer.
+        This routine applies when using moodle template with CDATA.
+        """
+        l = re.findall('<!\[CDATA\[(.*?)\]\]>', self.c_answer, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
+        if len(l)<5:
+            raise NameError('Missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
+        return l
 
 
 

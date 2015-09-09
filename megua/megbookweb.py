@@ -33,6 +33,7 @@ from xmoodle import MoodleExporter
 from xsphinx import SphinxExporter
 from xlatex import PDFLaTeXExporter
 from mconfig import *
+from xlatex import *
 
 
 #TODO Is it necessary to import other libs?
@@ -291,6 +292,100 @@ class MegBookWeb(MegBookBase):
         MoodleExporter(self, where, debug)  
 
 
+    def siacuapreview(self,exname,ekeys=[]):
+        r"""
+
+        INPUT:
+
+        - ``exname``: problem name (name in "class E12X34_something_001(Exercise):").
+
+        - ``ekeys``: list of numbers that generate the same problem instance.
+
+        OUTPUT:
+
+        - this command writes an html file with all instances.
+
+        NOTE:
+
+        - you can export between 3 and 6 wrong options and 1 right.
+
+        EXAMPLE:
+
+            sage: meg.siacuapreview(exname="E12X34",ekeys=[1,2,5])
+
+
+        Algorithm:
+            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
+
+        """
+
+        #Create exercise instance
+        row = self.megbook_store.get_classrow(exname)
+        if not row:
+            print "Exercise %s not found." % exname
+            return
+
+        (concept_dict,concept_list) = self._siacua_extract(row['summary_text'])
+
+        self.siacuaoption_template = self.env.get_template("siacuapreview_option.html")
+
+        allexercises = u''
+
+        for e_number in ekeys:
+
+            #Create exercise instance
+            ex_instance = exerciseinstance(row, ekey=e_number)
+
+            problem = ex_instance.problem()
+            answer = ex_instance.answer()
+    
+            #Adapt for appropriate URL for images
+            #if ex_instance.image_list != []:
+            #    problem = self._adjust_images_url(problem)
+            #    answer = self._adjust_images_url(answer)
+            #    self.send_images()
+    
+            #TODO: pass this to ex.py
+            if ex_instance.has_multiplechoicetag:
+                answer_list = ex_instance.collect_options_and_answer()
+            else:
+                print ex_instance.name,"has [CDATA] field. Please change to <showone> ... </showone> markers."
+                answer_list = ex_instance.answer_extract_options()
+
+            all_options = u'<table style="width:100%;">\n'
+
+            for a in answer_list[:-1]:
+                option_html = self.siacuaoption_template.render(optiontext=a)
+                all_options += option_html
+            
+            all_options += u'</table>\n'
+
+            ex_text = u'<h3>Concretizac\xe3o: ekey=' + str(e_number) + '</h3>'
+            ex_text += problem + '<br/>'
+            ex_text += all_options 
+            ex_text += answer_list[-1]
+
+            #Add one more instance with ekey
+            allexercises += ex_text
+
+        self.siacuapreview_header = self.env.get_template("siacuapreview_header.html")
+
+        all_html = self.siacuapreview_header.render(
+                exname = exname,
+                allexercises = allexercises
+            )
+
+
+        #write all to an html file.
+        f = codecs.open(exname+'.html', mode='w', encoding='utf-8')
+        f.write(all_html)
+        f.close()
+
+        os.system("rm *.tex")	
+
+
+
+
     def siacua(self,exname,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0):
         r"""
 
@@ -371,12 +466,12 @@ class MegBookWeb(MegBookBase):
             #TODO: pass this to ex.py
             if ex_instance.has_multiplechoicetag:
                 if ex_instance.image_list != []:
-                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in self._siacua_answer_frominstance(ex_instance)]
+                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
                 else:
-                    answer_list = self._siacua_answer_frominstance(ex_instance)
+                    answer_list = ex_instance.collect_options_and_answer()
             else:
                 print ex_instance.name,"has [CDATA] field. Please change to <showone> ... </showone> markers."
-                answer_list = self._siacua_answer_extract(answer)
+                answer_list = ex_instance.answer_extract_options()
 
             #Create images for graphics (if they exist) 
                 #for problem
@@ -463,34 +558,6 @@ class MegBookWeb(MegBookBase):
             return [start + i for i in range(many)]
         else:
             return ekeys
-
-    def _siacua_answer_extract(self,answer_text):
-        r"""
-        Does the parsing of answer to extract options and complete answer.
-        This routine applies when using moodle template with CDATA.
-        """
-        l = re.findall('<!\[CDATA\[(.*?)\]\]>', answer_text, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
-        if len(l)<5:
-            raise NameError('Missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
-        return l
-
-
-    def _siacua_answer_frominstance(self,ex):
-        r"""
-        This routine applies when using <multiplechoice>...</multiplechoice>.
-        """
-        #Elements must be in same order as in function "_siacua_answer_extract"
-        l = ex.all_choices + [ex.detailed_answer] #join two lists
-
-        if len(l)<5:
-            raise NameError('Missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
-
-        #print "==========="
-        #print "For _siacua_answer:",l
-        #print "=========="
-        return l
-
-
 
 
     def _siacua_json(self,course, exname, e_number, problem, answer_list,concept_list):
@@ -1046,9 +1113,9 @@ class MegBookWeb(MegBookBase):
                 if ex_instance.image_list != []:
                     answer_list = [self._adjust_images_url(choicetxt) for choicetxt in self._siacua_answer_frominstance(ex_instance)]
                 else:
-                    answer_list = self._siacua_answer_frominstance(ex_instance)
+                    answer_list = ex_instance.collect_options_and_answer()
             else:
-                answer_list = self._siacua_answer_extract(answer)
+                answer_list = ex_instance.answer_extract_options()
 
 
             #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
@@ -1186,11 +1253,11 @@ class MegBookWeb(MegBookBase):
             #TODO: this lines are a copy of code in "siacua()".
             if ex_instance.has_multiplechoicetag:
                 if ex_instance.image_list != []:
-                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in self._siacua_answer_frominstance(ex_instance)]
+                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
                 else:
-                    answer_list = self._siacua_answer_frominstance(ex_instance)
+                    answer_list = ex_instance.collect_options_and_answer()
             else:
-                answer_list = self._siacua_answer_extract(answer)
+                answer_list = ex_instance.answer_extract_options()
 
 
             #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
@@ -1287,86 +1354,38 @@ class MegBookWeb(MegBookBase):
 
 
 
-def latexcommentthis(txt):
-    """Put % signs in each line"""
-    txt += '\n' #assure last line has "\n"
-    tlist = re.findall('(.*?)\n', txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
-    return '\n'.join( [ '%'+t for t in tlist] ) + '\n'
+
+    def to_latex(self,problem_name):
+        r"""
+        Generates a tex file ready in standard LaTeX to put in a thesis.
+
+        INPUT:
         
+        - `problem_name`: problem name.
+
+        #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
+        """
+
+        ofile = codecs.open(exercise_latex.html, mode='w', encoding='utf-8')
+
+        #amc template without groups for each question
+        exercise_text = u'<html>\n<body>\n\n'
+        exercise_text += u'meg.save(r"""\n'
+
+        #Get summary, problem and answer and class_text
+        row = self.megbook_store.get_classrow(problem_name)
+        if not row:
+            print "meg.to_latex(): %s cannot be accessed on database" % problem_name
+            return
 
 
-def latexunderscore(txt):
-    """Put \_  in each underscore"""
-    return re.subn("_","\_",txt)[0]
 
-def equation2display(txt):
-    """Put \displaystyle\$  in each $$"""
-    return re.subn(r"\$\$(.*?)\$\$",r"$\displaystyle \1$",txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
-        
+        exercise_text += u'""")\n'
+        exercise_text += u'</body>\n</html>\n'
 
+        ofile.write(html_string)
+        ofile.close()
 
-
-def html2latex(htmltext):
-    r"""
-    Replace:
-
-    * \n\n\n by \n\n (reduce to much blank lines);
-    * <p> by \n\n; </p> by empty string;
-    * <center> by \n\n; </center> by empty string;
-    """
-
-    #No groups, direct replacements
-    lr = [  (ur'(\d)%', ur'\1\%'),  # 3% --> 3\%
-            (ur'(\d) %', ur'\1\%'),  # 3 % --> 3\%
-            (ur'<br>', '\n\n'),
-            (ur'<p>', '\n\n'),
-            (ur'</p>', '\n'),
-            (ur'<ul>', ur'\\begin{itemize}'),
-            (ur'</ul>', ur'\\end{itemize}'),
-            (ur'<ol>', ur'\\begin{enumerate}'),
-            (ur'</ol>', ur'\\end{enumerate}'),
-            (ur'<li>', ur'\\item '),    
-            (ur'</li>', '\n\n'),    
-            (ur'<center>', '\n\n'),
-            (ur'</center>', '\n'),
-            (ur'<style>(.*?)</style>', '\n'),
-            (ur'<pre>(.*?)</pre>',ur'\n%Falta colocar linhas vazias em baixo\n\\begin{alltt}\n\1\n\\end{alltt}\n\n'), 
-        ]
-
-    newtext = htmltext
-    for pr in lr:
-        (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
-
-    #Convert from <table> to \begin{tabular}
-    newtext = table2tabular(newtext)
-    
-
-    #Removing spaces and lots of blank lines.
-    nr = 1
-    while nr >= 1:
-        (newtext, nr) = re.subn('\n\n\n', '\n\n', newtext, count=0, flags=re.UNICODE)
-        #print "html2latex():", nr
-
-    return newtext
-
-
-def table2tabular(text):
-    r"""Convert <table>...</table> to \begin{tabular} ... \end{tabular}"""
-
-    lista = [
-            (ur'<table(.*?)>', ur'\n\n\\begin{tabular}{...}\n'),
-            (ur'</table>', ur'\n\end{tabular}\n'),
-            (ur'<tr(.*?)>', ur'\n'),
-            (ur'</tr>', ur' \\\\ \hline\n'), 
-            (ur'<td(.*?)>', ' '),
-            (ur'</td>', ' & '),
-        ]
-
-    newtext = text
-    for pr in lista:
-        (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
-    
-    return newtext
 
 
 
