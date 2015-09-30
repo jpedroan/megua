@@ -187,6 +187,101 @@ class E34A30_FatorIntegrante_002(Exercise):
 ''')
 
 
+
+
+meg.save(r'''
+
+%SUMMARY Equações e inequações; Equações lineares
+Resolução de equações lineares numa variável. 97H30 Equations and inequalities
+Equação do tipo ax+b=c. Resolução e princípios de equivalência
+
+
+Palavras chave: equação de 1º grau, princípios de equivalência, equação linear com uma incógnita
+
+
+
+%PROBLEM Princípios de equivalência 
+
+
+
+Considere a equação
+\[
+eq1=eq2
+\]
+
+Indica o conjunto-solução da equação dada. 
+    
+<multiplechoice>
+<choice> $$\displaystyle \left\{acd1\right\}$$ </choice>
+<choice> $$\displaystyle \left\{acd2\right\}$$ </choice>
+<choice> $$\displaystyle \left\{acd3\right\}$$ </choice>
+<choice> $$\displaystyle \left\{acd4\right\}$$ </choice>
+</multiplechoice>
+
+   
+ 
+
+
+%ANSWER
+
+Vamos separar os termos com incógnita do termo independente, adicionando a ambos os membros da equação $a2$:
+    \[
+   eq1=eq2 \Leftrightarrow eq1+a2@()=eq2+a2@() \Leftrightarrow ina1\,x=a1
+    \]
+Aplicamos agora o segundo princípio de equivalência, multiplicando ambos os membros da equação $\displaystyle ina1\,x=a1$ por $\displaystyle ac1$:
+    \[
+    ac1 \times (ina1\,x)=ac1 \times a1@()\Leftrightarrow x=acd1
+    \]
+    A solução da equação $\displaystyle eq1=eq2$ é $\displaystyle x=acd1$, ou, o conjunto solução da equação é $\displaystyle \left\{acd1\right\}$.
+   
+    A opção correta é $\displaystyle \left\{acd1\right\}$.
+
+
+
+class E97H30_SP_LinearEquations_001(Exercise):
+    #neste exercicio resolvem-se equações de 1º grau e aplicam-se os princípios de equivalência
+    def make_random(s):
+        x=var('x')
+        y=var('y')
+        s.ina1=ur.iunif_nonset(-10,10,[0,1])
+        s.inb1=ur.iunif_nonset(-10,10,[0])
+        s.ind1=ur.iunif_nonset(-10,10,[0])
+        s.a1=s.ind1-s.inb1
+        if s.ind1==s.inb1 or s.ina1^2==s.a1^2 or s.ina1^2==s.ind1^2-s.inb1^2:
+            s.ind1=11
+        
+        
+    def solve(s):
+        #Define o 1º e o 2º membro da equação
+        s.eq1=s.ina1*x+s.inb1
+        s.eq2=s.ind1
+        
+        
+        #resoluçao 
+        s.ac1=1/s.ina1
+        s.ac2=1/s.a1
+        s.a2=-s.inb1
+        s.a3=s.ind1+s.inb1
+        s.a4=s.inb1-s.ind1
+        
+   
+        
+        #resposta correta
+        s.acd1=s.ac1*s.a1
+        
+        #escolha multipla 2
+        s.acd2=s.ac1*s.a3
+        
+        #escolha multipla 3
+        s.acd3=s.ac1*s.a4
+        
+        #escolha multipla 4
+        s.acd4=s.ac2*s.ina1
+''')
+
+
+
+
 meg.save(r'''
 
 %SUMMARY Espaço vetorial e Referenciais Ortonormados; Produto escalar entre vetores
@@ -424,6 +519,11 @@ ltdoc = r'''
 {{put_here("E97G40_produto_escalar2_R2_008",ekey=10)}}
 
 \noindent\textbf{Exercício 3}
+
+{{put_here("E97H30_SP_LinearEquations_001",ekey=10)}}
+
+
+\noindent\textbf{Exercício 4}
 
 {{put_here("E97G40_soma_001",ekey=10)}}
 

@@ -651,11 +651,18 @@ class MegBook:
                 return "% TODO: CDATA is present."
 
             #Find and extract text inside <multiplechoice>...</multiplechoice>
-            new_text = re.sub(
+            m = re.search(
                 r'<\s*multiplechoice\s*>(.+?)<\s*/multiplechoice\s*>', 
-                r'% no more <multiplechoice> tag here',
-                input_text, re.DOTALL|re.UNICODE)
-        
+                input_text, 
+                re.DOTALL|re.UNICODE)
+    
+            #TODO: command re.sub does not work in here above to replace at once. 
+            #Only re.search (and re.finditer) works!
+            if m:
+                new_text = input_text[:m.start()] + input_text[m.end()+1:]
+            else:
+                new_text = input_text
+
             return new_text
 
         problem = remove_multiplechoicetag(ex_instance.problem())
