@@ -544,6 +544,7 @@ class Exercise:
         self.has_multiplechoicetag = True
 
 
+
     def collect_options_and_answer(self):
         r"""
         This routine applies when using <multiplechoice>...</multiplechoice>.

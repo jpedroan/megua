@@ -641,9 +641,25 @@ class MegBook:
         #Get summary, problem and answer and class_text
         ex_instance = exerciseinstance(row,ekey,edict)
 
+        #this function is builtin:        
+        def remove_multiplechoicetag(input_text):
+            """When <multiplechoice>...</multiplecoice> removes it from input_text.
+            It returns the text but no changes are made in fields.
+            """
+    
+            if "CDATA" in input_text:
+                return "% TODO: CDATA is present."
 
-        problem = ex_instance.problem()
-        answer  = ex_instance.answer()
+            #Find and extract text inside <multiplechoice>...</multiplechoice>
+            new_text = re.sub(
+                r'<\s*multiplechoice\s*>(.+?)<\s*/multiplechoice\s*>', 
+                r'% no more <multiplechoice> tag here',
+                input_text, re.DOTALL|re.UNICODE)
+        
+            return new_text
+
+        problem = remove_multiplechoicetag(ex_instance.problem())
+        answer  = remove_multiplechoicetag(ex_instance.answer())
 
 
         #print "?================================"
@@ -671,13 +687,13 @@ class MegBook:
                 ekey=ekey,
                 problem  = to_unicode( problem ), 
                 option1  = options_list[0],
-                comment1 = "wrong" if pos!=0 else "correct",
+                comment1 = "wrong option:" if pos!=0 else "correct option:",
                 option2  = options_list[1],
-                comment2 = "wrong" if pos!=1 else "correct",
+                comment2 = "wrong option:" if pos!=1 else "correct option:",
                 option3  = options_list[2],
-                comment3 = "wrong" if pos!=2 else "correct",
+                comment3 = "wrong option:" if pos!=2 else "correct option:",
                 option4  = options_list[3],
-                comment4 = "wrong" if pos!=3 else "correct",
+                comment4 = "wrong option:" if pos!=3 else "correct option:",
                 answer   =  to_unicode( ex_instance.detailed_answer ),
             )            
 

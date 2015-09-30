@@ -12,23 +12,28 @@
 \begin{itemize}
 
 % {{ comment1 }}
-\item {{ option1 }}  
+\item[$\Box$] {{ option1 }}  
 
 % {{ comment2 }}
-\item {{ option2 }}
+\item[$\Box$] {{ option2 }}
 
 % {{ comment3 }}
-\item {{ option3 }}
+\item[$\Box$] {{ option3 }}
 
 % {{ comment4 }}
-\item {{ option4 }}
+\item[$\Box$] {{ option4 }}
 
 \end{itemize}
+
+{% if answer %}
+
+\bigskip
 
 \noindent\textbf{Resolução}
 
 {{ answer }}
 
+{% endif %}
 
 %Fim do "{{ exname }}"
 

@@ -394,6 +394,7 @@ class E97G40_soma_001(Exercise):
 
 
 
+
 # =================================================
 # Documento em LaTeX (exame, caderno de exercícios)
 # =================================================
@@ -456,5 +457,5 @@ meg.latex_document(ltdoc,exercisetemplate=exercisetemplate)
 # Documento em LaTeX para AMC
 # ===========================
 
-meg.amc(["E34A30_FatorIntegrante_002",10,"E97G40_produto_escalar2_R2_008",20])
+#meg.amc(["E34A30_FatorIntegrante_002",10,"E97G40_produto_escalar2_R2_008",20])
 
