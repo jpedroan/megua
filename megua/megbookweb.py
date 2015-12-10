@@ -386,7 +386,7 @@ class MegBookWeb(MegBookBase):
 
 
 
-    def siacua(self,exname,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0):
+    def siacua(self,exname,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
         r"""
 
         INPUT:
@@ -480,7 +480,7 @@ class MegBookWeb(MegBookBase):
 
             #build json string
             send_dict =  self._siacua_json(course, exname, e_number, problem, answer_list, concept_list)
-            send_dict.update(dict({'usernamesiacua': usernamesiacua, 'grid2x2': grid2x2}))
+            send_dict.update(dict({'usernamesiacua': usernamesiacua, 'grid2x2': grid2x2, 'siacuatest': siacuatest}))
             send_dict.update(concept_dict)
 
             #Call siacua for store.
@@ -530,7 +530,10 @@ class MegBookWeb(MegBookBase):
     def _siacua_send(self, send_dict):
         params = urllib.urlencode(send_dict)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-        conn = httplib.HTTPConnection("siacua.web.ua.pt")
+        if send_dict["siacuatest"]:
+            conn = httplib.HTTPConnection("siacuatest.web.ua.pt")
+        else:  
+            conn = httplib.HTTPConnection("siacua.web.ua.pt")
         conn.request("POST", "/MeguaInsert.aspx", params, headers)
         response = conn.getresponse()
         #TODO: improve message to user.
