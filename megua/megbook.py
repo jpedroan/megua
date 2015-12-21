@@ -641,32 +641,8 @@ class MegBook:
         #Get summary, problem and answer and class_text
         ex_instance = exerciseinstance(row,ekey,edict)
 
-        #this function is builtin:        
-        def remove_multiplechoicetag(input_text):
-            """When <multiplechoice>...</multiplecoice> removes it from input_text.
-            It returns the text but no changes are made in fields.
-            """
-    
-            if "CDATA" in input_text:
-                return "% TODO: CDATA is present."
-
-            #Find and extract text inside <multiplechoice>...</multiplechoice>
-            m = re.search(
-                r'<\s*multiplechoice\s*>(.+?)<\s*/multiplechoice\s*>', 
-                input_text, 
-                re.DOTALL|re.UNICODE)
-    
-            #TODO: command re.sub does not work in here above to replace at once. 
-            #Only re.search (and re.finditer) works!
-            if m:
-                new_text = input_text[:m.start()] + input_text[m.end()+1:]
-            else:
-                new_text = input_text
-
-            return new_text
-
-        problem = remove_multiplechoicetag(ex_instance.problem())
-        answer  = remove_multiplechoicetag(ex_instance.answer())
+        problem = ex_instance.problem(removemultitag=True)
+        answer  = ex_instance.answer(removemultitag=True)
 
 
         #print "?================================"
