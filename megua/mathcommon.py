@@ -162,7 +162,7 @@ def _LOG_latex(fun,x,base=None):
         return r'\log_{%s}\left(%s\right)' % (latex(base),latex(x))    
 
 x,b=SR.var('x,b')
-LOG_ = function('logb', x, b, print_latex_func=_LOG_latex)
+LOG_ = function('logb')(x, b, print_latex_func=_LOG_latex)
 
 
 def logb(x,base=e,factorize=False):
