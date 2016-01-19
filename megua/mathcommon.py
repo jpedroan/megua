@@ -5,6 +5,7 @@ AUTHORS:
 
 - Pedro Cruz (2010-06): initial version
 - Pedro Cruz (2013-11): added logb (and this module is now imported in ex.py)
+- Pedro Cruz (2016-01): changed for new formal functions sagemath standard.
 
 """
 
@@ -15,7 +16,7 @@ AUTHORS:
 #  Distributed under the terms of the GNU General Public License (GPL)
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
-  
+
 
 r"""
 Must import everything from sage.all::
@@ -24,7 +25,7 @@ Must import everything from sage.all::
 
 Avoiding this is impossible. For example::
 
-      from sage.rings.real_double import RDF 
+      from sage.rings.real_double import RDF
 
 does not work.
 
@@ -153,20 +154,26 @@ def to_unicode(s):
 # log for "high school"
 #=======================
 
-def _LOG_latex(fun,x,base=None):
+def FORMALLOG_latex(fun,x,base=None):
     if base==e or base is None:
         return r'\ln\left(%s\right)' % latex(x)
     elif base==10:
         return r'\log\left(%s\right)' % latex(x)
     else:
-        return r'\log_{%s}\left(%s\right)' % (latex(base),latex(x))    
+        return r'\log_{%s}\left(%s\right)' % (latex(base),latex(x))
 
 x,b=SR.var('x,b')
-LOG_ = function('logb')(x, b, print_latex_func=_LOG_latex)
+FORMALLOG = function('logb',nargs=2, print_latex_func=FORMALLOG_latex)
+#Two arguments: x and base.
 
 
 def logb(x,base=e,factorize=False):
-    r"""logb is an alternative to ``log`` from Sage. 
+    r"""
+    This is a procedure that decides to compute or to print a logarithm in any base.
+    
+    (logb is an alternative to ``log`` from Sage.)
+    
+    After calling `logb()` several objects could be returned including the `FORMALLOG` formal log function.
 
     This version keeps the base because ``log(105,base=10)`` is transformed by Sage (and many others CAS) 
     into ``log(105)/log(10)`` and sometimes this is not what we want to see as a result. 
@@ -200,14 +207,14 @@ def logb(x,base=e,factorize=False):
         0
         sage: logb(e,base=10)
         logb(e, 10)
-        sage: logb(10,base=e) 
-        logb(10, e) 
-        sage: logb(sqrt(105)) 
+        sage: logb(10,base=e)
+        logb(10, e)
+        sage: logb(sqrt(105))
         logb(sqrt(105), e) 
         sage: logb(5,base=e)
-        logb(5, e)     
+        logb(5, e)
         sage: logb(e^2,base=e)
-        2   
+        2
         sage: logb(0,base=10)
         -Infinity
 
@@ -250,10 +257,10 @@ def logb(x,base=e,factorize=False):
         if factorize:
             F = factor(x)
         if factorize and type(F) == sage.structure.factorization_integer.IntegerFactorization:
-            l = [ factor_exponent * LOG_(x=factor_base,b=base) for (factor_base,factor_exponent) in F ]
+            l = [ factor_exponent * FORMALLOG(factor_base,base) for (factor_base,factor_exponent) in F ]
             return add(l) 
         else:
-            return LOG_(x=x,b=base)
+            return FORMALLOG(x,base)
 
 
 #=======================
@@ -269,7 +276,8 @@ def _POW_latex(fun,basev,expv):
         return r'%s^{%s}' % (latex(basev),latex(expv))    
 
 bv,ev=SR.var('bv,ev')
-POW_ = function('powb', bv, ev, print_latex_func=_POW_latex)
+#FORMALPOW = function('powb', bv, ev, print_latex_func=_POW_latex)
+FORMALPOW = function('powb', nargs=2, print_latex_func=_POW_latex)
 
 def powb(basev,expv):
     r"""powb is an alternative to ``^`` from Sage that preserves ^ in latex.
@@ -303,7 +311,7 @@ def powb(basev,expv):
     elif basev==1:
         return 1
     else:
-        return POW_(bv=basev,ev=expv)
+        return FORMALPOW(basev,expv)
 
 
 #=======================
@@ -317,7 +325,8 @@ def _FACT_latex(fun,x):
 
 # x=SR.var('x')  see above.
 #inerte: does not calulate factorial, only put "!".
-FACT_ = function('factb', x, print_latex_func=_FACT_latex)
+#FACT_ = function('factb', x, print_latex_func=_FACT_latex)
+FORMALFACT = function('factb', nargs=1, print_latex_func=_FACT_latex)
 
 
 def factb(xv):
@@ -349,7 +358,7 @@ def factb(xv):
         \frac{120}{5!}
 
     """
-    return FACT_(x=xv)
+    return FORMALFACT(xv)
 
 
 # =========

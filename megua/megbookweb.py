@@ -208,9 +208,16 @@ class MegBookWeb(MegBookBase):
         #f = open(sname+'.html','w')
         #f.write(html_string.encode('latin1'))
         #f.close()
+
+        #For megua 5.2
         f = codecs.open(sname+'.html', mode='w', encoding='utf-8')
         f.write(html_string)
         f.close()
+        
+        salvus.file(sname+'.html')
+        
+        salvus.html(html_string)
+        
 
         #To be used on sphinx
         #TODO: move this somewhere.

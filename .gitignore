@@ -6,5 +6,5 @@ mconfig.py
 *.aux
 *.log
 build
-.spkg-install*
-
+*.sage-chat
+*.sage-history
