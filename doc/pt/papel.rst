@@ -10,7 +10,7 @@ Exercícios em papel
 Os exercícios em papel têm características diferentes dos exercícios para 
 a :ref:`web <websection>` entre as quais salientamos:
 
-* A linguagem é estritamente LaTeX (não se usa HTML, como para os exercícios para a :ref:`web <websection>`).
+* Usa-se o LaTeX para descrever os exercícios (não se usa HTML, como para os exercícios para a :ref:`web <websection>`).
 * Cada ``worksheet`` (tal como no caso web) contém um exercício.
 
 Já com uma base de dados construída, é depois possível:
