@@ -205,19 +205,33 @@ class Exercise:
         """
         return parameter_change(self._summary_text,self.__dict__)
 
-    def problem(self):
+    def problem(self,removemultitag=False):
         """
-        Use class text self._problem_text and replace for parameters on dictionary. Nothing is saved.
-        """
-        text1 = parameter_change(self._problem_text,self.__dict__)
-        return self._change_text(text1)
+        Use class text self._problem_text and replace for parameters on dictionary. 
+        Nothing is saved.
 
-    def answer(self):
+        If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
         """
-        Use class text self._answer_text and replace for parameters on dictionary. Nothing is saved.
+        if removemultitag:
+            text1 = self.remove_multiplechoicetag(self._problem_text)
+        else:
+            text1 = self._problem_text
+        text2 = parameter_change(text1,self.__dict__)
+        return self._change_text(text2)
+
+    def answer(self,removemultitag=False):
         """
-        text1 = parameter_change(self._answer_text,self.__dict__)
-        self.c_answer = self._change_text(text1)
+        Use class text self._answer_text and replace for parameters on dictionary. 
+        Nothing is saved.
+
+        If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
+        """
+        if removemultitag:
+            text1 = self.remove_multiplechoicetag(self._answer_text)
+        else:
+            text1 = self._answer_text
+        text2 = parameter_change(text1,self.__dict__)
+        self.c_answer = self._change_text(text2)
         return self.c_answer
 
 
@@ -543,7 +557,28 @@ class Exercise:
         #For sending it's important to know where options are stored.
         self.has_multiplechoicetag = True
 
+    def remove_multiplechoicetag(input_text):
+        """When <multiplechoice>...</multiplecoice> removes it from input_text.
+        It returns the text but no changes are made in fields.
+        """
 
+        if "CDATA" in input_text:
+            return "% TODO: CDATA is present."
+
+        #Find and extract text inside <multiplechoice>...</multiplechoice>
+        m = re.search(
+            r'<\s*multiplechoice\s*>(.+?)<\s*/multiplechoice\s*>', 
+            input_text, 
+            re.DOTALL|re.UNICODE)
+
+        #TODO: command re.sub does not work in here above to replace at once. 
+        #Only re.search (and re.finditer) works!
+        if m:
+            new_text = input_text[:m.start()] + input_text[m.end()+1:]
+        else:
+            new_text = input_text
+
+        return new_text
 
     def collect_options_and_answer(self):
         r"""

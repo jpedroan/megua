@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Guia Curto &mdash; Documentação MEGUA For Sage5.2</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'For Sage5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <link rel="top" title="Documentação MEGUA For Sage5.2" href="index.html" />
+    <link rel="next" title="Sage Mathematics" href="sagemath.html" />
+    <link rel="prev" title="Tutorial do MEGUA 0.2" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="guia-curto">
+<h1>Guia Curto<a class="headerlink" href="#guia-curto" title="Link permanente para este título">¶</a></h1>
+<p>Apresentamos um guia para as etapas principais da construção de um exercício <a class="reference external" href="http://www.priberam.pt/dlpo/parametrizado">parametrizado</a>.</p>
+<div class="section" id="fase-teorica-e-criativa">
+<h2>Fase teórica e criativa<a class="headerlink" href="#fase-teorica-e-criativa" title="Link permanente para este título">¶</a></h2>
+<p>Começar com a <strong>ideia apelativa</strong> do exercício que motivam os <strong>conceitos teóricos</strong> escolhidos. Propomos as seguintes etapas:</p>
+<ol class="arabic simple">
+<li>Escrever o problema e seus parâmetros.</li>
+<li>Escrever de imediato a resolução completa baseada nos parâmetros definidos no problema.</li>
+<li>Só depois as opções de escolha múltipla (se estiver a escrever para a web).</li>
+</ol>
+<p>A criação de exercícios baseados em parâmetros aleatórios tem que ter em conta aspetos que não são contemplados:</p>
+<p><strong>Valores &#8220;apropriados&#8221;</strong></p>
+<p>Os valores que o estudante irá ver no problema devem ser &#8220;apropriados&#8221;:</p>
+<ul class="simple">
+<li>Valores muito grandes e que obriguem a contas demoradas não são em geral boa escolha pois desejamos a atenção seja focada no conceito e não nos números que vão ocorrer.</li>
+<li>Por vezes ocorre o contrário: um estudante habitua-se a derivar apenas $x^2$ ou $x^3$. Há registo de estudantes que não souberam responder se lhe pedirmos a derivada de $x^{1000}$.</li>
+<li>Por vezes a ocorrência de $e$ (número de Euler, ou Nepper) ou $sqrt{2}$, embora sejam números, pode representar um problema dependendo do nível a que o problema é colocado.</li>
+</ul>
+<p><strong>Prever todas as situações</strong></p>
+<p>Tem que se prever todas as situações pois os parâmetros são gerados aleatoriamente.
+É fácil ver que se o cálculo da resolução envolver um passo $a/b$ então temos que impedir que $b$ seja zero.
+Por outras palavras, há que gerir os domínios das sucessivas transformações ocorridas numa resolução. Esta escolha faz com que
+o domínio dos valores que ocorrem no problema deve ser bem pensada.</p>
+<p><em>Pense ao contrário</em>: para ter um certo tipo de solução final &#8220;amigável&#8221; e resolução &#8220;suave&#8221;, de que domínios se devem escolher valores para
+os parâmetros do enunciado.</p>
+</div>
+<div class="section" id="fase-da-implementacao">
+<h2>Fase da implementação<a class="headerlink" href="#fase-da-implementacao" title="Link permanente para este título">¶</a></h2>
+<p>Após a etapa teórica, vem a criação de um novo exercício no servidor.
+Pretende-se nesta fase escrever o texto em LaTeX e HTML e codificar as regras de cálculo dos parâmetros na linguagem Python.</p>
+<p>A melhor abordagem é a construção passo a passo. Começar só com um parâmetro e pouco texto e logo de seguida ver se funciona. Depois ir adicionando as várias situações.
+Espera-se deste modo capturar melhor situações de erro que são parte normal de quem usa uma linguagem de programação ou descrição.</p>
+<ol class="arabic simple">
+<li>Aceda ao site <a class="reference external" href="http://www.megua.org">megua.org</a> e faça <em>login</em>; usar o chrome ou firefox preferencialmente; se é docente e pretende um login contacte <a class="reference external" href="http://www.ua.pt/dmat/pageperson.aspx?id=1183">Pedro Cruz</a>.</li>
+<li>Abrir um qualquer exercício que já exista na sua conta e que servirá de modelo a um novo.</li>
+<li>Faça <code class="docutils literal"><span class="pre">File</span> <span class="pre">Copy</span> <span class="pre">Worksheet</span></code>.</li>
+<li>Mude o nome (com <em>click</em> no nome). Se é aluno de mestrado a sugestão do nome é <code class="docutils literal"><span class="pre">Mestrado:meuprimeironome_areadoexercicio_001</span></code> para um primeiro exercício.</li>
+<li>Faça <code class="docutils literal"><span class="pre">share</span></code> (botão no canto superior direito) com os utilizadores do projeto em que está.</li>
+</ol>
+<p>Depois, o texto deve ser alterado nestes passos:</p>
+<ol class="arabic simple">
+<li>Alterar secções em <code class="docutils literal"><span class="pre">%summary</span> <span class="pre">....</span></code>, escrever um sumário do que é o exercício e catalogar (ver abaixo).</li>
+<li>Criar problema (e seus parâmetros) em <code class="docutils literal"><span class="pre">%problem</span> <span class="pre">&lt;nome</span> <span class="pre">sugestivo</span> <span class="pre">não</span> <span class="pre">técnico</span> <span class="pre">para</span> <span class="pre">o</span> <span class="pre">estudante&gt;</span></code>. Este nome deve ser curto. Por exmeplo, se o exercícios menciona o transporte de azeitonas então o exercício pode chamar-se &#8220;Azeitonas&#8221;.</li>
+<li>Criar resolução completa (e seus parâmetros) em <code class="docutils literal"><span class="pre">%answer</span></code>.</li>
+<li>Alterar nome do exercício usando um formato análogo a <code class="docutils literal"><span class="pre">class</span> <span class="pre">E97H60_determinantes_001</span></code> em que 97H60 deve ser escolhido da MSC (ver <a class="reference external" href="msc">abaixo</a>).</li>
+</ol>
+<p>Em <a class="reference external" href="paraweb">Exercícios para a web</a> encontra-se um exercício completo e explicado bem como outras opções.
+Em <a class="reference external" href="pythonsection">Python/Sage</a> encontra-se um guia para a programação de valores.</p>
+</div>
+<div class="section" id="mathematics-subject-classification">
+<h2>Mathematics Subject Classification<a class="headerlink" href="#mathematics-subject-classification" title="Link permanente para este título">¶</a></h2>
+<p>Os exercícios devem ser catalogados com o sistema de classificação para a matemática conhecido por
+<em>Mathematics Subject Classification</em> (MSC2010). Pode usar-se mais que uma área mas uma delas deverá ser a principal.</p>
+<p>Para a criação de material educativo é normal que a principal área pertença a esta classe:</p>
+<div class="highlight-python"><div class="highlight"><pre>97-XX Mathematics education
+</pre></div>
+</div>
+<p>dentro da qual se encontram os domínios principais para os quais se pretendem desenvolver exercícios:</p>
+<ul class="simple">
+<li>consulte as subáreas <a class="reference external" href="http://msc2010.org/mscwiki/index.php?title=97-XX">97-XX</a>;</li>
+<li>a classificação completa em <a class="reference external" href="http://msc2010.org/mscwiki/index.php?title=MSC2010">msc2010.org</a>.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Tabela de Conteúdos</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Guia Curto</a><ul>
+<li><a class="reference internal" href="#fase-teorica-e-criativa">Fase teórica e criativa</a></li>
+<li><a class="reference internal" href="#fase-da-implementacao">Fase da implementação</a></li>
+<li><a class="reference internal" href="#mathematics-subject-classification">Mathematics Subject Classification</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="capítulo anterior">Tutorial do MEGUA 0.2</a></li>
+      <li>Next: <a href="sagemath.html" title="próximo capítulo">Sage Mathematics</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>Esta Página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/rapido.txt"
+            rel="nofollow">Exibir Fonte</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Pesquisa rápida</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Ir" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Digite os termos da busca ou o nome de um módulo, classe ou função.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, João Pedro Cruz.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/rapido.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

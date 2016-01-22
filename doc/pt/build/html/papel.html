@@ -1,0 +1,399 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Exercícios em papel &mdash; Documentação MEGUA For Sage5.2</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'For Sage5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <link rel="top" title="Documentação MEGUA For Sage5.2" href="index.html" />
+    <link rel="next" title="Programação dos parâmetros em Python/Sage" href="pythonsection.html" />
+    <link rel="prev" title="Exercícios para a web" href="paraweb.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="exercicios-em-papel">
+<span id="papelsection"></span><h1>Exercícios em papel<a class="headerlink" href="#exercicios-em-papel" title="Link permanente para este título">¶</a></h1>
+<p>Os exercícios em papel têm características diferentes dos exercícios para
+a <a class="reference internal" href="paraweb.html#websection"><span>web</span></a> entre as quais salientamos:</p>
+<ul class="simple">
+<li>Usa-se o LaTeX para descrever os exercícios (não se usa HTML, como para os exercícios para a <a class="reference internal" href="paraweb.html#websection"><span>web</span></a>).</li>
+<li>Cada <code class="docutils literal"><span class="pre">worksheet</span></code> (tal como no caso web) contém um exercício.</li>
+</ul>
+<p>Já com uma base de dados construída, é depois possível:</p>
+<ul class="simple">
+<li>Apresentar exercícios de forma sequêncial, com numeração.</li>
+<li>As resoluções podem ou não constar do documento.</li>
+<li>Estas podem aparecer logo depois do exercício ou no final do documento (ao estilo &#8220;soluções&#8221;).</li>
+<li>Podem criar-se brochuras de exercícios ou formato tipo exame.</li>
+<li>Pode-se exportar o LaTeX para edição no software de TeX no computador pessoal.</li>
+</ul>
+<p>e outras características que se descrevem de seguida.</p>
+<p>As etapas para criar bases de dados de exercícios são:</p>
+<ol class="arabic simple">
+<li>Criar um novo <code class="docutils literal"><span class="pre">worksheet</span></code> no Notebook (do Sage Mathematics).</li>
+<li>Numa célula nova, abrir a base de dados (se não existir será criada). Pode indicar o seu username como nome ou o nome dum projeto.</li>
+<li>Na célula seguinte, introduz-se o modelo do exercício.</li>
+</ol>
+<p>Depois de se criar uma base de dados com os necessários exercícios podem-se criar os formatos (brochuras, exames, etc), usando uma nova <code class="docutils literal"><span class="pre">worksheet</span></code>.</p>
+<div class="section" id="exercicio-completo">
+<h2>Exercício Completo<a class="headerlink" href="#exercicio-completo" title="Link permanente para este título">¶</a></h2>
+<p>Ilustra-se agora um exercício completo para papel:</p>
+<p><strong>Célula 1</strong></p>
+<p>Copie e cole, na primeira célula, o conteúdo abaixo. Mude o NOME para o seu nome ou nome do projeto. Depois faça <em>shift enter</em> para a executar.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#auto</span>
+<span class="kn">from</span> <span class="nn">megua.all</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">meg</span> <span class="o">=</span> <span class="n">MegBook</span><span class="p">(</span><span class="s">&quot;/home/nbuser/NOME.sqlite&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Agora, na segunda célula vamos introduzir o primeiro exercício:</p>
+<p><strong>Célula 2</strong></p>
+<p>Copiar e colar e depois fazer <em>shift enter</em> para a executar.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">meg</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">r&quot;&quot;&quot;</span>
+
+<span class="s">%SUMMARY Demonstração; Papel</span>
+
+<span class="s">Este exercício considera as quatro operações aritméticas.</span>
+
+<span class="s">Classificação: 97F20 Pre-numerical stage, concept of numbers</span>
+
+<span class="s">%PROBLEM Exemplo</span>
+
+<span class="s">Determine:</span>
+<span class="s">\begin{enumerate}</span>
+<span class="s">\item[(a)] $num1+den1$</span>
+<span class="s">\item[(b)] $num1-den1$</span>
+<span class="s">\item[(c)] $num1 \times den1$</span>
+<span class="s">\item[(d)] $num1/den1$</span>
+<span class="s">\end{enumerate}</span>
+
+<span class="s">%ANSWER</span>
+
+
+<span class="s">As soluções são</span>
+<span class="s">\begin{enumerate}</span>
+<span class="s">\item[(a)] $num1+den1=rsum$</span>
+<span class="s">\item[(b)] $num1-den1=rdiff$</span>
+<span class="s">\item[(c)] $num1 \times den1=rprod$</span>
+<span class="s">\item[(d)] $num1/den1=rdiv$</span>
+<span class="s">\end{enumerate}</span>
+
+
+
+<span class="s">class E97F20_operacoes_001(Exercise):</span>
+
+<span class="s">    def make_random(s):</span>
+<span class="s">        s.num1 = ur.iunif(1,10)</span>
+<span class="s">        s.den1 = ur.iunif(1,10)</span>
+
+<span class="s">    def solve(s):</span>
+<span class="s">        s.rsum  = s.num1 + s.den1</span>
+<span class="s">        s.rdiff = s.num1 - s.den1</span>
+<span class="s">        s.rprod = s.num1 * s.den1</span>
+<span class="s">        s.rdiv = round(s.num1 / s.den1,3)</span>
+
+
+<span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Após a execução da célula irá aparecer o</p>
+<p><strong>Resultado</strong></p>
+<p>O resultado é um ficheiro <cite>PDF</cite> e um ficheiro <code class="docutils literal"><span class="pre">tex</span></code>. Se estiver a user o Chrome como navegador pode ser visualizado com um <em>click</em> na primeira vez no pdf. Posteriores alterações podem ser vistas usando a tecla F5 que atualiza.</p>
+<p>Pode abrir o tex e com copy/paste colocar no editor LaTeX do seu computador pessoal.</p>
+</div>
+<div class="section" id="descricao-da-estrutura">
+<h2>Descrição da estrutura<a class="headerlink" href="#descricao-da-estrutura" title="Link permanente para este título">¶</a></h2>
+<p>TO DO!</p>
+</div>
+<div class="section" id="escolha-de-texto">
+<h2>Escolha de texto<a class="headerlink" href="#escolha-de-texto" title="Link permanente para este título">¶</a></h2>
+<p>Uma funcionalidade em exercícios que aglomeram vários casos num único texto surge a necessidade de <strong>escolher texto</strong>.
+Suponha que quer escrever <em>apenas</em> uma de duas frases na resolução detalhada ou outra parte do exercício:</p>
+<ul class="simple">
+<li>o limite não existe.</li>
+<li>o limite existe e o seu valor é $valor$.</li>
+</ul>
+<p>Para estes casos, ou com mais hipóteses, use a sintaxe que é mostrada para o exemplo dado:</p>
+<div class="highlight-html"><div class="highlight"><pre>&lt;showone variavel&gt;
+ &lt;thisone Caso sem limite - caso 0 - (isto é comentário)&gt;
+     O limite não existe.
+ &lt;/thisone&gt;
+ &lt;thisone Caso em que o limite existe - caso 1 (isto é comentário)&gt;
+     O limite existe e o seu valor é \$valor\$.
+ &lt;/thisone&gt;
+&lt;/showone&gt;
+</pre></div>
+</div>
+<p>posteriomente, na parte da programação, é necessário escolher qual das frases irá ser escolhida. Isso é feito dando um valor apropriado à variável <code class="docutils literal"><span class="pre">s.variavel</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">E12X34</span><span class="o">................</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">variavel</span> <span class="o">=</span> <span class="mi">0</span> <span class="n">ou</span> <span class="mi">1</span> <span class="n">para</span> <span class="n">decidir</span> <span class="n">sobre</span> <span class="n">o</span> <span class="n">texto</span> <span class="n">apropriado</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Claro que podem existir mais que dois casos.</p>
+<p><strong>Outra técnica para seleção de texto</strong> com base numa variável inteira
+é o uso do comando <code class="docutils literal"><span class="pre">variavel&#64;c{&quot;Texto</span> <span class="pre">0&quot;,&quot;Texto</span> <span class="pre">1&quot;,&quot;Texto</span> <span class="pre">2&quot;}</span></code>.
+O seguinte caso mostra um exemplo de aplicação em
+que <code class="docutils literal"><span class="pre">casov</span></code> define qual das três frases irá aparecer:</p>
+<p><strong>NOTA:</strong> esta versão do <code class="docutils literal"><span class="pre">var&#64;c{....}</span></code> só funciona com letras e espaços. Não funciona com fórmulas ou outros símbolos.</p>
+<p>Exemplo de texto:</p>
+<div class="line-block">
+<div class="line">Neste caso como $f(-x)$</div>
+<div class="line">casov&#64;c{&#8220;é&#8221;,&#8221;é&#8221;,&#8221;não é&#8221;} igual</div>
+<div class="line">casov&#64;c{&#8220;à própria função&#8221;,&#8221;ao simétrico da função&#8221;,&#8221;nem à função nem à sua simétrica&#8221;} então a função</div>
+<div class="line">casov&#64;c{&#8220;é uma função par&#8221;,&#8221;é uma função ímpar&#8221;,&#8221;nem é uma função par nem ímpar&#8221;}.</div>
+</div>
+<p>O efeito para o primeiro caso, isto é, se <code class="docutils literal"><span class="pre">casov</span> <span class="pre">==</span> <span class="pre">0</span></code> seleciona as frases ou palavras:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&quot;é&quot;</span> <span class="s">&quot;à própria função&quot;</span> <span class="s">&quot;é uma função par&quot;</span>
+</pre></div>
+</div>
+<p>e a frase gerada fica: &#8220;Neste caso como f(-x) é  igual à própria função então a função é uma função par.&#8221;</p>
+</div>
+<div class="section" id="graficos">
+<h2>Gráficos<a class="headerlink" href="#graficos" title="Link permanente para este título">¶</a></h2>
+<p>Na versão atual consideramos apenas pacote TikZ para gráficos a 2D.</p>
+<p>NOTA para quem usa a web: salienta-se que os gráficos TikZ são incluídos naturalmente no LaTex não precisando de marcadores &lt;latex 100%&gt; ... &lt;/latex&gt;.</p>
+<p>O <a class="reference external" href="http://paws.wcu.edu/tsfoguel/tikzpgfmanual.pdf">manual do Tikz</a> é um recurso algo longo. Mas existem <a class="reference external" href="http://www.texample.net/tikz/examples/">exemplos</a>  muito atrativos de uso do TikZ em que muitos são auto explicados.</p>
+<p>Outra maneira de usar o TikZ é construir gráficos no Geogebra e exportar em TikZ para
+o exercício. Depois basta substituir valores numéricos concretos pelos parâmetros.</p>
+<p>Este é um caso:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span class="k">\definecolor</span><span class="nb">{</span>qqqqcc<span class="nb">}{</span>rgb<span class="nb">}{</span>0,0,0.8<span class="nb">}</span>
+<span class="k">\definecolor</span><span class="nb">{</span>qqqqff<span class="nb">}{</span>rgb<span class="nb">}{</span>0,0,1<span class="nb">}</span>
+<span class="k">\definecolor</span><span class="nb">{</span>ccqqqq<span class="nb">}{</span>rgb<span class="nb">}{</span>0.8,0,0<span class="nb">}</span>
+<span class="k">\definecolor</span><span class="nb">{</span>ttzzqq<span class="nb">}{</span>rgb<span class="nb">}{</span>0.2,0.6,0<span class="nb">}</span>
+
+<span class="k">\begin</span><span class="nb">{</span>tikzpicture<span class="nb">}</span>[line cap=round,line join=round,&gt;=triangle 45,x=unx1@f<span class="nb">{</span>f<span class="nb">}</span>cm,y=uny1@f<span class="nb">{</span>f<span class="nb">}</span>cm]
+
+
+<span class="k">\draw</span><span class="na">[-&gt;,color=black]</span> (v11@f<span class="nb">{</span>f<span class="nb">}</span>,0) -- (v21@f<span class="nb">{</span>f<span class="nb">}</span>,0) node [anchor=north east] <span class="nb">{</span> <span class="s">$</span><span class="nb">x</span><span class="s">$</span><span class="nb">}</span>;
+<span class="k">\foreach</span> <span class="k">\x</span> in <span class="nb">{}</span>
+<span class="k">\draw</span><span class="na">[shift={(\x,0)},color=black]</span> (0pt,2pt) -- (0pt,-2pt) node[right,above] <span class="nb">{</span><span class="k">\footnotesize</span> <span class="s">$</span><span class="nb">x</span><span class="s">$</span><span class="nb">}</span>;
+<span class="k">\draw</span><span class="na">[-&gt;,color=black]</span> (0,v12@f<span class="nb">{</span>f<span class="nb">}</span>) -- (0,v22@f<span class="nb">{</span>f<span class="nb">}</span>) node [anchor=north east] <span class="nb">{</span><span class="s">$</span><span class="nb"> y</span><span class="s">$</span><span class="nb">}</span>;
+<span class="k">\draw</span><span class="na">[color=black]</span> (0pt,-5pt) node[left] <span class="nb">{</span><span class="k">\footnotesize</span> <span class="s">$</span><span class="m">0</span><span class="s">$</span><span class="nb">}</span>;
+
+
+<span class="k">\clip</span>(v11@f<span class="nb">{</span>f<span class="nb">}</span>,v12@f<span class="nb">{</span>f<span class="nb">}</span>) rectangle (v21@f<span class="nb">{</span>f<span class="nb">}</span>,v22@f<span class="nb">{</span>f<span class="nb">}</span>);
+
+<span class="k">\draw</span><span class="na">[color=ttzzqq,line width=1.2pt,smooth,samples=100,domain=ext1@f{f}:ext2@f{f}]</span> plot(<span class="k">\x</span>,<span class="nb">{</span>a1+b1/((1*<span class="k">\x</span>)+d1)<span class="nb">}</span>);
+<span class="k">\draw</span><span class="na">[color=qqqqcc,line width=1pt,smooth,samples=100,domain=ext1@f{f}:ext2@f{f}]</span> plot(<span class="k">\x</span>,<span class="nb">{</span>slopes1@f<span class="nb">{</span>f<span class="nb">}</span>*(<span class="k">\x</span>-ix0)+iy0@f<span class="nb">{</span>f<span class="nb">}}</span>);
+<span class="k">\draw</span><span class="na">[color=ccqqqq,line width=1pt,smooth,samples=100,domain=ext1@f{f}:ext2@f{f}]</span> plot(<span class="k">\x</span>,<span class="nb">{</span>slopet1@f<span class="nb">{</span>f<span class="nb">}</span>*(<span class="k">\x</span>-ix0)+iy0@f<span class="nb">{</span>f<span class="nb">}}</span>);
+
+<span class="k">\begin</span><span class="nb">{</span>scriptsize<span class="nb">}</span>
+<span class="k">\fill</span> [color=qqqqff] (ix0,iy0@f<span class="nb">{</span>f<span class="nb">}</span>) circle (1.5pt);
+<span class="k">\draw</span><span class="na">[color=qqqqff]</span> (labelA1,iy0@f<span class="nb">{</span>f<span class="nb">}</span>) node[left,below] <span class="nb">{</span><span class="s">$</span><span class="nb">A</span><span class="s">$</span><span class="nb">}</span>;
+<span class="k">\fill</span> [color=qqqqff] (ix1,iy1@f<span class="nb">{</span>f<span class="nb">}</span>) circle (1.5pt);
+<span class="k">\draw</span><span class="na">[color=qqqqff]</span> (ix1,iy1@f<span class="nb">{</span>f<span class="nb">}</span>) node[right,above] <span class="nb">{</span><span class="s">$</span><span class="nb">B</span><span class="s">$</span><span class="nb">}</span>;
+<span class="k">\end</span><span class="nb">{</span>scriptsize<span class="nb">}</span>
+<span class="k">\end</span><span class="nb">{</span>tikzpicture<span class="nb">}</span>
+</pre></div>
+</div>
+<p>No exemplo acima existem imensos parâmetros em virtude da figura resultante ser complexa.
+Explicam-se alguns aspetos:</p>
+<ul class="simple">
+<li>O TikZ requer números inteiros ou reais aproximados.</li>
+<li>São exemplos de parâmetros: <em>v11&#64;f{f}</em> em que <strong>&#64;f{f}</strong> indica que o número racional <em>v11</em> deve ser convertido à sua aproximação real.</li>
+<li>Também, são exemplos de parâmetros: <em>ix0</em>, ou ainda <em>labelA1</em>. Estes sem qualquer conversão.</li>
+<li>Todos os parâmetros são calculados na parte da programação.</li>
+</ul>
+<p>Os gráficos do pacote TikZ são maioritariamente para 2D. Mas é ainda
+possível criar <strong>gráficos para 3D</strong> recorrendo a um complemento para o TikZ chamado de
+<a class="reference external" href="ftp://ftp.tex.ac.uk/pub/tex/graphics/pgf/contrib/tikz-3dplot/tikz-3dplot_documentation.pdf">3dplot</a>. Outros exemplos
+sem recurso a este pacote podem ser encontrados <a class="reference external" href="http://www.texample.net/tikz/examples/tag/3d/">aqui</a>.</p>
+</div>
+<div class="section" id="tabelas-em-latex">
+<span id="tabelaslatex"></span><h2>Tabelas em LaTeX<a class="headerlink" href="#tabelas-em-latex" title="Link permanente para este título">¶</a></h2>
+<p>Podem-se criar tabelas em LaTeX usando várias formas, entre elas, o <code class="docutils literal"><span class="pre">tabular</span></code> em
+modo texto e <code class="docutils literal"><span class="pre">array</span></code> em modo matemático.</p>
+<p>Sugere-se um possível gerador de tabelas em LaTeX e um documento muito completo sobre o tema:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://truben.no/latex/table/">http://truben.no/latex/table/</a></li>
+<li><a class="reference external" href="http://en.wikibooks.org/wiki/LaTeX/Tables">http://en.wikibooks.org/wiki/LaTeX/Tables</a></li>
+</ul>
+<p>Usando o marcador <code class="docutils literal"><span class="pre">tabular</span></code>:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span class="k">\begin</span><span class="nb">{</span>tabular<span class="nb">}{</span>|c|c|c|<span class="nb">}</span>
+<span class="k">\hline</span>
+par1 <span class="nb">&amp;</span> par2 <span class="nb">&amp;</span> par3 <span class="k">\\</span>
+<span class="k">\hline</span>
+<span class="k">\end</span><span class="nb">{</span>tabular<span class="nb">}</span>
+</pre></div>
+</div>
+<p>em que <em>par1</em>, <em>par2</em>, e <em>par3</em> são parâmetros a serem calculados na parte da programação.
+Podem também ser criadas tabelas usando a notação matemática
+(o software <a class="reference external" href="http://www.mathjax.org/">MathJAX</a> é executado no seu <em>browser</em> e faz o
+serviço de conversão da notação LaTeX no objecto gráfico):</p>
+<div class="highlight-latex"><div class="highlight"><pre><span class="sb">$$</span><span class="nb"></span>
+<span class="nv">\begin</span><span class="nb">{array}{|c|c|c|}</span>
+<span class="nv">\hline</span><span class="nb"></span>
+<span class="nb">par</span><span class="m">1</span><span class="nb"> &amp; par</span><span class="m">2</span><span class="nb"> &amp; par</span><span class="m">3</span><span class="nb"> </span><span class="nv">\\</span><span class="nb"></span>
+<span class="nv">\hline</span><span class="nb"></span>
+<span class="nv">\end</span><span class="nb">{array}</span>
+<span class="s">$$</span>
+</pre></div>
+</div>
+<p>em que <em>par1</em>, <em>par2</em>, e <em>par3</em> são parâmetros a serem calculados na parte da programação.</p>
+</div>
+<div class="section" id="brochuras-e-testes">
+<h2>Brochuras e Testes<a class="headerlink" href="#brochuras-e-testes" title="Link permanente para este título">¶</a></h2>
+<p>Após a concretização de uma base de exercícios podemos constituir brochuras ou testes conforme explicado no início desta secção.</p>
+<p>Depois do autor saber o que pretende tem à sua disposição  comando <code class="docutils literal"><span class="pre">template_fromstring</span></code> para ajudar que necessita conhecer:</p>
+<ul class="simple">
+<li>o modo como se visualiza <strong>cada</strong> exercício;</li>
+<li>o formato do texto em geral e quais os exercícios selecionados.</li>
+</ul>
+<p><strong>Que campos deseja?</strong></p>
+<p>Um exercício é caracterizado por vários campos:</p>
+<ul class="simple">
+<li>nome (em class E12X34_nome_001)</li>
+<li>sumário</li>
+<li>secções</li>
+<li>nome ilustrativo do problema</li>
+<li>o enunciado do problema (antes da concretização)</li>
+<li>o enunciado do problema (depois de uma concretização)</li>
+<li>a resolução (antes da concretização)</li>
+<li>a resolução (depois de uma concretização)</li>
+</ul>
+<p>Assim, a primeira tarefa é criar o texto que define o aspeto e campos a serem usados no texto. Para isso, numa nova célula do <code class="docutils literal"><span class="pre">worksheet</span></code> pode fazer-se, para visualizar <strong>todos</strong> os campos:</p>
+<p><strong>Como se pretende visualizar?</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Configuração completa: mostra todos os campos de um exercicio.</span>
+
+<span class="n">modelo_exercicio</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span><span class="se">\\</span><span class="s">textbf{Name:}~</span><span class="se">\\</span><span class="s">verb+{{ exname }}+ </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s"> </span><span class="se">\\</span><span class="s">textbf{Summary} </span><span class="se">\n\n</span><span class="s"> {{ summary }} </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s"> </span><span class="se">\\</span><span class="s">textbf{Problem template} </span><span class="se">\n\n</span><span class="s"> {{ problemtemplate }} </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s"> </span><span class="se">\\</span><span class="s">textbf{Answer template} </span><span class="se">\n\n</span><span class="s"> {{ answertemplate }} </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s"> </span><span class="se">\\</span><span class="s">begin{verbatim}</span><span class="se">\n</span><span class="s">{{ codetxt }}</span><span class="se">\n\\</span><span class="s">end{verbatim} </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s"> </span><span class="se">\\</span><span class="s">textbf{Problem Example } </span><span class="se">\n\n</span><span class="s"> {{ problem }} </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s"> </span><span class="se">\\</span><span class="s">textbf{Answer Example } </span><span class="se">\n\n</span><span class="s"> {{ answer }} </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>ou ainda, para visualizar apenas a concretização do problema e resolução:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Configuração curta: mostra apenas problem e answer</span>
+
+<span class="n">modelo_curto</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s"> </span><span class="se">\\</span><span class="s">textbf{Problem Example } </span><span class="se">\n\n</span><span class="s"> {{ problem }} </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s"> </span><span class="se">\\</span><span class="s">textbf{Answer Example } </span><span class="se">\n\n</span><span class="s"> {{ answer }} </span><span class="se">\</span>
+<span class="se">\n\n</span><span class="s">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>De seguida:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#</span>
+<span class="c"># Exemplo de ficheiro latex a ser usado como molde.</span>
+<span class="c">#</span>
+
+<span class="n">ficha_de_trabalho</span> <span class="o">=</span> <span class="s">r&quot;&quot;&quot;</span>
+<span class="s">\documentclass{article}</span>
+
+<span class="s">\usepackage[utf8]{inputenc}</span>
+
+<span class="s">\begin{document}</span>
+<span class="s">{{ put_here(&quot;E26B05_DPpolinomio_001&quot;) }}</span>
+
+<span class="s">{{ put_here(&quot;E26B05_DPexponencial_001&quot;) }}</span>
+
+<span class="s">{{ put_here(&quot;E26B05_DPpotencia_001&quot;) }}</span>
+
+<span class="s">{{ put_here(&quot;E26B05_DPlogaritmo_001&quot;) }}</span>
+
+<span class="s">{{ put_here(&quot;E26B05_DPracional_001&quot;) }}</span>
+
+<span class="s">\end{document}</span>
+<span class="s">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Tabela de Conteúdos</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Exercícios em papel</a><ul>
+<li><a class="reference internal" href="#exercicio-completo">Exercício Completo</a></li>
+<li><a class="reference internal" href="#descricao-da-estrutura">Descrição da estrutura</a></li>
+<li><a class="reference internal" href="#escolha-de-texto">Escolha de texto</a></li>
+<li><a class="reference internal" href="#graficos">Gráficos</a></li>
+<li><a class="reference internal" href="#tabelas-em-latex">Tabelas em LaTeX</a></li>
+<li><a class="reference internal" href="#brochuras-e-testes">Brochuras e Testes</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="paraweb.html" title="capítulo anterior">Exercícios para a web</a></li>
+      <li>Next: <a href="pythonsection.html" title="próximo capítulo">Programação dos parâmetros em Python/Sage</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>Esta Página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/papel.txt"
+            rel="nofollow">Exibir Fonte</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Pesquisa rápida</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Ir" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Digite os termos da busca ou o nome de um módulo, classe ou função.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, João Pedro Cruz.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/papel.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
