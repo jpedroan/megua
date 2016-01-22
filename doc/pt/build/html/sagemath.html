@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sage Mathematics &mdash; Documentação MEGUA For Sage5.2</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'For Sage5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <link rel="top" title="Documentação MEGUA For Sage5.2" href="index.html" />
+    <link rel="next" title="Exercícios para a web" href="paraweb.html" />
+    <link rel="prev" title="Guia Curto" href="rapido.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sage-mathematics">
+<span id="sagemath"></span><h1>Sage Mathematics<a class="headerlink" href="#sage-mathematics" title="Link permanente para este título">¶</a></h1>
+<p>Aquilo a que chamamos de &#8220;MEGUA&#8221; é um pacote de software que permite criar exercícios parametrizados recorrendo ao ambiente Sage Mathematics, sistema este que se descreve de seguida.</p>
+<p>O Sage Mathematics é uma enorme biblioteca e também um sistema de acesso a bibliotecas de matemáticas já existentes. Grande parte dstas bibliotecas matemáticas foi desenvolvida para o sistema Linux pelo que a sua disponibilização em Windows ainda está em desenvolvimento. Se usa um computador Linux (distribuição Ubuntu, por exemplo), então é bastante fácil instalar e usar o Sage.</p>
+<p>Porque, nos tempos atuais:</p>
+<ul class="simple">
+<li>a maioria usa computadores com Windows</li>
+<li>tablets</li>
+<li>e já existem hábitos de programação na nuvem (Cloud Computing and Archive)</li>
+</ul>
+<p>então houve necessidade de criar o <a class="reference internal" href="#sagenotebook"><span>Sage Notebook</span></a> que usamos no
+projeto MEGUA para de criação e reutilizaçao de exercícios parametrizados.</p>
+<p>Já no decurso deste projeto surgiu uma versão muito modernizada e com filosofia de
+segurança e sistema de partilha de projetos diferente do notebook:
+chama-se <a class="reference external" href="https:cloud.sagemath.org">Sage Mathematics Cloud</a>  (sigla SMC). Pode criar uma conta
+nesse sistema e usar as capacidades do Sage na nuvem, convidando os seus estudantes a fazer o mesmo.</p>
+<p>NOTA: o pacote MEGUA ainda não está disponível para esse sistema.</p>
+<div class="section" id="sage-notebook">
+<span id="sagenotebook"></span><h2>Sage Notebook<a class="headerlink" href="#sage-notebook" title="Link permanente para este título">¶</a></h2>
+<p>O <em>Notebook</em> é a ferramenta que está a ser usada para criar os exercícios parametrizados com a vantagem de ver os resultados imediatamente e poder partilhar com os colegas ou outros autores.</p>
+<p>O <em>notebook</em>, normalmente, serve para cálculo e exibição de resultados gráficos. Antes de começar um novo exercício pode usar esta potencialidade para testar comandos, ver gráficos, etc.</p>
+<p>As caixas visíveis são chamadas de <strong>células</strong> e permitem a introdução de comandos.
+Estes comandos são &#8220;calculados&#8221; com <strong>shift+enter</strong>.</p>
+<p>Para  apagar uma caixa, apaga-se primeiro todo o seu conteúdo e depois usar o <strong>backspace</strong> no seu teclado.</p>
+<p>Exemplos (onde está &#8220;sage:&#8221; é como se fosse uma célula):</p>
+<div class="highlight-python"><div class="highlight"><pre>sage: 1+2  #fazer shift enter
+3
+</pre></div>
+</div>
+<p>ou podemos criar um gráfico com:</p>
+<div class="highlight-python"><div class="highlight"><pre>sage: plot(sin(x),x,figsize=(2,2))
+</pre></div>
+</div>
+<img alt="_images/nb_sin.png" src="_images/nb_sin.png" />
+</div>
+<div class="section" id="pesquisa-via-google">
+<h2>Pesquisa via google<a class="headerlink" href="#pesquisa-via-google" title="Link permanente para este título">¶</a></h2>
+<p>Se pretende encontrar uma solução que acha que deve existir ou simplesmente averiguar se já gluém explorou um dado tema deve procurar via google (claro que normalmente lembramo-nos de realizar esta tarefa mas curiosamente nem sempre recordamos isto para temas que são novos, como pode ser o caso de programação em Python ou LaTeX).</p>
+<p>Assim, recomenda-se a pesquisa de termos em inglês começando por &#8220;sage math&#8221; seguido de outros termos.
+Seguem-se exemplos:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.google.pt/search?q=sage+math+plot+axes">sage math plot axes</a> para informação sobre gráficos e eixos coordenados.</li>
+<li><a class="reference external" href="https://www.google.pt/search?q=sage+math+integration">sage math integration</a></li>
+</ul>
+<p>Em resumo, este tutorial é um guia para produzir exercícios parametrizados que contem descrições muito resumido das largas capacidades do Sage Mathematics. A <strong>pesquisa</strong> de como realizar tarefas
+de programação ou LaTeX <strong>é um ato do dia a dia</strong> do utilizador do Sage.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Tabela de Conteúdos</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Sage Mathematics</a><ul>
+<li><a class="reference internal" href="#sage-notebook">Sage Notebook</a></li>
+<li><a class="reference internal" href="#pesquisa-via-google">Pesquisa via google</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="rapido.html" title="capítulo anterior">Guia Curto</a></li>
+      <li>Next: <a href="paraweb.html" title="próximo capítulo">Exercícios para a web</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>Esta Página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sagemath.txt"
+            rel="nofollow">Exibir Fonte</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Pesquisa rápida</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Ir" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Digite os termos da busca ou o nome de um módulo, classe ou função.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, João Pedro Cruz.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/sagemath.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

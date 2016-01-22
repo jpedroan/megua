@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reescrita cos(...)^2 =&gt; cos^2(...) &mdash; Documentação MEGUA For Sage5.2</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'For Sage5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <link rel="top" title="Documentação MEGUA For Sage5.2" href="index.html" />
+    <link rel="next" title="Valores e objetos aleatórios" href="randomvars.html" />
+    <link rel="prev" title="Programação dos parâmetros em Python/Sage" href="pythonsection.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="reescrita-cos-2-cos-2">
+<span id="reescrita"></span><h1>Reescrita <code class="docutils literal"><span class="pre">cos(...)^2</span> <span class="pre">=&gt;</span> <span class="pre">cos^2(...)</span></code><a class="headerlink" href="#reescrita-cos-2-cos-2" title="Link permanente para este título">¶</a></h1>
+<p>Como mostra o exemplo do título tem-se, por vezes, a necessidade
+de <a class="reference external" href="http://www.priberam.pt/dlpo/reescrita">reescrever</a>  uma expressão numa outra
+equivalente mas de aspeto mais familiar, convencional ou simplesmente mais &#8220;amiga&#8221; dos nossos olhos:</p>
+<div class="math">
+<p><img src="_images/math/8d0aa8c1ae9886a68cb0cf4daec5cb45e07b2103.png" alt="\cos(\ldots)^2 \Longrightarrow \cos^2(\ldots)"/></p>
+</div><p>O autor dum exercício pode escrever no texto que produz a expressão <img class="math" src="_images/math/b6585dd1d1ea4488569350dd49b904322516c314.png" alt="\cos^2(x)"/> diretamente
+em vez de <img class="math" src="_images/math/ea6df7b566b69b23294c284444e052b860f4ae2a.png" alt="\cos(x)^2"/>.
+Portanto, o problema que se descreve nesta secção só surge quando se pretende
+visualizar o resultado de um cálculo automático.</p>
+<p>O Sage Mathematics (ou outro sistema algébrico) foi programado com uma única
+maneira de apresentar expressões e que muitas vezes não coincidem com a maneira
+de uma particular escola portuguesa ou simplesmente não apresenta os resultados da
+maneira mais elegante para um estudante novo na matemática.</p>
+<p>Alguns casos são comuns:</p>
+<ul class="simple">
+<li><img class="math" src="_images/math/c9f2338fe9136404a2f280fb752a27df076bc16d.png" alt="e^{(2x)}"/> devia ser apenas <img class="math" src="_images/math/d059dc618a72df2002a679242a2c740667196983.png" alt="e^{2x}"/></li>
+<li><img class="math" src="_images/math/d2a04c757a50e4a5957e2f627d1aff09a55b176a.png" alt="\log(2x)"/> pode ser representado por <img class="math" src="_images/math/73146664a961d2f82c201a42380cc0c8e17f05e1.png" alt="\ln(2x)"/></li>
+<li><img class="math" src="_images/math/30dda966ad4725351faaecbb4240e4eeb4b1fed7.png" alt="\tan(2x)^4"/> pode ser melhor representado por <img class="math" src="_images/math/a28b7d40c1d8d715e4e0ccf0b83e49f7d72374f7.png" alt="\text{tg}^4(2x)"/></li>
+</ul>
+<p>Temos duas abordagens. No instante em que uma expressão
+é calculada (na parte <code class="docutils literal"><span class="pre">def</span> <span class="pre">solve()</span></code>) podemos, com algum trabalho moroso, (re-)construir uma string
+a ser visualizada após esse cálculo.</p>
+<p>Mas a maneira padronizada no MEGUA é criar uma rotina <code class="docutils literal"><span class="pre">rewrite</span></code> que exista a par com o <code class="docutils literal"><span class="pre">make_random</span></code> e <code class="docutils literal"><span class="pre">solve</span></code>. Segue-se um exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">rewrite</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">texto_entrada</span><span class="p">):</span>
+
+    <span class="c">#1. Esta parte depende do que queremos alterar:</span>
+
+    <span class="n">modificacoes</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span> <span class="s">ur&#39;dx x y&#39;</span>                                      <span class="p">,</span>   <span class="s">ur&#39;x y dx&#39;</span>       <span class="p">),</span>
+        <span class="p">(</span> <span class="s">ur&#39;</span><span class="se">\\</span><span class="s">tan&#39;</span>                                       <span class="p">,</span>   <span class="s">ur&#39;\text{tg}&#39;</span>    <span class="p">),</span>
+        <span class="p">(</span> <span class="s">ur&#39;e\^\{</span><span class="se">\\</span><span class="s">left\((.+?)</span><span class="se">\\</span><span class="s">right\)\}&#39;</span>               <span class="p">,</span>   <span class="s">ur&#39;e^{\1}&#39;</span>       <span class="p">),</span>
+        <span class="p">(</span> <span class="s">ur&#39;</span><span class="se">\\</span><span class="s">sin</span><span class="se">\\</span><span class="s">left\(([\d</span><span class="se">\\</span><span class="s">, t]+?)</span><span class="se">\\</span><span class="s">right\)\^\{2\}&#39;</span>  <span class="p">,</span>   <span class="s">ur&#39;\sin^2(\1)&#39;</span>   <span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="c">#2. Esta parte é sempre a mesma.</span>
+
+    <span class="n">texto</span> <span class="o">=</span> <span class="n">texto_entrada</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modificacoes</span><span class="p">:</span>
+        <span class="n">texto</span> <span class="o">=</span>  <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span> <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">text</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">U</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">texto</span>
+</pre></div>
+</div>
+<p>Comenta-se de seguida o algoritmo e cada uma das substituições mencionadas em <code class="docutils literal"><span class="pre">modificacoes</span></code>.</p>
+<p>Antes de tudo, os parâmetros são substituídos pelos valores aleatórios e pelas expressões calculadas em <code class="docutils literal"><span class="pre">make_random</span></code> e <code class="docutils literal"><span class="pre">solve</span></code>.
+Depois, uma função <code class="docutils literal"><span class="pre">rewrite</span></code>, como a acima ilustrada, segue a seguinte ideia simples:</p>
+<ol class="arabic simple">
+<li>Definem-se as regras de conversão de expressões.</li>
+<li>Percorre-se e transforma-se todo o texto para cada regra (em que cada regra é aplicada ao texto já transformado pelas regras anteriores).</li>
+</ol>
+<p>Resta assim apresentar como se definem as <strong>regras de conversão</strong>. Estas regrdas são definidas usando
+&#8220;expressões regulares,&#8221; termo proveniente da computação.
+Este tema não pode ser apresentado numa curta secção pelo que apenas se ilustram
+os casos simples apresentados na função <code class="docutils literal"><span class="pre">rewrite</span></code> descrita acima.</p>
+<p>Cada regra tem duas componentes: a expressão a ser encontrada e a nova expressão
+que tomará o lugar da primeira. As letras <cite>ur`</cite> devem aparecer sempre sem entrar em detalhes (<a class="reference external" href="http://stackoverflow.com/questions/2081640/what-exactly-do-u-and-rstring-flags-in-python-and-what-are-raw-string-litte">o que são as letras ur?</a>).</p>
+<p><strong>Primeira regra</strong></p>
+<div class="highlight-python"><div class="highlight"><pre>procurar:      substituir por:
+dx x y         x y dx
+</pre></div>
+</div>
+<p>Nesta primeira regra é descrita a transformação intuitiva: onde está &#8216;dx x y&#8217; deve estar &#8216;x y dx&#8217; pois é mais frequente, quando
+se ensina a primitivar, que o &#8216;dx&#8217; esteja no final da integração.</p>
+<p><strong>Segunda regra</strong></p>
+<div class="highlight-python"><div class="highlight"><pre>procurar:      substituir por:
+\\tan          \text{tg}
+</pre></div>
+</div>
+<p>Explica-se de seguida porque se vê <code class="docutils literal"><span class="pre">\\tan</span></code> e não apenas <code class="docutils literal"><span class="pre">\tan</span></code>.</p>
+<p>A segunda regra transforma todas as ocorrências de <code class="docutils literal"><span class="pre">\tan</span></code> em <code class="docutils literal"><span class="pre">\text{tg}</span></code>. No contexto das
+expressões regulares cada símbolo na lista <code class="docutils literal"><span class="pre">\^{}()</span></code> tem um significado especial.
+Por outro lado, estes mesmos símbolos, são plenamente usados em LaTeX. Este <strong>conflito</strong>
+é resolvido precedendo cada um deles com <code class="docutils literal"><span class="pre">\</span></code> (incluindo o próprio <code class="docutils literal"><span class="pre">\</span></code>!).
+Assim, para encontrar <code class="docutils literal"><span class="pre">\tan</span></code> temos que indicar <code class="docutils literal"><span class="pre">\\tan</span></code> porque <code class="docutils literal"><span class="pre">\\</span></code>
+equivale a procurar por <code class="docutils literal"><span class="pre">\</span></code>.</p>
+<p>No segundo membro da regra já não é necessário usar <code class="docutils literal"><span class="pre">\</span></code> e usa-se <code class="docutils literal"><span class="pre">\text{tg}</span></code> indicando que tg não deve estar
+em itálico (faça a experiência de tirar o <code class="docutils literal"><span class="pre">\text</span></code>).</p>
+<p><strong>Terceira regra</strong></p>
+<div class="highlight-python"><div class="highlight"><pre>procurar:                        substituir por:
+e\^\{\\left\((.+?)\\right\)\}    e^{\1}
+</pre></div>
+</div>
+<p>Tratamos o caso duma exponencial: <img class="math" src="_images/math/c9f2338fe9136404a2f280fb752a27df076bc16d.png" alt="e^{(2x)}"/> deve ser apenas <img class="math" src="_images/math/d059dc618a72df2002a679242a2c740667196983.png" alt="e^{2x}"/>.
+Para se apresentar esta terceira regra tira-se o <code class="docutils literal"><span class="pre">\</span></code> extra para simplicidade de leitura
+ficando com:</p>
+<div class="highlight-python"><div class="highlight"><pre>procurar:                        substituir por:
+e^{\left((.+?)\right)}           e^{ \1 }
+</pre></div>
+</div>
+<p>Recorda-se do LaTeX que <code class="docutils literal"><span class="pre">\left(</span></code> e <code class="docutils literal"><span class="pre">\right)</span></code> indicam um par de parentesis
+que cresce consoante a altura da fórmula. Vamos supor, para apresentar este exemplo,
+que, para o resultado final, o tamanho é fixo e então não precisamos
+de <code class="docutils literal"><span class="pre">\left</span></code> ou <code class="docutils literal"><span class="pre">\right</span></code>.</p>
+<p>Restam dois símbolos novos: <code class="docutils literal"><span class="pre">(.+?)</span></code> no lado esquerdo  e <code class="docutils literal"><span class="pre">\1</span></code> no lado direito.
+No primeiro é feita uma <strong>recolha de tudo</strong> o que ocorre entre  <code class="docutils literal"><span class="pre">\left(</span></code> e <code class="docutils literal"><span class="pre">\right)</span></code>
+e é-lhe dado o nome de <code class="docutils literal"><span class="pre">\1</span></code>. Ou seja, o lado direito da regra <code class="docutils literal"><span class="pre">e^{</span> <span class="pre">\1</span> <span class="pre">}</span></code> reproduz em <code class="docutils literal"><span class="pre">\1</span></code> o que foi
+encontrado entre <code class="docutils literal"><span class="pre">\left(</span></code> e <code class="docutils literal"><span class="pre">\right)</span></code> mas agora sem o par de parentesis.
+As chavetas no LaTeX não aparecem mas são necessárias para indicar que tudo o que nelas
+está contido fica em &#8220;super-escrito&#8221;.</p>
+<p><strong>Quarta regra</strong></p>
+<div class="highlight-python"><div class="highlight"><pre>procurar:                                    substituir por:
+\\sin\\left\(([\d\\, t]+?)\\right\)\^\{2\}&#39;  \sin^2(\1)
+</pre></div>
+</div>
+<p>Esta regra transforma expressões como <img class="math" src="_images/math/66f69627df98a8ace63fa6c10cc8e3585b945c47.png" alt="\cos(2t)^2"/> numa equivalente mas de aspeto
+mais usual <img class="math" src="_images/math/72b56f5aeeb98acf0f7f1f8ed85f356f6ed7f991.png" alt="\cos^2(2t)"/>. Nesta regra ocorrem símbolos novos na expressão a procurar:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">[\d\\,</span> <span class="pre">t]</span></code>: designa qualquer dígito (d), barra (\), a vírgula (,), o espaço ( ) ou ainda a letra t.</li>
+<li><code class="docutils literal"><span class="pre">[\d\\,</span> <span class="pre">t]+?</span></code>: designa uma combinação de dígitos, barras, vírgulas, espaços ou letras t.</li>
+<li><code class="docutils literal"><span class="pre">\^</span></code>: designa o símbolo ^ no LaTeX (a potência).</li>
+</ul>
+<p>Portanto, tudo o que é encontrado por <code class="docutils literal"><span class="pre">([\d\\,</span> <span class="pre">t]+?)</span></code> é representando por <code class="docutils literal"><span class="pre">\1</span></code> na
+expressão final onde apenas o &#8220;quadrado&#8221; muda de posição. No exemplo dado, ocorre o 2t entre
+parentesis e portanto o valor de <code class="docutils literal"><span class="pre">\1</span></code> é 2t.</p>
+<p>Explicação complementar: porque não se usou <strong>apenas</strong> <code class="docutils literal"><span class="pre">(.+?)</span></code> em vez de <code class="docutils literal"><span class="pre">([\d\\,</span> <span class="pre">t]+?)</span></code>?
+Ao usar a forma mais genérica no seguinte exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre>\sin( 2t )  + \sin( 4t )^2
+</pre></div>
+</div>
+<p>obteriamos <code class="docutils literal"><span class="pre">\sin(</span></code>, depois    <code class="docutils literal"><span class="pre">2t</span> <span class="pre">)</span>&nbsp; <span class="pre">+</span> <span class="pre">\sin(</span> <span class="pre">4t</span></code>, e finalmente, <code class="docutils literal"><span class="pre">)^2</span></code>. Isto é,
+o valor de <code class="docutils literal"><span class="pre">\1</span></code> seria <code class="docutils literal"><span class="pre">2t</span> <span class="pre">)</span>&nbsp; <span class="pre">+</span> <span class="pre">\sin(</span> <span class="pre">4t</span></code> e não apenas 2t pois a expressão regular &#8220;procura&#8221; por um quadrado
+que só existe no segundo sin.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="pythonsection.html" title="capítulo anterior">Programação dos parâmetros em Python/Sage</a></li>
+      <li>Next: <a href="randomvars.html" title="próximo capítulo">Valores e objetos aleatórios</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>Esta Página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/rewrite.txt"
+            rel="nofollow">Exibir Fonte</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Pesquisa rápida</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Ir" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Digite os termos da busca ou o nome de um módulo, classe ou função.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, João Pedro Cruz.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/rewrite.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

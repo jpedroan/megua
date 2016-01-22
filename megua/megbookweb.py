@@ -343,8 +343,8 @@ class MegBookWeb(MegBookBase):
             #Create exercise instance
             ex_instance = exerciseinstance(row, ekey=e_number)
 
-            problem = ex_instance.problem()
-            answer = ex_instance.answer()
+            problem = ex_instance.problem(removemultitag=True)
+            answer  = ex_instance.answer(removemultitag=True)
     
             #Adapt for appropriate URL for images
             #if ex_instance.image_list != []:
