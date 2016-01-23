@@ -16,7 +16,7 @@ Started in 2011, MEGUA is an external package for Sagemath for creating parametr
 
 There are two branches in this repository:
 
-- **old_megua**: running in a non public server from 2011 to 2015.
+- **old_megua**: running in a non public server from november 2010 to 2015.
 - **master**: version to be adopted for SageMathCloud use, command-line, etc. 
 
 
