@@ -1,14 +1,14 @@
 r"""
 MegBookBase -- Base class for build your own database of exercises on some markup language.
 
-MegBookBase is ready for textual form exercises. See derivatives of this class for
-other markup languages.
+MegBookBase is ready for textual utf-8 form exercises. 
+See derivatives of this class for other markup languages.
 
 
 AUTHORS:
 
 - Pedro Cruz (2012-06): initial version (based on megbook.py)
-- Pedro Cruz (2016-01): version for SMC.
+- Pedro Cruz (2016-01): first modifications for use in SMC.
 
 """
 
@@ -17,7 +17,7 @@ AUTHORS:
 
 
 #*****************************************************************************
-#       Copyright (C) 2012 Pedro Cruz <PedroCruz@ua.pt>
+#       Copyright (C) 2012,2016 Pedro Cruz <PedroCruz@ua.pt>
 #
 #  Distributed under the terms of the GNU General Public License (GPL)
 #                  http://www.gnu.org/licenses/
@@ -34,13 +34,15 @@ from exerparse import exerc_parse
 #Because sage.plot.plot.EMBEDDED_MODE
 #This variable indicates if notebook is present.
 #Trying no include now the EMBEDDED_MODE and wait for some place else:
-from sage.all import *
+#from sage.all import * #REMOVE IS EVERYTHONG IS WORKING
+
 
 #Python modules:
 import sqlite3 #for row objects as result from localstore.py
 import shutil
 import os
-import random 
+import random
+
 #import codecs
 
 
@@ -136,7 +138,7 @@ class MegBookBase:
        Exercise E28E28_nonexistant is not on the database.
     """
 
-    def __init__(self,filename=None,natlang='pt_pt',markuplang='text'): #TODO: utf-8 instead of asciitext?
+    def __init__(self,filename=None,natlang='pt_pt',markuplang='text'): 
         r"""
 
         INPUT::
@@ -145,15 +147,16 @@ class MegBookBase:
         - ``markuplang`` -- 'latex' or 'web'.
 
         """
-    
-        #Sage and sagenotebook DATA variable is only defined after 
-        #worksheet is opened so it cannot be imported to here.
 
+        if not filename:
+            raise IOError("MegBook needs database filename.")
+
+    
         #Create or open the database
         try:
             self.megbook_store = LocalStore(filename=filename,natlang=natlang,markuplang=markuplang)
             self.local_store_filename = self.megbook_store.local_store_filename #keep record.
-            print "Opened " + str(self)
+            #print "Opened " + str(self)
         except sqlite3.Error as e:
             print "Filename couldn't be opened: " , e.args[0], "\n"
             raise e
@@ -206,7 +209,7 @@ class MegBookBase:
         try:
             tmpl = self.env.get_template(filename)
         except jinja2.exceptions.TemplateNotFound:
-            return "MegUA -- missing template %s"%filename
+            return "MegBookBase: missing template %s"%filename
         r = tmpl.render(**user_context)
         return r
 
@@ -457,6 +460,12 @@ class MegBookBase:
         #Modify this
         sname = 'Exercise name %s' % exrow['owner_key'].encode('utf8')
         print sname + '\n' + exrow['problem_text'].encode('utf8') + '\n'
+        #TODO
+        #if is_notebook():
+        #    html('<b>' + sname + ': </b><pre>' + exrow['problem_text'].encode('utf8') + '</pre><br/>')
+        #else:
+        #    print sname + '\n' + exrow['problem_text'].encode('utf8') + '\n'
+
 
 
     def remove(self,owner_keystring,dest='.'):
@@ -513,8 +522,7 @@ class MegBookBase:
         #return ex_instance #removed because makes too much "noise" in output
 
 
-
-    def print_instance(self, ex_instance, show_output=False):
+    def print_instance(self, ex_instance):
         """
         After producing an exercise template or requesting a new instance of some exercise
         this routine will print it on notebook notebook or command line mode. It also should

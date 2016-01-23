@@ -4,7 +4,7 @@ MegBookWeb -- Build your own database of exercises to the web.
 AUTHORS:
 
 - Pedro Cruz (2012-06): initial version.
-- Pedro Cruz (2016-01): version for SMC.
+- Pedro Cruz (2016-01): first modifications for use in SMC.
 
 
 """

@@ -1,5 +1,5 @@
 r"""
-MegBook -- Build your own database of exercises.
+MegBookLaTeX -- Build your own database of exercises.
 
 AUTHORS:
 
@@ -9,6 +9,7 @@ AUTHORS:
 - Pedro Cruz (2012-01): including jinja2 templating.
 
 - Pedro Cruz (2012-06): starting project for use of web and pdflatex.
+- Pedro Cruz (2016-01): first modifications for use in SMC.
 
 
 """
@@ -23,11 +24,14 @@ AUTHORS:
   
 
 #megua modules:
-from localstore import LocalStore,ExIter
-from ex import *
-from exerparse import exerc_parse
+from megbookbase import *
+
+#remove after confirmation
+#from localstore import LocalStore,ExIter
+#from ex import *
+#from exerparse import exerc_parse
+
 from xsphinx import SphinxExporter
-#from xair import AirExporter, BookmarkList
 from platex import pcompile
 from xsws import SWSExporter
 from xlatex import html2latex,latexcommentthis
@@ -35,7 +39,7 @@ from xlatex import html2latex,latexcommentthis
 #Because sage.plot.plot.EMBEDDED_MODE
 #This variable indicates if notebook is present.
 #Trying no include now the EMBEDDED_MODE and wait for some place else:
-from sage.all import *
+#from sage.all import *
 
 
 #Sage modules:
@@ -45,16 +49,16 @@ from sage.misc.latex import Latex, _run_latex_, _latex_file_
 from sage.misc.html import html
 
 #Python modules:
-import sqlite3 #for row objects as result from localstore.py
-import shutil
-import os
-import StringIO
-from random import sample,randint
+#import sqlite3 #for row objects as result from localstore.py
+#import shutil
+#import os
+#import StringIO
+#from random import sample,randint
 #import codecs
 
 
 # Jinja2 package
-import jinja2
+#import jinja2
 #from jinja2 import Environment, PackageLoader,FileSystemLoader,Template, TemplateNotFound
 #Note on Jinja2:
 # di = { 'ex_10_0_4': 10 }
@@ -62,9 +66,9 @@ import jinja2
 # print "Template folders are: " + str(env.loader.searchpath)
 
 
-class MegBook:
+class MegBookLaTex(MegBookBase):
     r"""
-    MEG set of routines for exercise templating.
+    MEGUA set of routines for exercise templating with LaTeX.
 
     INPUT::
 
@@ -88,7 +92,7 @@ class MegBook:
     Create or edit a database::
 
        >>> from all import *
-       >>> meg = MegBook(r'.testoutput/megdb.sqlite')
+       >>> meg = MegBookLaTeX(r'.testoutput/megdb.sqlite')
        MegBook opened. Execute `MegBook?` for examples of usage.
        Templates for 'pt_pt' language.
 
@@ -147,157 +151,48 @@ class MegBook:
 
     #TODO 1: increase docstring examples.
 
-    #TODO 2: asure that there is a natlang folder in templates (otherwise put it in english). Warn for existing languages if specifies lan does not exist.
+    #TODO 2: assure that there is a natlang folder in templates (otherwise put it in english). Warn for existing languages if specifies lan does not exist.
 
     #TODO 3: remove html_output and latex_debug=False; create debug only.
 
 
-    def __init__(self,filename,natlang='pt_pt',markuplang='latex',html_output=False,latex_debug=False):
+    def __init__(self,filename,natlang='pt_pt'):
         r"""
 
         INPUT::
         - ``filename`` -- filename where the database is stored.
         - ``natlang`` -- For example 'pt_pt' for portuguese (of portugal), 'en_us' for english from USA.
-        - ``markuplang`` -- 'latex' (currently is the only supported option.
 
         """
-        #Variable DATA is only defined after worksheet is opened so it cannot be imported to here.
+        
 
-        if not filename:
-            raise IOError("MegBook needs database filename to be specified.")
-
-        self.local_store_filename  = filename
+        #Tirar: self.local_store_filename  = filename
 
         #Create or open the database
         try:
-            self.megbook_store = LocalStore(filename=self.local_store_filename,natlang=natlang,markuplang=markuplang)
-            print "MegBook opened. Execute `MegBook?` for examples of usage."
+            MegBookBase.__init__(self,filename=filename,natlang=natlang,markuplang='latex')
+            print "MegBookLaTeX opened. Execute `MegBook?` for examples of usage."
         except sqlite3.Error as e:
-            print "MegBook couldn't be opened: ", e.args[0]
+            print "MegBookLaTeX couldn't be opened: ", e.args[0]
             return
 
         #Templating (with Jinja2)
-        if os.environ.has_key('MEGUA_TEMPLATE_PATH'):
-            TEMPLATE_PATH = os.environ['MEGUA_TEMPLATE_PATH']
-        else:
-            from pkg_resources import resource_filename
-            TEMPLATE_PATH = os.path.join(resource_filename(__name__,''),'template',natlang)
-        print "Templates for '%s' language: %s" % (natlang,TEMPLATE_PATH)
+        #if os.environ.has_key('MEGUA_TEMPLATE_PATH'):
+        #    TEMPLATE_PATH = os.environ['MEGUA_TEMPLATE_PATH']
+        #else:
+        #    from pkg_resources import resource_filename
+        #    TEMPLATE_PATH = os.path.join(resource_filename(__name__,''),'template',natlang)
+        #print "Templates for '%s' language: %s" % (natlang,TEMPLATE_PATH)
         #print "Templates in: " + TEMPLATE_PATH
-        self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_PATH))
+        #self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_PATH))
 
-        #For template. See template_create function.
-        self.template_row = None
-
-        #TODO: remove this as it is. Adding options is best.
-        #Debug on/off
-        self.html_output = html_output
-        #if not self.html_output:
-        #    print "Use: megbook.html_output=True, if you want to see an online instance of the new exercise."
-
-        #TODO remove latex_debug. 
-        self.latex_debug = latex_debug
-        #if not self.latex_debug:
-        #    print "Use: megook.latex_debug=True, if you want to see LaTex error messages."
 
 
     def __str__(self):
-        return "MegBook(%s,%s,%s)" % (self.local_store_filename,self.natlang,self.markuplang)
+        return "MegBookLaTeX(%s,%s,%s)" % (self.local_store_filename,self.natlang,self.markuplang)
 
     def __repr__(self):
-        return "MegBook(%s,%s,%s)" % (self.local_store_filename,self.natlang,self.markuplang)
-
-
-    def template(self, filename, **user_context):
-        """
-        Returns HTML, CSS, LaTeX, etc., for a template file rendered in the given
-        context.
-
-        INPUT:
-
-        - ``filename`` - a string; the filename of the template relative
-          to ``sagenb/data/templates``
-
-        - ``user_context`` - a dictionary; the context in which to evaluate
-          the file's template variables
-
-        OUTPUT:
-
-        - a string - the rendered HTML, CSS, etc.
-
-        BASED ON:
-
-           /home/.../sage/devel/sagenb/sagenb/notebook/tempate.py
-
-        """
-
-        try:
-            tmpl = self.env.get_template(filename)
-        except jinja2.exceptions.TemplateNotFound:
-            return "MegUA -- missing template %s"%filename
-        r = tmpl.render(**user_context)
-        return r
-
-
-    def save(self,exercisestr,dest='.'):
-        r"""
-        Save an exercise defined on a `python string`_ using a specific sintax defined here_.
-
-        INPUT::
-
-        - ``exercisestr`` -- a `python string`_ text containing a summary, problem, answer and class according to meg exercise sintax.
-        - ``dest`` -- directory where latex compilation will be done.
-
-        OUTPUT::
-
-            Textual messages with errors.
-            Check ``dest`` directory (default is current) for compilation results.
-
-        .. _python string: http://docs.python.org/release/2.6.7/tutorial/introduction.html#strings
- 
-        """
-
-        #print "TYPE OF INPUT ", str(type(exercisestr))
-
-        if type(exercisestr)==str:
-            exercisestr = unicode(exercisestr,'utf-8')
-
-
-        # ---------------------------------------
-        # Check exercise syntax: 
-        #    exer_parse return tuple:    
-        #       summary, problem, answer and classtext.
-        # ---------------------------------------
-        row = exerc_parse(exercisestr)
-        if not row:
-            print self.template('exercise_syntax.txt')
-            print "==================================="
-            print "Exercise was not saved on database."
-            print "==================================="
-            return
-
-        # (0 owner_key, 1 txt_sections, 2 txt_summary, 3 txt_problem, 4 txt_answer, 5 txt_class)
-        #row = {'owner_key': p[0], 'summary_text': p[2], 'problem_text': p[3], 'answer_text': p[4], 'class_text': p[5]}
-
-
-        # -------------
-        # Exercise ok?
-        # -------------
-        if not self.is_exercise_ok(row,dest,silent=False):
-            print "==================================="
-            print "Exercise was not saved on database."
-            print "==================================="
-            return
-
-
-        # ----------------------------
-        # Exercise seems ok: store it.
-        # ----------------------------
-        inserted_row = self.megbook_store.insertchange(row)
-        if inserted_row: 
-            print 'Exercise name %s inserted or changed.' % inserted_row['owner_key']
-        else:
-            print 'Problem in access to the database. Could not save the exercise on the database.'
+        return "MegBookLaTeX(%s,%s,%s)" % (self.local_store_filename,self.natlang,self.markuplang)
 
 
 
@@ -326,82 +221,7 @@ class MegBook:
         return True
 
 
-    def exercise_pythontest(self,row,start=0,many=5, edict=None,silent=False):
-        r"""
-        Test an exercise with random keys.
-
-        INPUT:
-
-         - ``row`` -- dictionary with class textual definitions.
-         - ``start`` -- the parameteres will be generated for this random seed for start.
-         - ``many`` -- how many keys to generate. 
-         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-
-        OUTPUT:
-
-            Printed message and True/False value.
-
-        TODO: change this function name to exercise_test.
-        """
-
-
-        #output = cStringIO.StringIO()
-        #output.write('First line.\n')
-        #print >>output, 'Second line.'
-
-
-        success = True
-
-        #Testing        
-        try:
-            #Do the test for other keys
-            if not silent:
-                print  "Testing python/sage class '%s' with %d different keys." % (row['owner_key'],many)
-
-            #Create a class and a first instance for ekey=start.
-            ekey = start #for exceptions
-            print  "Testing for ekey =",start
-            ex_instance = exerciseinstance(row,ekey=start,edict=edict)
-
-            for ekey in range(start+1,start+many):
-                print  "Testing for ekey =",ekey
-                ex_instance.update(ekey=ekey)
-        except SyntaxError as se:
-            print  "   Exercise class '%s' contains a syntax error on line %d." % (row['owner_key'],se.lineno)
-            cl = row['class_text'].split()
-            if len(cl)>se.lineno:
-                print  "      check line: %s" % cl[se.lineno-1]
-            success = False
-        except Exception as ee: # Exception will be in memory.
-            print  "Error on exercise '{0}' with parameters edict={1} and ekey={2}".format(row['owner_key'],edict,ekey)
-            print  "   error description: ", ee
-            if is_notebook():
-                print  "   Copy exercise code, only the class part, to a new cell. Then add the following command"
-                print  "%s().update(ekey=%d)" % (row['owner_key'],ekey)
-                print  "and execute with shift+enter. This may help finding the error line."
-            else:
-                print  "   Test the exercise code, only the class part using the following command"
-                print  "%s().update(ekey=%d)" % (row['owner_key'],ekey)
-                print  "This may help finding the error line."
-            success = False
-        
-        #Conclusion
-        if not silent:
-            if success:
-                print  "    No programming errors found in this test."
-            else:
-                print  "Review exercise '%s' based on the reported cases." % row['owner_key']
-
-        # Retrieve file contents -- this will be
-        # 'First line.\nSecond line.\n'
-        #contents = output.getvalue()
-
-        # Close object and discard memory buffer --
-        # .getvalue() will now raise an exception.
-        #output.close()
-
-        return success
-
+ 
 
     def exercise_compiletest(self,row,dest='.',silent=False):
         r"""
@@ -448,165 +268,25 @@ class MegBook:
             
 
 
-    def check_all(self,dest='.'):
-        r""" 
-        Check all exercises of this megbook for errrors.
-
-        INPUT:
-
-        OUTPUT:
-
-            Printed message and True/False value.
-        """
-
-        all_ex = []
-        for row in ExIter(self.megbook_store):
-            if not self.is_exercise_ok(row,dest,silent=True):
-                print "   Exercise '%s' have python/sage or latex errors." % row['owner_key']
-                all_ex.append(row['owner_key'])
-        if all_ex:
-            print "Review the following exercises:"
-            for r in all_ex:
-                print r
-        else:
-            print "No problem found."
-
-    def search(self,regex):
-        r"""
-        Performs a search of a regular expression ``regex`` over all fields.
-
-        INPUT:
-        - ``regex`` -- regular expression (see regex_ module).
-        OUTPUT:
-        - 
-        
-        .. _regex: http://docs.python.org/release/2.6.7/library/re.html
-        """
-        exlist = self.megbook_store.search(regex)
-        for row in exlist:
-            self.search_print_row(row)
-
-
-    def search_print_row(self,exrow):
-        r"""
-        This is an helper function of ``Meg.search`` function to print the contents of a search.
-        Not to be called by meg user.
-
-        INPUT:
-
-        - ``exrow`` -- an sqlite row structure_ where fields are accessible by name.
-
-        OUTPUT:
-
-        - html or text.
-
-        NOTES:
-            unicode is in utf-8 -> string
-            http://en.wikipedia.org/wiki/ISO/IEC_8859-1
-            Sage html() requires string.
-        """
-    
-        sname = 'Exercise name %s' % exrow['owner_key'].encode('utf8')
-        if is_notebook():
-            html('<b>' + sname + ': </b><pre>' + exrow['problem_text'].encode('utf8') + '</pre><br/>')
-        else:
-            print sname + '\n' + exrow['problem_text'].encode('utf8') + '\n'
-
-
-    def remove(self,owner_keystring,dest='.'):
-        r"""
-        Removing an exercise from the database.
-
-        INPUT:
-
-        - ``owner_keystring`` -- the class name.
-        """
-
-        #Get the exercise
-        row = self.megbook_store.get_classrow(owner_keystring)
-        if row:            
-            fname = os.path.join(dest,owner_keystring+'.txt')
-            #store it on a text file
-            f = open(fname,'w')
-            f.write(row['summary_text'].encode('utf-8')) #includes %summary line
-            f.write(row['problem_text'].encode('utf-8')) #includes %problem line
-            f.write(row['answer_text'].encode('utf-8')) #includes %answer line
-            f.write(row['class_text'].encode('utf-8'))
-            f.close()
-            print "Exercise '%s' stored on text file %s." % (owner_keystring,fname)
-
-            #remove it
-            self.megbook_store.remove_exercise(owner_keystring)
-        else:
-            print "Exercise %s is not on the database." % owner_keystring
-
-
-
-    def new(self,owner_keystring, ekey=None, edict=None):
-        r"""Prints an exercise instance of a given type
-
-        INPUT:
-
-         - ``owner_keystring`` -- the class name.
-         - ``ekey`` -- the parameteres will be generated for this random seed.
-         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-
-        OUTPUT:
-            An instance of class named ``owner_keystring``.
-
-        """
-        #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(owner_keystring)
-        if not row:
-            print "%s cannot be accessed on database" % owner_keystring
-            return None
-        #Create and print the instance
-        ex_instance = exerciseinstance(row, ekey, edict)
-        self.print_instance(ex_instance)
-        return ex_instance
-
-
 
     def print_instance(self, ex_instance):
         """
-        Routine used to produce an exercise output to notebook or command line mode.
+        After producing an exercise template or requesting a new instance of some exercise
+        this routine will print it on notebook notebook or command line mode. It also should
+        give a file were the user can find text markup (latex or html, etc).
         """
 
-        summtxt =  ex_instance.summary()
-        probtxt =  ex_instance.problem()
-        answtxt =  ex_instance.answer()
-        sname   =  ex_instance.name
-
         #Use jinja2 template to generate LaTeX.
-        latex_string = self.template("print_instance_latex.tex",sname=sname,summtxt=summtxt,probtxt=probtxt,answtxt=answtxt,ekey=ex_instance.ekey)
+        latex_string = self.template(
+            "print_instance_latex.tex",
+            sname=ex_instance.name,
+            summtxt=ex_instance.summary(),
+            probtxt=ex_instance.problem(),
+            answtxt=ex_instance.answer(),
+            ekey=ex_instance.ekey)
 
-        if is_notebook():
-
-            # ---------------
-            # Using notebook.
-            # ---------------
-
-            #Produce PDF file from LaTeX.
-            pcompile(latex_string,'.',sname, hideoutput=True)
-
-        else:
-
-            # -------------------
-            # Using command line.
-            # -------------------
-            
-            #Textual output
-            if self.html_output:
-                print '-'*len(sname)
-                print sname 
-                print '-'*len(sname)
-                print summtxt.encode('utf8')
-                print probtxt.encode('utf8')
-                print answtxt.encode('utf8')
-
-            #Produce PDF file from LaTeX.
-            pcompile(latex_string, '.', sname, hideoutput=self.html_output)
-
+        #Produce PDF file from LaTeX.
+        pcompile(latex_string,'.',sname, hideoutput=True)
 
 
 
@@ -1206,22 +886,6 @@ class MegBook:
         return new_text
 
 
-#end class MegBook
-
-
-
-
-def is_notebook():
-    return sage.plot.plot.EMBEDDED_MODE
-
-
-    r''' Remove this definition:
-
-    def dbinstance(self, ex_class, ekey=None, edict=None):
-        #Get summary, problem, answer and class_text
-        row = self.megbook_store.get_classrow(ex_class.name)
-        #Create instance
-        return self.instance(ex_class.name,ex_class, row, ekey, edict)
-    '''
+#end class MegBookLaTeX
 
 
