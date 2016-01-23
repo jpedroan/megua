@@ -8,7 +8,7 @@ other markup languages.
 AUTHORS:
 
 - Pedro Cruz (2012-06): initial version (based on megbook.py)
-
+- Pedro Cruz (2016-01): version for SMC.
 
 """
 
@@ -24,7 +24,8 @@ AUTHORS:
 #*****************************************************************************
   
 
-#Meg modules:
+#megua modules:
+from mconfig import * #megua configuration file: server side settings.
 from localstore import LocalStore,ExIter
 from ex import *
 from exerparse import exerc_parse
@@ -283,7 +284,7 @@ class MegBookBase:
 
         Developer note: derive this for other markups.
         """
-        return True 
+        raise NotImplementedError
 
 
     def exercise_pythontest(self,row,start=0,many=5, edict=None,silent=False):
@@ -539,21 +540,6 @@ class MegBookBase:
 
 
 
-#end class MegBook
-
-
-
-def is_notebook():
-    return sage.plot.plot.EMBEDDED_MODE
-
-
-    r''' Remove this definition:
-
-    def dbinstance(self, ex_class, ekey=None, edict=None):
-        #Get summary, problem, answer and class_text
-        row = self.megbook_store.get_classrow(ex_class.name)
-        #Create instance
-        return self.instance(ex_class.name,ex_class, row, ekey, edict)
-    '''
+#end class MegBookBase
 
 
