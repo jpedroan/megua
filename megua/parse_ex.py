@@ -161,7 +161,7 @@ def flex(txt):
 
 
 
-def exerc_parse(inputtext):
+def parse_ex(inputtext):
     r"""
     Convert ``inputtext`` into a tuple ``(owner_key,txt_summary,txt_problem,txt_answer,txt_class)`` extracted from text.
 
@@ -181,13 +181,13 @@ def exerc_parse(inputtext):
 
     EXAMPLES:
 
-    ... test with: sage -python -m doctest exerparse.py
+    ... test with: sage -python -m doctest parse_ex.py
 
 
     Example of the standard situation::
 
-    >>> from exerparse import exerc_parse
-    >>> exerc_parse(r'''
+    >>> from parse_es import parse_ex
+    >>> parse_ex(r'''
     ... %summary Section
     ...  My summary.
     ... %problem Suggestive Textual Name

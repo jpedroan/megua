@@ -198,3 +198,174 @@ def lang_set(s):
     else:
         return s
 
+
+
+
+    def make_index(self,where='.',debug=False):
+        """
+        Produce rst code files from the database and an index reading first line of the %summary field.
+
+        Command line use: 
+            The ``where`` input argument, when specified,  will contain all details of Sphinx compilation.
+
+        LINKS:
+
+        http://code.activestate.com/recipes/193890-using-rest-restructuredtext-to-create-html-snippet/
+
+        """
+
+        html_index = SphinxExporter(self,where,debug)
+        print "Index is at: "+ html_index.htmlfile
+
+        if is_notebook():
+            if where == '.': 
+                #To open a browser
+                pos = html_index.htmlfile.find(".")
+                html(r'<a href="%s" target=_blank>Press to open database index.</a>' % html_index.htmlfile[pos:])
+            elif 'data' in where:
+                #To open a browser
+                pos = html_index.htmlfile.find("/home")
+                pos2 = html_index.htmlfile.find("/home",pos+1)
+                if pos2>=0:
+                    pos = pos2
+                html(r'<a href="%s" target=_blank>Press to open database index.</a>' % html_index.htmlfile[pos:])
+            else:
+                #print "Index is at: "+ html_index.htmlfile
+                print "See index at Megua button at top."
+        else:
+            print "firefox -no-remote ", html_index.htmlfile
+
+
+    #def make_air(self,repetitions=2,dest='.',exerset=None):
+    #    air = AirExporter(self,repetitions,exerset)
+    #    if pcompile(air.fulltext, dest, "air_out",hideoutput=is_notebook(),runs=2):
+    #        BookmarkList(os.path.join(dest,'air_out.pdf'))
+    #    #print bm.bm_list #TODO: export to xml
+
+
+
+    def make_index(self,where='.',debug=False):
+        """
+        Produce rst code files from the database and an index reading first line of the %summary field.
+
+        Command line use: 
+            The ``where`` input argument, when specified,  will contain all details of Sphinx compilation.
+
+        LINKS:
+
+        http://code.activestate.com/recipes/193890-using-rest-restructuredtext-to-create-html-snippet/
+
+        """
+
+        html_index = SphinxExporter(self,where,debug)
+        print "Index is at: "+ html_index.htmlfile
+
+        if is_notebook():
+            if where == '.': 
+                #To open a browser
+                pos = html_index.htmlfile.find(".")
+                html(r'<a href="%s" target=_blank>Press to open database index.</a>' % html_index.htmlfile[pos:])
+            elif 'data' in where:
+                #To open a browser
+                pos = html_index.htmlfile.find("/home")
+                pos2 = html_index.htmlfile.find("/home",pos+1)
+                if pos2>=0:
+                    pos = pos2
+                html(r'<a href="%s" target=_blank>Press to open database index.</a>' % html_index.htmlfile[pos:])
+            else:
+                #print "Index is at: "+ html_index.htmlfile
+                print "See index at Megua button at top."
+        else:
+            print "firefox -no-remote ", html_index.htmlfile
+
+
+
+    def gallery(self,owner_keystring, ekey=None, edict=None):
+        r"""Prints an exercise instance of a given type and output RST file for gallery.
+
+        INPUT:
+
+         - ``owner_keystring`` -- the class name.
+         - ``ekey`` -- the parameteres will be generated for this random seed.
+         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
+
+        OUTPUT:
+            An instance of class named ``owner_keystring`` and output RST file for gallery.
+
+        """
+        #Get summary, problem and answer and class_text
+        row = self.megbook_store.get_classrow(owner_keystring)
+        if not row:
+            print "%s cannot be accessed on database" % owner_keystring
+            return None
+        #Create and print the instance
+        ex_instance = exerciseinstance(row, ekey, edict)
+        #generate one instance
+        self.print_instance(ex_instance)
+        #generate rst file
+
+        summtxt =  ex_instance.summary()
+        probtxt =  ex_instance.problem()
+        answtxt =  ex_instance.answer()
+        sname   =  ex_instance.name
+
+        #Use jinja2 template to generate LaTeX.
+        if 'CDATA' in answtxt:
+            answtxt_woCDATA = re.subn(
+                '<!\[CDATA\[(.*?)\]\]>', r'\1', 
+                answtxt, 
+                count=0,
+                flags=re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
+        else:
+            answtxt_woCDATA = re.subn(
+                '<choice>(.*?)</choice>', r'<b>Escolha:</b><br>\1<hr>', 
+                answtxt, 
+                count=0,
+                flags=re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
+
+
+
+        html_string = self.template("print_instance_html.html",
+                sname=sname,
+                summtxt=summtxt,
+                probtxt=probtxt,
+                answtxt=answtxt_woCDATA,
+                ekey=ex_instance.ekey)
+
+        #Produce files for pdf and png graphics if any tikz code embed on exercise
+        #Ver ex.py: now latex images are produced in ex.problem() and ex.answer()
+        #html_string = self.publish_tikz(sname,html_string)
+
+
+        #file with html to export (extension txt prevents html display).
+
+        #To be viewed on browser
+        #f = open(sname+'.html','w')
+        #f.write(html_string.encode('latin1'))
+        #f.close()
+        f = codecs.open(sname+'.html', mode='w', encoding='utf-8')
+        f.write(html_string)
+        f.close()
+
+        rst_string = self.template("rst_instance.rst",
+                sname=sname,
+                summtxt=summtxt,
+                probtxt=probtxt,
+                answtxt=answtxt_woCDATA,
+                ekey=ex_instance.ekey)
+
+        #Produce files for pdf and png graphics if any tikz code embed on exercise
+        #Ver ex.py: now latex images are produced in ex.problem() and ex.answer()
+        #html_string = self.publish_tikz(sname,html_string)
+
+        #file with html to export (extension txt prevents html display).
+
+        #To be viewed on browser
+        #f = open(sname+'.html','w')
+        #f.write(html_string.encode('latin1'))
+        #f.close()
+        f = codecs.open(sname+'.rst', mode='w', encoding='utf-8')
+        f.write(rst_string)
+        f.close()
+
+

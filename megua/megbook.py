@@ -1,9 +1,7 @@
+# -*- coding: utf-8 -*-
+
 r"""
-MegBookBase -- Base class for build your own database of exercises on some markup language.
-
-MegBookBase is ready for textual utf-8 form exercises. 
-See derivatives of this class for other markup languages.
-
+MegBook -- build your own database of exercises in several markup languages.
 
 AUTHORS:
 
@@ -23,12 +21,14 @@ AUTHORS:
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
   
+  
+#megua configuration file: server side settings.
+from mconfig import * 
 
 #megua modules:
-from mconfig import * #megua configuration file: server side settings.
 from localstore import LocalStore,ExIter
 from ex import *
-from exerparse import exerc_parse
+from parse_ex import parse_ex
 
 
 #Because sage.plot.plot.EMBEDDED_MODE
@@ -45,6 +45,20 @@ import random
 
 #import codecs
 
+#Python Modules
+import re
+import codecs
+import random as randomlib #random is imported as a funtion somewhere
+import json
+import httplib, urllib
+
+
+#Megua modules:
+from platex import pcompile
+from xmoodle import MoodleExporter
+from xsphinx import SphinxExporter
+from xlatex import * #including PDFLaTeXExporter
+
 
 # Jinja2 package
 import jinja2
@@ -55,15 +69,12 @@ import jinja2
 # print "Template folders are: " + str(env.loader.searchpath)
 
 
-class MegBookBase:
+class MegBook:
     r"""
-    Base routines for exercise templating. Abstract class.
-
-    INPUT::
-
-    - ``filename`` -- filename where the database is stored.
-
-    This module provides a means to produce a database of exercises that can be seen as a book of some author or authors.
+    A book of exercises of several markup languages.
+    
+    This module provides a means to produce a database of exercises 
+    that can be seen as a book of some author or authors.
 
     Using exercices:
 
@@ -81,14 +92,12 @@ class MegBookBase:
     Create or edit a database::
 
        >>> from all import *
-       >>> meg = MegBookBase(r'.testoutput/megbasedb.sqlite')
-       MegBook opened. Execute `MegBook?` for examples of usage.
-       Templates for 'pt_pt' language.
+       >>> meg = MegBook(r'.testoutput/megbasedb.sqlite')
 
 
     Save a new or changed exercise::
 
-       >>> txt=r'''
+       >>> ex=ExLaTeX(r'''
        ... %Summary Primitives
        ... Here one can write few words, keywords about the exercise.
        ... For example, the subject, MSC code, and so on.
@@ -108,8 +117,7 @@ class MegBookBase:
        ...     def solve(self):
        ...         x=SR.var('x')
        ...         self.prim = integrate(self.ap * x + self.bp,x)
-       ... '''
-       >>> meg.save(txt,dest=r'.testoutput')
+       ... ''')
        Each problem can have a suggestive name. 
        Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
        <BLANKLINE>
@@ -117,7 +125,8 @@ class MegBookBase:
            No problems found in this test.
           Compiling 'E28E28_pdirect_001' with pdflatex.
           No errors found during pdflatex compilation. Check E28E28_pdirect_001.log for details.
-       Exercise name E28E28_pdirect_001 inserted or changed.
+       >>> meg.save(ex,dest=r'.testoutput')
+       Exercise name E28E28_pdirect_001 inserted.
 
     Search an exercise:
 
@@ -138,13 +147,18 @@ class MegBookBase:
        Exercise E28E28_nonexistant is not on the database.
     """
 
-    def __init__(self,filename=None,natlang='pt_pt',markuplang='text'): 
+    #TODO 1: increase docstring examples.
+
+    #TODO 2: assure that there is a natlang folder in templates (otherwise put it in english). Warn for existing languages if specifies lan does not exist.
+
+
+    def __init__(self,filename=None,defaultnatlang='pt_pt',defaultmarkuplang='siacua'): 
         r"""
 
         INPUT::
         - ``filename`` -- filename where the database is stored.
-        - ``natlang`` -- For example, 'pt_pt', for portuguese (of portugal), 'en_us' for english from USA.
-        - ``markuplang`` -- 'latex' or 'web'.
+        - ``defaultnatlang`` -- For example, 'pt_pt', for portuguese (of portugal), 'en_us' for english from USA.
+        - ``defaultmarkuplang`` -- 'latex' or 'web'.
 
         """
 
@@ -178,10 +192,11 @@ class MegBookBase:
 
 
     def __str__(self):
-        return "MegBookBase(%s) for natural language %s and markup language  %s." % (self.local_store_filename,self.natlang,self.markuplang)
+        return "MegBook('%s','%s','%s')" % (self.local_store_filename,self.natlang,self.markuplang)
 
     def __repr__(self):
-        return "MegBookBase(%s)" % (self.local_store_filename)
+        return "MegBook('%s','%s','%s')" % (self.local_store_filename,self.natlang,self.markuplang)
+
 
     def template(self, filename, **user_context):
         """
@@ -214,148 +229,29 @@ class MegBookBase:
         return r
 
 
-    def save(self,exercisestr,dest='.'):
+    def save(self,exercise):
         r"""
         Save an exercise defined on a `python string`_ using a specific sintax defined here_.
 
         INPUT::
 
-        - ``exercisestr`` -- a `python string`_ text containing a summary, problem, answer and class according to meg exercise sintax.
-        - ``dest`` -- directory where possible compilation will be done.
+        - ``exercise`` -- an exercise instance.
 
         OUTPUT::
 
             Textual messages with errors.
             Check ``dest`` directory (default is current) for compilation results.
 
-        .. _python string: http://docs.python.org/release/2.6.7/tutorial/introduction.html#strings
 
         """
 
-        #print "TYPE OF INPUT ", str(type(exercisestr))
-
-        if type(exercisestr)==str:
-            exercisestr = unicode(exercisestr,'utf-8')
-
-
-        # ---------------------------------------
-        # Check exercise syntax: 
-        #    summary, problem, answer and class.
-        # ---------------------------------------
-        row = exerc_parse(exercisestr)
-
-        if not row:
-            print self.template('exercise_syntax.txt')
-            print "==================================="
-            print "Exercise was not saved on database."
-            print "==================================="
-            return
-
-        # (0 owner_key, 1 txt_sections, 2 txt_summary, 3 txt_problem, 4 txt_answer, 5 txt_class)
-        #row = {'owner_key': p[0], 'summary_text': p[2], 'problem_text': p[3], 'answer_text': p[4], 'class_text': p[5]}
-
-
-        # -------------
-        # Exercise ok?
-        # -------------
-        #TODO: what to do when latex or latex images have errors?
-        #TODO: this is not good this way!
-        if not self.is_exercise_ok(row,dest,silent=True):
-            print "==================================="
-            print "Exercise was not saved on database."
-            print "==================================="
-            return
-
-
-        # ----------------------------
-        # Exercise seems ok: store it.
-        # ----------------------------
-        #TODO: it should not be in database until a good instance is produced.
         inserted_row = self.megbook_store.insertchange(row)
-        #Users don't like anoying messages: 
-        #print "A problem is going to be generated with ekey=0"
         try:
             self.new(row['owner_key'], ekey=0)
         except e:
             print 'Problem name %s must be reviewed.' % inserted_row['owner_key']
             raise e
 
-
-    def is_exercise_ok(self,row,dest,silent=True):
-        r"""
-        Check if exercise is ready for compilation and for python/sage errors.
-
-        Developer note: derive this for other markups.
-        """
-        raise NotImplementedError
-
-
-    def exercise_pythontest(self,row,start=0,many=5, edict=None,silent=False):
-        r"""
-        Test an exercise with random keys.
-
-        INPUT:
-
-         - ``row`` -- dictionary with class textual definitions.
-         - ``start`` -- the parameteres will be generated for this random seed for start.
-         - ``many`` -- how many keys to generate. 
-         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-
-        OUTPUT:
-
-            Printed message and True/False value.
-
-        TODO: change this function name to exercise_test.
-        """
-
-        success = True
-
-        
-    
-        #Testing for SyntaxErrors
-        if not silent:
-            print "Check '%s' for syntatical errors on Python code." % row['owner_key'] #TODO: add here a link to common syntatical error 
-
-        try:
-            #compiles and produces a class in memory (but no instance)
-            exerciseclass(row)
-            if not silent:
-                print "    No syntatical errors found on Python code."
-        except:
-            success = False
-        
-
-        if success:
-
-            #Testing for semantical errors
-            if not silent:
-                #print "Execute python class '%s' with %d different keys searching for semantical errors in the algorithm." % (row['owner_key'],many)
-                print "Execute python class '%s' with %d different keys" % (row['owner_key'],many)
-
-            try:
-
-                for ekey in range(start,start+many):
-                    if not silent:
-                        print "    Testing for random key: ekey=",ekey
-                    exerciseinstance(row,ekey=ekey,edict=edict)
-
-            except: # Exception will be in memory.
-                print "    Error on exercise '{0}' with parameters edict={1} and ekey={2}".format(row['owner_key'],edict,ekey)
-                success = False #puxar para a frente
-                #NOTES:
-                #TODO: check http://docs.python.org/2/tutorial/errors.html 
-                # ("One may also instantiate an exception first" ...)
-                #TODO: remove this
-
-            
-        #Conclusion
-        if not silent:
-            if success:
-                print "    No problems found in Python."
-            else:
-                print "    Please review the code '%s' based on the reported cases." % row['owner_key']
-
-        return success
 
 
 
