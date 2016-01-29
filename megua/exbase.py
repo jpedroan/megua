@@ -97,8 +97,8 @@ import tempfile
 import os
 
 
-class Exercise:
-    """Class ``Exercise`` is the base class for an exercise.
+class ExerciseBase:
+    """Class ``ExerciseBase`` is the base class for an exercise.
 
 
     Derivations of this class will be specific Exercise Templates. A template of an exercise depends on numerical parameters. 
@@ -114,35 +114,34 @@ class Exercise:
     """
 
 
-    """Class variables:
-    - a derivation of class ``Exercise`` will inherit the values below.
-    - a derivation of class ``Exercise`` should change this class parameters to new ones.
-    """
+    # =======================
+    # The following variables 
+    #      ARE PART OF THE CLASS,
+    # they are instantiated before
+    # the instance 
+    #- a derivation of class ``Exercise`` will inherit the values below.
+    #- a derivation of class ``Exercise`` should change this class parameters to new ones.
 
-    megbook = None #this is set in MegBook.
 
-    def __init__(self,ename=None, ekey=None,edict=None,summary=None,problem=None,answer=None, code=None):
-        self.name = name
-        #text fields: IMPORTANT: use SELF. on class globals!!!!
-        if summary is not None:
-            self.summary_text = summary
-        if problem is not None:
-            self.problem_text = problem
-        if summary is not None:
-            self.answer_text = answer
-        if code is not None:
-            self.
-        #Guarantee a first set of parameters
+    # This is set in MegBook
+    _megbook = None 
+
+    # This are set in MegBook
+    # by MegBook.exerciseclass() and 
+    #   MegBook.exerciseinstance()
+    _unique_name = None
+    _summary_text = None
+    _problem_text = None
+    _answer_text  = None
+
+
+    def __init__(self,ekey=None, edict=None):
         self.update(ekey,edict)
 
-#, edict=" + str(edict) + ")\n")
     def __str__(self):
         return str(self.__dict__)
 
-    def __repr__(self): #python _ _ repr _ _
-        return str(self.__class__) + r"(" + repr(self.__dict__) + ")"
-
-    def _repr_(self): #sage _ repr _
+    def _repr_(self): 
         return str(self.__class__) + r"(" + repr(self.__dict__) + ")"
 
     def _latex_(self): #sage _ repr _
@@ -162,42 +161,14 @@ class Exercise:
         self.ekey = ur.set_seed(ekey)
 
         #Call user derived function to generate a set of random variables.
-        self.make_random()
-
-        #Change all or some parameters existing in pdict.
-        if edict is not None:
-            self.__dict__.update(edict) 
+        self.make_random(edict)
 
         #Call user derived function to solve it.
+        #TODO: warn that this is not to be used again
         self.solve()
 
-    try:
-        #exec compile(sage_class,row["owner_key"],'eval')
-        #TODO: http://www.sagemath.org/doc/reference/misc/sage/misc/sage_eval.html
-        # and spread this for more points in code.
-        sage_class = preparse(row['class_text'])
-        exec sage_class
-    except: 
-        tmp = tempfile.mkdtemp()
-        pfilename = tmp+"/"+row["owner_key"]+".sage"
-        pcode = open(pfilename,"w")
-        pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8") )
-        pcode.close()
-        errfilename = "%s/err.log" % tmp
-        os.system("sage -python %s 2> %s" % (pfilename,errfilename) )
-        errfile = open(errfilename,"r")
-        err_log = errfile.read()
-        errfile.close()
-        #TODO: adjust error line number by -2 lines HERE.
-        #....
-        #remove temp directory
-        #print "=====> tmp = ",tmp
-        os.system("rm -r %s" % tmp)
-        print err_log #user will see errors on syntax.
-        raise SyntaxError  #to warn user #TODO: not always SyntaxError
 
-
-    def make_random(self):
+    def make_random(self,edict=None):
         """
         Derive this function.
         """    
@@ -222,6 +193,11 @@ class Exercise:
         """
         return text
 
+
+    def check(self, maxtime=None):
+        pass
+    
+    
     def summary(self):
         """#, edict=" + str(edict) + ")\n")
         Use class text self._summary_text and replace for parameters on dictionary. Nothing is saved.
@@ -271,10 +247,32 @@ class Exercise:
 
 
 
-    def name(self):
-        return self.name
+    def unique_name(self):
+        return self._unique_name
 
 
+    def print_instance(self):
+        """
+        After producing an exercise template or requesting a new instance of some exercise
+        this routine will print it on notebook notebook or command line mode. It also should
+        give a file were the user can find text markup (latex or html, etc).
+        """
+        #Derive this for other markups.
+
+        summtxt =  self.summary()
+        probtxt =  self.problem()
+        answtxt =  self.answer()
+        uname   =  self.unique_name()
+
+        print '-'*len(uname)
+        print uname 
+        print '-'*len(uname)
+        print summtxt.encode('utf8')
+        print probtxt.encode('utf8')
+        print answtxt.encode('utf8')
+
+    
+    
     def show_one(self,input_text):
         """Find all <showone value>...</showone> tags and select proper <thisone>...</thisone>
         Change it in the original text leaving only the selected ... in <thisone>...</thisone>
@@ -675,194 +673,77 @@ class Exercise:
 
         return newtext2
 
-
-# --------------
-# Instantiators
-# --------------
-
-"""
-ERRORS:
-- during class text preparse (including class name).
-- 
-"""
-
-def exerciseclass(row):
-    r"""
-    Interpret the `exercise class` (not an object) from text fields.
-    """
-
-    #Create the class (not yet the instance)
-
-    #TODO:
-    #   put class in globals(). 
-    #   Now ex_name is on global space ?? 
-    #   or is in this module space?
-
-    try:
-        #exec compile(sage_class,row["owner_key"],'eval')
-        #TODO: http://www.sagemath.org/doc/reference/misc/sage/misc/sage_eval.html
-        # and spread this for more points in code.
-        sage_class = preparse(row['class_text'])
-        exec sage_class
-    except: 
-        tmp = tempfile.mkdtemp()
-        pfilename = tmp+"/"+row["owner_key"]+".sage"
-        pcode = open(pfilename,"w")
-        pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8") )
-        pcode.close()
-        errfilename = "%s/err.log" % tmp
-        os.system("sage -python %s 2> %s" % (pfilename,errfilename) )
-        errfile = open(errfilename,"r")
-        err_log = errfile.read()
-        errfile.close()
-        #TODO: adjust error line number by -2 lines HERE.
-        #....
-        #remove temp directory
-        #print "=====> tmp = ",tmp
-        os.system("rm -r %s" % tmp)
-        print err_log #user will see errors on syntax.
-        raise SyntaxError  #to warn user #TODO: not always SyntaxError
-
-
-    #Get class name
-    ex_class = eval(row['owner_key']) #String contents row['owner_key'] is now a valid identifier.
-
-    #class fields
-    ex_class._summary_text = row['summary_text']
-    ex_class._problem_text = row['problem_text']
-    ex_class._answer_text  = row['answer_text']
-
-    return ex_class
-
-
-
-def exerciseinstance(row, ekey=None, edict=None):
-    r"""
-    Instantiates the `exercise class` (not an object) from text fields.
-    Then, creates an instance using  `exercise_instance` routine.
-
-    This function creates an instance of a class named in parameter owner_keystring. That class must be already defined in memory.
-
-    INPUT:
-
-     - ``owner_keystring`` -- the class name (python string).
-     - ``ex_class`` -- a class definition in memory.
-     - ``row``-- the sqlite row containing fields: 'summary_text', 'problem_text',  'answer_text'.
-     - ``ekey`` -- the parameteres will be generated for this random seed.
-     - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-
-    OUTPUT:
-        An instance of class named ``owner_keystring``.
-
-    NOTES:
-
-        http://docs.python.org/library/exceptions.html#exceptions.Exception
-
-    """
-
-    #Create the class (not yet the instance). See exerciseclass definition above.
-    ex_class = exerciseclass(row)
-
-    #Create one instance of ex_class
-    try:
-        ex_instance = ex_class(row['owner_key'],ekey,edict)
-    except: 
-        tmp = tempfile.mkdtemp()
-        pfilename = tmp+"/"+row["owner_key"]+".sage"
-        pcode = open(pfilename,"w")
-        pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8")+"\n")
-        pcode.write(row['owner_key'] + "(ekey=" + str(ekey) + ", edict=" + str(edict) + ")\n")
-        pcode.close()
-        errfilename = "%s/err.log" % tmp
-        os.system("sage %s 2> %s" % (pfilename,errfilename) )
-        errfile = open(errfilename,"r")
-        err_log = errfile.read()
-        errfile.close()
-        #TODO: adjust error line number by -2 lines HERE.
-        #....
-        #remove temp directory
-        #print "=====> tmp = ",tmp
-        os.system("rm -r %s" % tmp)
-        print err_log
-        raise Exception  #to warn user #TODO: not always SyntaxError
+    def check_sagepythoncode(row,start=0,many=5, edict=None,silent=False):
+        r"""
+        Test an exercise with random keys.
     
-    return ex_instance
-
-
-def to_unicode(s):
-    if type(s)!=unicode:
-        return unicode(s,'utf-8')
-    else:
-        return s
-
-
-def exercise_pythontest(row,start=0,many=5, edict=None,silent=False):
-    r"""
-    Test an exercise with random keys.
-
-    INPUT:
-
-     - ``row`` -- dictionary with class textual definitions.
-     - ``start`` -- the parameteres will be generated for this random seed for start.
-     - ``many`` -- how many keys to generate. 
-     - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-
-    OUTPUT:
-
-        Printed message and True/False value.
-
-    TODO: change this function name to exercise_test.
-    """
-
-    success = True
-
+        INPUT:
     
-
-    #Testing for SyntaxErrors
-    if not silent:
-        print "Check '%s' for syntatical errors on Python code." % row['owner_key'] #TODO: add here a link to common syntatical error 
-
-    try:
-        #compiles and produces a class in memory (but no instance)
-        exerciseclass(row)
-        if not silent:
-            print "    No syntatical errors found on Python code."
-    except:
-        success = False
+         - ``row`` -- dictionary with class textual definitions.
+         - ``start`` -- the parameteres will be generated for this random seed for start.
+         - ``many`` -- how many keys to generate. 
+         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
     
-
-    if success:
-
-        #Testing for semantical errors
-        if not silent:
-            #print "Execute python class '%s' with %d different keys searching for semantical errors in the algorithm." % (row['owner_key'],many)
-            print "Execute python class '%s' with %d different keys" % (row['owner_key'],many)
-
-        try:
-
-            for ekey in range(start,start+many):
-                if not silent:
-                    print "    Testing for random key: ekey=",ekey
-                exerciseinstance(row,ekey=ekey,edict=edict)
-
-        except: # Exception will be in memory.
-            print "    Error on exercise '{0}' with parameters edict={1} and ekey={2}".format(row['owner_key'],edict,ekey)
-            success = False #puxar para a frente
-            #NOTES:
-            #TODO: check http://docs.python.org/2/tutorial/errors.html 
-            # ("One may also instantiate an exception first" ...)
-            #TODO: remove this
-
+        OUTPUT:
+    
+            Printed message and True/False value.
+    
+        TODO: change this function name to exercise_test.
+        """
+    
+        success = True
+    
         
-    #Conclusion
-    if not silent:
+    
+        #Testing for SyntaxErrors
+        if not silent:
+            print "Check '%s' for syntatical errors on Python code." % row['unique_name'] #TODO: add here a link to common syntatical error 
+    
+        try:
+            #compiles and produces a class in memory (but no instance)
+            exerciseclass(row)
+            if not silent:
+                print "    No syntatical errors found on Python code."
+        except:
+            success = False
+        
+    
         if success:
-            print "    No problems found in Python."
-        else:
-            print "    Please review the code '%s' based on the reported cases." % row['owner_key']
+    
+            #Testing for semantical errors
+            if not silent:
+                #print "Execute python class '%s' with %d different keys searching for semantical errors in the algorithm." % (row['unique_name'],many)
+                print "Execute python class '%s' with %d different keys" % (row['unique_name'],many)
+    
+            try:
+    
+                for ekey in range(start,start+many):
+                    if not silent:
+                        print "    Testing for random key: ekey=",ekey
+                    exerciseinstance(row,ekey=ekey,edict=edict)
+    
+            except: # Exception will be in memory.
+                print "    Error on exercise '{0}' with parameters edict={1} and ekey={2}".format(row['unique_name'],edict,ekey)
+                success = False #puxar para a frente
+                #NOTES:
+                #TODO: check http://docs.python.org/2/tutorial/errors.html 
+                # ("One may also instantiate an exception first" ...)
+                #TODO: remove this
+    
+            
+        #Conclusion
+        if not silent:
+            if success:
+                print "    No problems found in Python."
+            else:
+                print "    Please review the code '%s' based on the reported cases." % row['unique_name']
+    
+        return success
+    
+    
 
-    return success
 
 
-
-
+    
+#end of exbase.py
+    

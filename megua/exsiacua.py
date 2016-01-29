@@ -48,13 +48,13 @@ AUTHORS:
         )
 
         if not silent:
-            print "Compiling '%s' with pdflatex." % row['owner_key']
+            print "Compiling '%s' with pdflatex." % row['unique_name']
 
         #TODO: put this in other place
         latex_error_pattern = re.compile(r"!.*?l\.\d+(.*?)$",re.DOTALL|re.M)
 
         try:
-            pcompile(latex_string,dest,row['owner_key'])
+            pcompile(latex_string,dest,row['unique_name'])
         except subprocess.CalledProcessError as err:
             #Try to show the message to user
             #print "Error:",err

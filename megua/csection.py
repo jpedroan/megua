@@ -170,18 +170,18 @@ class SectionClassifier:
         """        
 
         for row in ExIter(self.megbook_store):
-            if self.exercise_set and not row['owner_key'] in self.exercise_set:
+            if self.exercise_set and not row['unique_name'] in self.exercise_set:
                 continue
             #get a list in form ["section", "subsection", "subsubsection", ...]
             sec_list = str_to_list(row['sections_text'])
             if sec_list == [] or sec_list == [u'']:
-               sec_list = [ first_part(row['owner_key']) ]
+               sec_list = [ first_part(row['unique_name']) ]
             #sec_list contain at least one element.
             if not sec_list[0] in self.contents:
                 self.contents[sec_list[0]] = Section(sec_list[0])
             #sec_list contains less than `max_level` levels
             subsec_list = sec_list[1:self.max_level]
-            self.contents[sec_list[0]].add(row['owner_key'],subsec_list)
+            self.contents[sec_list[0]].add(row['unique_name'],subsec_list)
 
 
     def textprint(self):

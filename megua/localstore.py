@@ -111,7 +111,7 @@ class LocalStore:
     ...     os.remove(filename)
     >>> lstore = LocalStore(filename,natlang='pt_pt',markuplang='latex')
     >>> LocalStore._debug = True
-    >>> row = {'owner_key': u'keyone', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name1',
+    >>> row = {'unique_name': u'keyone', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name1',
     ... 'summary_text': u'summary1 \xe1\xe9', 'problem_text': u'problem1', 'answer_text': u'answer1', 'class_text': u'class Ex1'}
     >>> r = lstore.insertchange(row) 
     Exercise 'keyone' inserted in database.
@@ -121,7 +121,7 @@ class LocalStore:
     <BLANKLINE>
     problem1
     <BLANKLINE>
-    >>> row = {'owner_key': u'keytwo', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name2',
+    >>> row = {'unique_name': u'keytwo', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name2',
     ... 'summary_text': u'summary2 \xe9\xf3', 'problem_text': u'problem2', 'answer_text': u'answer2', 'class_text': u'class Ex2'}
     >>> r = lstore.insertchange(row)
     Exercise 'keytwo' inserted in database.
@@ -131,7 +131,7 @@ class LocalStore:
     <BLANKLINE>
     problem2
     <BLANKLINE>
-    >>> row = {'owner_key': u'keyone', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name1',\
+    >>> row = {'unique_name': u'keyone', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name1',\
     ... 'summary_text': u'summary1 modified', 'problem_text': u'problem1 modified', 'answer_text': u'answer1 modified', \
     ... 'class_text': u'class Ex1 modified'}
     >>> r = lstore.insertchange(row)
@@ -279,7 +279,7 @@ class LocalStore:
 
         c.execute('''CREATE TABLE exercises ( 
             problem_id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
-            owner_key TEXT UNIQUE, 
+            unique_name TEXT UNIQUE, 
             sections_text TEXT,
             suggestive_name TEXT,
             summary_text TEXT, 
@@ -306,16 +306,16 @@ class LocalStore:
         conn.close()
 
 
-    #def insertchange(self,owner_key,sections,summary,problem,answer,class_text):
+    #def insertchange(self,unique_name,sections,summary,problem,answer,class_text):
     def insertchange(self,row):
         """
-        Insert or change an entry in database with key ``owner_key``.
+        Insert or change an entry in database with key ``unique_name``.
 
         INPUT:
 
         - ``row`` -- data dictionary with entries:
 
-            * ``owner_key`` --  Exercise template name (and also python class name) and unique record identifier (string).
+            * ``unique_name`` --  Exercise template name (and also python class name) and unique record identifier (string).
             * ``sections_text`` -- Section; subsection; etc or empty string (unicode).
             * ``suggestive_name`` -- Suggestive name for this problem.
             * ``summary_text`` -- Summary of the exercise (unicode).
@@ -332,11 +332,11 @@ class LocalStore:
 
         """
 
-        owner_key = row['owner_key']
+        unique_name = row['unique_name']
 
-        #Check if owner_key already on database
+        #Check if unique_name already on database
         c = self.conn.cursor()
-        c.execute("SELECT owner_key FROM exercises WHERE owner_key=?",(owner_key,))
+        c.execute("SELECT unique_name FROM exercises WHERE unique_name=?",(unique_name,))
         do_insert = (c.fetchone()==None)
         c.close()
         if do_insert:
@@ -346,7 +346,7 @@ class LocalStore:
 
         #return the changed row
         c = self.conn.cursor()
-        c.execute("SELECT * FROM exercises WHERE owner_key=?",(owner_key,))
+        c.execute("SELECT * FROM exercises WHERE unique_name=?",(unique_name,))
         row = c.fetchone()
         c.close()
         return row
@@ -359,7 +359,7 @@ class LocalStore:
 
         c = self.conn.cursor()
         c.execute("""INSERT INTO exercises \
-            (owner_key, \
+            (unique_name, \
             sections_text, \
             suggestive_name, \
             summary_text, \
@@ -367,7 +367,7 @@ class LocalStore:
             answer_text, \
             class_text) VALUES \
             (?,?,?,?,?,?,?)""",  #ADD OR REMOVE ? for each new/removal columns
-            (   row['owner_key'], 
+            (   row['unique_name'], 
                 row['sections_text'],
                 row['suggestive_name'],
                 row['summary_text'],
@@ -379,7 +379,7 @@ class LocalStore:
         self.conn.commit()
         c.close()
         if LocalStore._debug:
-            print "Exercise '" + row['owner_key'] + "' inserted in database."
+            print "Exercise '" + row['unique_name'] + "' inserted in database."
 
 
 
@@ -402,20 +402,20 @@ class LocalStore:
                 answer_text=?, \
                 class_text = ? \
              WHERE \
-                owner_key=? """,
+                unique_name=? """,
             (   row['sections_text'],
                 row['suggestive_name'],
                 row['summary_text'],
                 row['problem_text'],
                 row['answer_text'],
                 row['class_text'],
-                row['owner_key']
+                row['unique_name']
             )
         )
         self.conn.commit()
         c.close()
         if LocalStore._debug:
-            print "Exercise '" + row['owner_key'] + "' changed in database."
+            print "Exercise '" + row['unique_name'] + "' changed in database."
 
     #See def search(...) below. 
     #
@@ -430,19 +430,19 @@ class LocalStore:
 
 
 
-    def get_classrow(self, owner_key):
-        owner_key = to_unicode(owner_key)
+    def get_classrow(self, unique_name):
+        unique_name = to_unicode(unique_name)
         c = self.conn.cursor()
-        c.execute("SELECT * FROM exercises WHERE owner_key=?", (owner_key,))
+        c.execute("SELECT * FROM exercises WHERE unique_name=?", (unique_name,))
         row = c.fetchone()
         c.close()
         return row
 
 
-    def remove_exercise(self, owner_key):
-        owner_key = to_unicode(owner_key)
+    def remove_exercise(self, unique_name):
+        unique_name = to_unicode(unique_name)
         c = self.conn.cursor()
-        c.execute("DELETE FROM exercises WHERE owner_key=?", (owner_key,))
+        c.execute("DELETE FROM exercises WHERE unique_name=?", (unique_name,))
         self.conn.commit()
         c.close()
 
@@ -481,7 +481,7 @@ class LocalStore:
                     problem_text REGEXP ? OR \
                     answer_text REGEXP ? OR \
                     class_text REGEXP ? \
-            ORDER BY owner_key \
+            ORDER BY unique_name \
             """, (regex, regex, regex, regex, regex, regex,)
         )
 
@@ -507,7 +507,7 @@ class LocalStore:
 
 
     def print_row(self,row):
-        sname = 'Record %03d: %s' % (row['problem_id'],row['owner_key'])
+        sname = 'Record %03d: %s' % (row['problem_id'],row['unique_name'])
         print sname + '\n\n' + row['problem_text'] + '\n'
 
 
@@ -576,7 +576,7 @@ class ExIter:
                     problem_text REGEXP ? OR \
                     answer_text REGEXP ? OR \
                     class_text REGEXP ? \
-                ORDER BY owner_key \
+                ORDER BY unique_name \
                 """, (regex, regex, regex, regex, regex,) )
         return c
 

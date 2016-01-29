@@ -171,7 +171,7 @@ class SphinxExporter:
             #Write exercise ownkey always at level 4.
             self.ofile.write(e+"\n"+self.char_level[section.level+1]*len(e) +"\n\n")
 
-            row = self.megbook_store.get_classrow(e) #e is exer name (same as owner_keystring)
+            row = self.megbook_store.get_classrow(e) #e is exer name (same as unique_namestring)
             etxt = self.exercise_template.render(
                     summary=str_indent(row['summary_text']),
                     problem=str_indent(row['problem_text']),
@@ -280,23 +280,23 @@ def lang_set(s):
 
 
 
-    def gallery(self,owner_keystring, ekey=None, edict=None):
+    def gallery(self,unique_name, ekey=None, edict=None):
         r"""Prints an exercise instance of a given type and output RST file for gallery.
 
         INPUT:
 
-         - ``owner_keystring`` -- the class name.
+         - ``unique_namestring`` -- the class name.
          - ``ekey`` -- the parameteres will be generated for this random seed.
          - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
 
         OUTPUT:
-            An instance of class named ``owner_keystring`` and output RST file for gallery.
+            An instance of class named ``unique_namestring`` and output RST file for gallery.
 
         """
         #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(owner_keystring)
+        row = self.megbook_store.get_classrow(unique_namestring)
         if not row:
-            print "%s cannot be accessed on database" % owner_keystring
+            print "%s cannot be accessed on database" % unique_name
             return None
         #Create and print the instance
         ex_instance = exerciseinstance(row, ekey, edict)

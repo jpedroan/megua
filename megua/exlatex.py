@@ -24,7 +24,7 @@ AUTHORS:
 from ex import *
 
 
-class ExLaTeX(ExerciseCreator):
+class ExLaTeX(ExerciseBase):
     
     r"""
 
@@ -33,7 +33,7 @@ class ExLaTeX(ExerciseCreator):
 
     Creation a LaTeX exercise::
         
-       >>> ex=ExLaTeX(r'''
+       >>> meg.save(r'''
        ... %Summary Primitives
        ... Here one can write few words, keywords about the exercise.
        ... For example, the subject, MSC code, and so on.
@@ -44,7 +44,7 @@ class ExLaTeX(ExerciseCreator):
        ... %Answer
        ... The answer is prim+C, with C a real number.
        ... 
-       ... class E28E28_pdirect_001(Exercise):
+       ... class E28E28_pdirect_001(ExLaTeX):
        ... 
        ...     def make_random(self):
        ...         self.ap = ZZ.random_element(-4,4)
@@ -68,44 +68,10 @@ class ExLaTeX(ExerciseCreator):
     silent_python_test = True
     destination_folder = '.'      
     autosave = True
+
           
-    def __init__(self,exercisestr):
-        r"""
-        
-        INPUTS::
-
-        .. _python string: http://docs.python.org/release/2.6.7/tutorial/introduction.html#strings
-        
-        """
-                
-        if type(exercisestr)==str:
-            exercisestr = unicode(exercisestr,'utf-8')
-
-
-        # ---------------------------------------
-        # Check exercise syntax: 
-        #    summary, problem, answer and class.
-        # MegBook will use this row to save things in LocalStore
-        # row variable components are:
-        #   (0 owner_key, 1 txt_sections, 2 txt_summary, 3 txt_problem, 4 txt_answer, 5 txt_class)
-        # row = {'owner_key': p[0], 'summary_text': p[2], 'problem_text': p[3], 'answer_text': p[4], 'class_text': p[5]}
-        # ---------------------------------------
-        self.row = exerc_parse(exercisestr)
-        if not self.row:
-            print "==================================="
-            print "Exercise syntax has errors."
-            print "==================================="
-            return
-
-
-        # -------------
-        # Exercise ok?
-        # -------------
-        self.ex_instance = create_check_exercise()
-
-        
-        if self.autosave:
-            Exercise.megbook.save(self.row)
+    def __init__(self,ekey=None, edict=None):
+        self.update(ekey,edict)
             
 
 
@@ -124,12 +90,14 @@ class ExLaTeX(ExerciseCreator):
         return latex_string         
 
         
-    def create_check_exercise(self):
+    def check(self,maxtime=None):
         r"""
         Check if exercise is well written before saving it to the database.
 
         #TODO: what to do when latex or latex images have errors?
         #TODO: this is not good this way!
+
+        #TODO: control the time and the process where it runs.
 
         """
 
@@ -138,16 +106,13 @@ class ExLaTeX(ExerciseCreator):
         # programming errors:
         #     syntax and few instances execution. 
         # -------------------------------
-        if not exercise_pythontest(self.row,silent=ExLaTeX.silent_python_test):
-            return
+        self.check_sagepythoncode(maxtime,silent=ExLaTeX.silent_python_test)
 
 
         # --------------------------
         # Testing latex compilation.
         # --------------------------
 
-        #create an instance
-        ex_instance = exerciseinstance(self.row)
 
         #Use jinja2 template to generate LaTeX.
         latex_string = Exercise.megbook.template("print_instance_latex.tex",
@@ -159,13 +124,13 @@ class ExLaTeX(ExerciseCreator):
         )
 
         if not ExLaTeX.silent_compilation:
-            print "Compiling '%s' with pdflatex." % self.row['owner_key']
+            print "Compiling '%s' with pdflatex." % self.row['unique_name']
 
         #TODO: put this in other place
         latex_error_pattern = re.compile(r"!.*?l\.\d+(.*?)$",re.DOTALL|re.M)
 
         try:
-            pcompile(latex_string,dest,self.row['owner_key'])
+            pcompile(latex_string,dest,self.row['unique_name'])
         except subprocess.CalledProcessError as err:
             #Try to show the message to user
             #print "Error:",err
@@ -195,12 +160,12 @@ class ExLaTeX(ExerciseCreator):
         #Use jinja2 template to generate LaTeX.
         latex_string = Exercise.megbook.template(
             "print_instance_latex.tex",
-            sname=self.ex_instance.name,
-            summtxt=self.ex_instance.summary(),
-            probtxt=self.ex_instance.problem(),
-            answtxt=self.ex_instance.answer(),
+            uname=self.unique_name(),
+            summtxt=self.summary(),
+            probtxt=self.problem(),
+            answtxt=self.answer(),
             ekey=self.ekey)
 
         #Produce PDF file from LaTeX.
-        pcompile(latex_string,'.',sname, hideoutput=True)
+        pcompile(latex_string,'.',self.unique_name(), hideoutput=True)
 

@@ -181,7 +181,7 @@ class MoodleXMLExporter:
             #Write exercise ownkey always at level 4.
             self.ofile.write(e+"\n"+self.char_level[4]*len(e) +"\n\n")
 
-            row = self.megbook_store.get_classrow(e) #e is exer name (same as owner_keystring)
+            row = self.megbook_store.get_classrow(e) #e is exer name (same as unique_name)
             etxt = self.exercise_template.render(
                     summary=str_indent(row['summary_text']),
                     problem=str_indent(row['problem_text']),

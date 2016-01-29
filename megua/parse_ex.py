@@ -1,7 +1,7 @@
 # -*- coding: iso-8859-15 -*-
 # vim:fileencoding=iso-8859-15
 r"""
-Convert an input text containing an exercise template into a tuple ``(owner_key,txt_summary,txt_problem,txt_answer,txt_class)`` extracted from text.
+Convert an input text containing an exercise template into a tuple ``(unique_name,txt_summary,txt_problem,txt_answer,txt_class)`` extracted from text.
 See ``exer_parse`` function.
 
 
@@ -163,13 +163,13 @@ def flex(txt):
 
 def parse_ex(inputtext):
     r"""
-    Convert ``inputtext`` into a tuple ``(owner_key,txt_summary,txt_problem,txt_answer,txt_class)`` extracted from text.
+    Convert ``inputtext`` into a tuple ``(unique_name,txt_summary,txt_problem,txt_answer,txt_class)`` extracted from text.
 
     INPUT:
     - ``inputext``-- text in the form "%summary...". See top of file.
 
     OUTPUT:
-        A tuple ``(owner_key,txt_summary,txt_problem,txt_answer,txt_class)`` or None if there errors. Errors will be printed (``print``).
+        A tuple ``(unique_name,txt_summary,txt_problem,txt_answer,txt_class)`` or None if there errors. Errors will be printed (``print``).
 
     ALGORITHM:
 
@@ -196,7 +196,7 @@ def parse_ex(inputtext):
     ...  My answer.
     ... class E12A34_name_001(Exercise):
     ...   more lines here''')
-    {'owner_key': 'E12A34_name_001', 'summary_text': '\n%summary Section\n My summary.\n', 'problem_text': '\n%problem Suggestive Textual Name\n My Problem.\n', 'suggestive_name': 'Suggestive Textual Name', 'class_text': 'class E12A34_name_001(Exercise):\n  more lines here', 'sections_text': 'Section', 'answer_text': '\n%answer\n My answer.\n'}
+    {'unique_name': 'E12A34_name_001', 'summary_text': '\n%summary Section\n My summary.\n', 'problem_text': '\n%problem Suggestive Textual Name\n My Problem.\n', 'suggestive_name': 'Suggestive Textual Name', 'class_text': 'class E12A34_name_001(Exercise):\n  more lines here', 'sections_text': 'Section', 'answer_text': '\n%answer\n My answer.\n'}
 
     Example when there are comments in front of tags::
 
@@ -211,7 +211,7 @@ def parse_ex(inputtext):
     ...       more lines ''')
     Ignoring text 'Answer Comment' in %answer tag at line 6.
     <BLANKLINE>
-    {'owner_key': 'E12A34_name_001', 'summary_text': '\n%summary Section\n     My summary.\n', 'problem_text': '\n%problem Suggestive Textual Name\n     My Problem.\n', 'suggestive_name': 'Suggestive Textual Name', 'class_text': 'class E12A34_name_001(Exercise):\n      more lines ', 'sections_text': 'Section', 'answer_text': '\n%answer\n    My answer.\n'}
+    {'unique_name': 'E12A34_name_001', 'summary_text': '\n%summary Section\n     My summary.\n', 'problem_text': '\n%problem Suggestive Textual Name\n     My Problem.\n', 'suggestive_name': 'Suggestive Textual Name', 'class_text': 'class E12A34_name_001(Exercise):\n      more lines ', 'sections_text': 'Section', 'answer_text': '\n%answer\n    My answer.\n'}
 
     Example when class name is malformed::
 
@@ -323,7 +323,7 @@ def parse_ex(inputtext):
             elif tag  == 're_class':
                 #action
                 state=ExState.CLASS
-                owner_key = classlines[current].lineinfo[0]
+                unique_name = classlines[current].lineinfo[0]
                 #print "Line info\n" + str(classlines[current].lineinfo)
                 txt_class = classlines[current].completeline
                 current+=1
@@ -356,9 +356,9 @@ def parse_ex(inputtext):
     if error_found:
         return None
     else:
-        #old way: return (owner_key,txt_sections,txt_summary,txt_problem,txt_answer,txt_class)
+        #old way: return (unique_name,txt_sections,txt_summary,txt_problem,txt_answer,txt_class)
         return  {
-            'owner_key': owner_key, 
+            'unique_name': unique_name, 
             'sections_text': txt_sections, 
             'suggestive_name': txt_problemname,
             'summary_text': txt_summary, 
@@ -372,6 +372,14 @@ def parse_ex(inputtext):
 """
 Helper functions.
 """
+
+def to_unicode(s):
+    if type(s)!=unicode:
+        return unicode(s,'utf-8')
+    else:
+        return s
+
+
 
 #TODO: change this !
 

@@ -111,7 +111,7 @@ class MoodleExporter:
 
                 xml_string = self.exercise_template.render(
                     sections= self._get_sections(row['sections_text']),
-                    exercisename=row['owner_key'],
+                    exercisename=row['unique_name'],
                     ekey=ex_instance.ekey,    
                     problemname=row['suggestive_name'],
                     problemtext=probtxt,

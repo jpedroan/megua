@@ -152,17 +152,16 @@ class MegBook:
     #TODO 2: assure that there is a natlang folder in templates (otherwise put it in english). Warn for existing languages if specifies lan does not exist.
 
 
-    def __init__(self,filename=None,defaultnatlang='pt_pt',defaultmarkuplang='siacua'): 
+    def __init__(self,filename=None): 
         r"""
 
         INPUT::
-        - ``filename`` -- filename where the database is stored.
-        - ``defaultnatlang`` -- For example, 'pt_pt', for portuguese (of portugal), 'en_us' for english from USA.
-        - ``defaultmarkuplang`` -- 'latex' or 'web'.
+        - ``filename`` -- filename where the sqlite database is stored.
 
         """
 
         if not filename:
+            #TODO: this must be in the LocalStore code.
             raise IOError("MegBook needs database filename.")
 
     
@@ -188,14 +187,15 @@ class MegBook:
         #For template. See template_create function.
         self.template_row = None
 
-        Exercise.megbook = self
+
+        ExerciseBase.megbook = self
 
 
     def __str__(self):
-        return "MegBook('%s','%s','%s')" % (self.local_store_filename,self.natlang,self.markuplang)
+        return "MegBook('%s','%s','%s')" % (self.local_store_filename)
 
     def __repr__(self):
-        return "MegBook('%s','%s','%s')" % (self.local_store_filename,self.natlang,self.markuplang)
+        return "MegBook('%s','%s','%s')" % (self.local_store_filename)
 
 
     def template(self, filename, **user_context):
@@ -224,32 +224,50 @@ class MegBook:
         try:
             tmpl = self.env.get_template(filename)
         except jinja2.exceptions.TemplateNotFound:
-            return "MegBookBase: missing template %s"%filename
+            return "MegBook: missing template %s"%filename
         r = tmpl.render(**user_context)
         return r
 
 
-    def save(self,exercise):
+
+
+    def save(self,uexercise):
         r"""
         Save an exercise defined on a `python string`_ using a specific sintax defined here_.
 
         INPUT::
 
-        - ``exercise`` -- an exercise instance.
+        - ``uexercise`` -- an exercise textual description (unicode string).
 
         OUTPUT::
+        
+        - Textual messages with errors.
 
-            Textual messages with errors.
-            Check ``dest`` directory (default is current) for compilation results.
-
+        DESCRIPTION:
+        
+        - An exercise textual description must be processed.
 
         """
 
-        inserted_row = self.megbook_store.insertchange(row)
+        #First check: syntatic level ("megua" script)
+        row =  parse_ex(to_unicode(exercise))
+
+    
+        #Second check: syntatic and runtime  ("python/sagemath" script)
+        ex_instance = self.exerciseinstance(row)            
+            
+        #Third check: creating several instances; create content.
+        ex_instance.check(maxtime=3) #3 seconds
+
+
+        #After all that, save it on database:                        
+        self.megbook_store.insertchange(row)
+        
+        #Check if saved.
         try:
-            self.new(row['owner_key'], ekey=0)
+            self.new(row["unique_name"], ekey=0, returninstance=True).print_instance()
         except e:
-            print 'Problem name %s must be reviewed.' % inserted_row['owner_key']
+            print 'Problem name %s must be reviewed.' % row["unique_name"]
             raise e
 
 
@@ -270,14 +288,16 @@ class MegBook:
         all_ex = []
         for row in ExIter(self.megbook_store):
             if not self.is_exercise_ok(row,dest,silent=True):
-                print "   Exercise '%s' have python/sage or compilation errors." % row['owner_key']
-                all_ex.append(row['owner_key'])
+                print "   Exercise '%s' have python/sage or compilation errors." % row['unique_name']
+                all_ex.append(row['unique_name'])
         if all_ex:
             print "Review the following exercises:"
             for r in all_ex:
                 print r
         else:
             print "No problem found."
+
+
 
     def select(self,regex=None, addkeys=False):
         r"""
@@ -303,7 +323,7 @@ class MegBook:
         """
         if regex is None:
             regex=""
-        exlist = [row[1] for row in self.megbook_store.search(regex)] #row[0] is owner_key
+        exlist = [row[1] for row in self.megbook_store.search(regex)] #row[0] is unique_name
         #print exlist
         if addkeys:
             pairs = [ (e,random.randint(0,1000)) for e in exlist]
@@ -354,7 +374,7 @@ class MegBook:
             Sage html() requires string.
         """
         #Modify this
-        sname = 'Exercise name %s' % exrow['owner_key'].encode('utf8')
+        sname = 'Exercise name %s' % exrow['unique_name'].encode('utf8')
         print sname + '\n' + exrow['problem_text'].encode('utf8') + '\n'
         #TODO
         #if is_notebook():
@@ -364,19 +384,19 @@ class MegBook:
 
 
 
-    def remove(self,owner_keystring,dest='.'):
+    def remove(self,unique_namestring,dest='.'):
         r"""
         Removing an exercise from the database.
 
         INPUT:
 
-        - ``owner_keystring`` -- the class name.
+        - ``unique_namestring`` -- the class name.
         """
 
         #Get the exercise
-        row = self.megbook_store.get_classrow(owner_keystring)
+        row = self.megbook_store.get_classrow(unique_namestring)
         if row:            
-            fname = os.path.join(dest,owner_keystring+'.txt')
+            fname = os.path.join(dest,unique_namestring+'.txt')
             #store it on a text file
             f = open(fname,'w')
             f.write(row['summary_text'].encode('utf-8')) #includes %summary line
@@ -384,66 +404,155 @@ class MegBook:
             f.write(row['answer_text'].encode('utf-8')) #includes %answer line
             f.write(row['class_text'].encode('utf-8'))
             f.close()
-            print "Exercise '%s' stored on text file %s." % (owner_keystring,fname)
+            print "Exercise '%s' stored on text file %s." % (unique_namestring,fname)
 
             #remove it
-            self.megbook_store.remove_exercise(owner_keystring)
+            self.megbook_store.remove_exercise(unique_namestring)
         else:
-            print "Exercise %s is not on the database." % owner_keystring
+            print "Exercise %s is not on the database." % unique_namestring
 
 
 
-    def new(self,owner_keystring, ekey=None, edict=None):
+    def new(self,unique_name, ekey=None, edict=None, returninstance=False):
         r"""Prints an exercise instance of a given type
 
         INPUT:
 
-         - ``owner_keystring`` -- the class name.
+         - ``unique_name`` -- the class name.
          - ``ekey`` -- the parameteres will be generated for this random seed.
          - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
+         - ``returninstance`` -- if True, this function return a python object.
 
         OUTPUT:
-            An instance of class named ``owner_keystring``.
+            An instance of class named ``unique_namestring``.
 
         """
         #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(owner_keystring)
+        row = self.megbook_store.get_classrow(unique_namestring)
         if not row:
-            print "%s cannot be accessed on database" % owner_keystring
-            return None
+            print "%s cannot be accessed on database" % unique_namestring
+            return
+        
         #Create and print the instance
-        ex_instance = exerciseinstance(row, ekey, edict)
-        self.print_instance(ex_instance)
-        return None
-        #return ex_instance #removed because makes too much "noise" in output
+        ex_instance = self.exerciseinstance(row, ekey, edict)
+        ex_instance.print_instance()
+        
+        if returninstance:
+            return ex_instance
+
+    
 
 
-    def print_instance(self, ex_instance):
+    def exerciseclass(self, row):
+        r"""
+        Interpret the `exercise class` (not an object) from text fields.
         """
-        After producing an exercise template or requesting a new instance of some exercise
-        this routine will print it on notebook notebook or command line mode. It also should
-        give a file were the user can find text markup (latex or html, etc).
+    
+        #Create the class (not yet the instance)
+    
+        #TODO:
+        #   put class in globals(). 
+        #   Now ex_name is on global space ?? 
+        #   or is in this module space?
+        # TODO: control the time and the process
+    
+        try:
+            #exec compile(sage_class,row["unique_name"],'eval')
+            #TODO: http://www.sagemath.org/doc/reference/misc/sage/misc/sage_eval.html
+            # and spread this for more points in code.
+            sage_class = preparse(row['class_text'])
+            exec sage_class
+        except: 
+            tmp = tempfile.mkdtemp()
+            pfilename = tmp+"/"+row["unique_name"]+".sage"
+            pcode = open(pfilename,"w")
+            pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8") )
+            pcode.close()
+            errfilename = "%s/err.log" % tmp
+            os.system("sage -python %s 2> %s" % (pfilename,errfilename) )
+            errfile = open(errfilename,"r")
+            err_log = errfile.read()
+            errfile.close()
+            #TODO: adjust error line number by -2 lines HERE.
+            #....
+            #remove temp directory
+            #print "=====> tmp = ",tmp
+            os.system("rm -r %s" % tmp)
+            print err_log #user will see errors on syntax.
+            raise SyntaxError  #to warn user #TODO: not always SyntaxError
+    
+    
+        #Get class name
+        ex_class = eval(row['unique_name']) #String contents row['unique_name'] is now a valid identifier.
+    
+        #class fields
+        ex_class._summary_text = row['summary_text']
+        ex_class._problem_text = row['problem_text']
+        ex_class._answer_text  = row['answer_text']
+    
+        return ex_class
+    
+        
+    
+    def exerciseinstance(self, row, ekey=None, edict=None):
+        r"""
+        Instantiates the `exercise class` (not an object) from text fields.
+        Then, creates an instance using  `exercise_instance` routine.
+    
+        This function creates an instance of a class named in parameter unique_namestring. That class must be already defined in memory.
+    
+        INPUT:
+    
+         - ``unique_namestring`` -- the class name (python string).
+         - ``ex_class`` -- a class definition in memory.
+         - ``row``-- the sqlite row containing fields: 'summary_text', 'problem_text',  'answer_text'.
+         - ``ekey`` -- the parameteres will be generated for this random seed.
+         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
+    
+        OUTPUT:
+            An instance of class named ``unique_namestring``.
+    
+        NOTES:
+    
+            http://docs.python.org/library/exceptions.html#exceptions.Exception
+    
+        # TODO: control the time and the process
+
         """
-        #Derive this for other markups.
-
-        summtxt =  ex_instance.summary()
-        probtxt =  ex_instance.problem()
-        answtxt =  ex_instance.answer()
-        sname   =  ex_instance.name
-
-        print '-'*len(sname)
-        print sname 
-        print '-'*len(sname)
-        print summtxt.encode('utf8')
-        print probtxt.encode('utf8')
-        print answtxt.encode('utf8')
-
-
-    def make_sws(self, dest='.'):
-        sws = SWSExporter(self,dest)
-
-
-
-#end class MegBookBase
-
-
+    
+        #Create the class (not yet the instance). See exerciseclass definition above.
+        ex_class = exerciseclass(row)
+    
+        #Create one instance of ex_class
+        try:
+            ex_instance = ex_class(row['unique_name'],ekey,edict)
+        except: 
+            tmp = tempfile.mkdtemp()
+            pfilename = tmp+"/"+row["unique_name"]+".sage"
+            pcode = open(pfilename,"w")
+            pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8")+"\n")
+            pcode.write(row['unique_name'] + "(ekey=" + str(ekey) + ", edict=" + str(edict) + ")\n")
+            pcode.close()
+            errfilename = "%s/err.log" % tmp
+            os.system("sage %s 2> %s" % (pfilename,errfilename) )
+            errfile = open(errfilename,"r")
+            err_log = errfile.read()
+            errfile.close()
+            #TODO: adjust error line number by -2 lines HERE.
+            #....
+            #remove temp directory
+            #print "=====> tmp = ",tmp
+            os.system("rm -r %s" % tmp)
+            print err_log
+            raise Exception  #to warn user #TODO: not always SyntaxError
+        
+        return ex_instance
+    
+    
+    
+    
+        
+        
+#end class MegBook
+        
+        

@@ -164,10 +164,10 @@ class PDFLaTeXExporter:
 
         for e in section.exercises:
 
-            row = self.megbook_store.get_classrow(e) #e is exer name (same as owner_keystring)
+            row = self.megbook_store.get_classrow(e) #e is exer name (same as unique_namestring)
             etxt = self.exercise_template.render(
-                    problem_name=row['owner_key'],
-                    slashedproblem_name=latexunderscore(row['owner_key']),
+                    problem_name=row['unique_name'],
+                    slashedproblem_name=latexunderscore(row['unique_name']),
                     summary=textwrap.fill( perc_str_indent(row['summary_text']), 80,replace_whitespace=False).strip(),
                     problem=textwrap.fill( str_indent(row['problem_text']), 80,replace_whitespace=False).strip(),
                     answer=textwrap.fill( str_indent(row['answer_text']), 80,replace_whitespace=False).strip(),
@@ -289,14 +289,14 @@ def equation2display(txt):
 
 
 
-    def put_here(self,owner_keystring, ekey=None, edict=None, elabel="NoLabel", em=True):
+    def put_here(self,unique_namestring, ekey=None, edict=None, elabel="NoLabel", em=True):
         r"""
-        Create an instance based on a template with key=owner_keystring.
+        Create an instance based on a template with key=unique_namestring.
         This routine is used on templates only.
 
         INPUT:
 
-        - ``owner_keystring`` -- the exercise key.
+        - ``unique_namestring`` -- the exercise key.
         - ``ekey`` -- random seed.
         - ``edict`` -- dictionary to be used after random initialization of ex parameters.
         - ``elabel`` -- to be used for "\label" or "\ref" in LaTeX.
@@ -311,11 +311,11 @@ def equation2display(txt):
 
         #Get summary, problem and answer and class_text
         #Field row['class_text'] is needed to render the template. See below.
-        row = self.megbook_store.get_classrow(owner_keystring)        
+        row = self.megbook_store.get_classrow(unique_namestring)        
         if not row:
             #TODO: passar a raise Error
-            print "%s cannot be accessed on database" % owner_keystring
-            return "%s cannot be accessed on database" % owner_keystring
+            print "%s cannot be accessed on database" % unique_namestring
+            return "%s cannot be accessed on database" % unique_namestring
 
         #Get summary, problem and answer and class_text
         ex_instance = exerciseinstance(row,ekey,edict)
@@ -345,7 +345,7 @@ def equation2display(txt):
             options_list.insert( pos, ex_instance.all_choices[0] )
 
             utxt = self.template("em_question_template.tex",
-                exname=owner_keystring,
+                exname=unique_namestring,
                 ekey=ekey,
                 problem  = to_unicode( problem ), 
                 option1  = options_list[0],
@@ -363,7 +363,7 @@ def equation2display(txt):
         else:
             #See template_create for template_row definition.
             utxt = self.template_row.render(
-                exname=owner_keystring,
+                exname=unique_namestring,
                 summary = to_unicode( ex_instance.summary() ), 
                 problemtemplate = to_unicode( ex_instance._problem_text ), 
                 answertemplate  = to_unicode( ex_instance._answer_text ), 
@@ -605,18 +605,18 @@ def equation2display(txt):
         bname,ext_name = os.path.splitext(filename)
 
 
-    def _classquestion_exercise(self,owner_keystring, ekey=None):
+    def _classquestion_exercise(self,unique_name, ekey=None):
         r"""
-        Create an instance based on a template with key=owner_keystring
+        Create an instance based on a template with key=unique_name
 
         Ecxceptions list::
 
             http://docs.python.org/2/library/exceptions.html
         """
         #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(owner_keystring)
+        row = self.megbook_store.get_classrow(unique_name)
         if not row:
-            raise NameError("'%s' cannot be accessed on database '%s'" % (owner_keystring,self.local_store_filename))
+            raise NameError("'%s' cannot be accessed on database '%s'" % (unique_name,self.local_store_filename))
 
         return exerciseinstance(row,ekey=ekey)
 

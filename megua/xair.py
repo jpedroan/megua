@@ -118,16 +118,16 @@ class AirExporter:
                 self.lines.append( self._get_exercise_text(e,rep,section.level) )
 
             
-    def _get_exercise_text(self,owner_keystring,ekey,elevel):
+    def _get_exercise_text(self,unique_name,ekey,elevel):
 
         if elevel<1: #exercise is not a leaf of the tree. TODO: improve
-            print "Air: Exercise %s needs section and subsection on %%summary tag." % owner_keystring
-            utxt = u"\n\n{\\small Exercise \\verb'%s' needs section and subsection on \\%%summary tag.}\n\n" % owner_keystring
+            print "Air: Exercise %s needs section and subsection on %%summary tag." % unique_namestring
+            utxt = u"\n\n{\\small Exercise \\verb'%s' needs section and subsection on \\%%summary tag.}\n\n" % unique_namestring
             return utxt
 
-        row = self.megbook_store.get_classrow(owner_keystring)
+        row = self.megbook_store.get_classrow(unique_name)
         if not row:
-            utxt = "MegUA: '%s' cannot be accessed on database '%s'" % (owner_keystring,self.megbook_store.local_store_filename)
+            utxt = "MegUA: '%s' cannot be accessed on database '%s'" % (unique_name,self.megbook_store.local_store_filename)
             print utxt
             return utxt
 
@@ -138,13 +138,13 @@ class AirExporter:
                 ename   =  row['suggestive_name'], 
                 problem =  to_unicode( ex_instance.problem() ), 
                 answer  =  to_unicode( ex_instance.answer() ),
-                elabel  =  "%s-%d" % ( remove_underscore(owner_keystring), ekey),
+                elabel  =  "%s-%d" % ( remove_underscore(unique_name), ekey),
                 elevel = elevel+2,
                 ekey=ekey,
-                exname=owner_keystring
+                exname=unique_namestring
             )
         except:
-            utxt = u"Exercise %s could not be created (ekey=%d).\n" % (owner_keystring,ekey)
+            utxt = u"Exercise %s could not be created (ekey=%d).\n" % (unique_name,ekey)
 
         return utxt
 
