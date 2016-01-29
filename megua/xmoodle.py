@@ -149,3 +149,99 @@ def lang_set(s):
     else:
         return s
 
+
+VER ISTO
+        # -------------------------------
+        # Set the Exercise print template
+        # -------------------------------
+        try:
+            self.cloze_template = self.env.get_template("moodle-cloze.xml")
+        except jinja2.exceptions.TemplateNotFound as e:
+            print "MegUA -- missing template moodle_cloze.xml"
+            raise e
+
+
+
+        # -------------------------------
+        # Set the Exercise print template
+        # -------------------------------
+        try:
+            self.mchoice_template = self.env.get_template("moodle-mchoice.xml")
+        except jinja2.exceptions.TemplateNotFound as e:
+            print "MegUA -- missing template moodle_mchoice.xml"
+            raise e
+
+
+    def moodle(self, exname, questiontype="mchoice", many=10,  ekey=0, where='.'):
+        """
+        Save an exercse to moodle xml file format.
+
+	INPUT:
+
+	- exname: string with exercise identification name.
+	- questiontype: "mchoice" or "cloze"
+	- many: how many samples (starting ekey generated key).
+	- ekeys: random values generation key.
+        - where: local folder to store data.
+
+        EXAMPLES:
+
+        Full use of parameters::
+
+            sage: meg.moodle("E12A34_Aplic_DerivadasE1_002", "mchoice", many=10, ekey=100)
+
+        Less parameters::
+
+            sage: meg.moodle("E12A34_Aplic_DerivadasE1_002", many=10 )
+
+        """
+
+        #If does not exist create
+        if not os.path.exists(where):
+            os.makedirs(where)
+
+
+        #Create exercise instance
+        row = self.megbook_store.get_classrow(exname)
+        if not row:
+            print "Exercise %s not found." % exname
+            return
+
+        questions_xml = unicode('')
+
+        for e_number in range(many):
+
+            #Create exercise instance
+            ex_instance = exerciseinstance(row, ekey= ekey + e_number)
+
+            if questiontype=='mchoice':
+                questions_xml += self.mchoice_template.render(
+                    sections= m_get_sections(row['sections_text']),
+		    exercisename = exname,
+		    ekey = e_number,
+                    problemname=row['suggestive_name'],
+                    answertext = ex_instance.answer(),
+                    problemtext = ex_instance.problem()
+                )
+            else:
+                questions_xml += self.cloze_template.render(
+                    sections= m_get_sections(row['sections_text']),
+		    exercisename = exname,
+		    ekey = e_number,
+                    problemname=row['suggestive_name'],
+                    answertext = ex_instance.answer(),
+                    problemtext = ex_instance.problem()
+                )
+
+
+        # -----------------
+        # output file
+        # -----------------
+        xmlfilename = "quiz-%s.xml" % exname
+        xmlfile = codecs.open(xmlfilename, encoding='utf-8', mode='w')
+        xmlfile.write('<?xml version="1.0" encoding="utf-8"?>\n<quiz>\n')
+        xmlfile.write(questions_xml)
+        xmlfile.write("\n</quiz>")
+        xmlfile.close()
+
+
