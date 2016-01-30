@@ -197,7 +197,9 @@ class MegBook:
     def __repr__(self):
         return "MegBook('%s','%s','%s')" % (self.local_store_filename)
 
-
+    def make_index(self,where='.',debug=False):
+        warnings.warn("make_index() is deprecated. TODO: what to do ?", DeprecationWarning)
+        
     def template(self, filename, **user_context):
         """
         Returns HTML, CSS, LaTeX, etc., for a template file rendered in the given
@@ -550,8 +552,276 @@ class MegBook:
     
     
     
-    
+    def get(self,unique_name,ekey=None,edict=None):
+        r"""
+
+        INPUT:
+
+        - ``unique_name``: problem name (name in "class E12X34_something_001(Exercise):").
+        - ``ekey``: numbers that generate the same problem instance.
+        - ``edict``: dictionary of values
+
+        OUTPUT:
+
+        - this command writes an html file with all instances.
+
+        NOTE:
+
+        - you can export between 3 and 6 wrong options and 1 right.
+
+        EXAMPLE:
+
+            #OLD sage: meg.siacuapreview(exname="E12X34",ekeys=[1,2,5])
+
+            #Current:
+            sage: meg.get("E12X34").siacuapreview([12,34,56])
+            sage: meg.get("E12X34",ekey=10).siacuapreview([12,34,56])
+            
+        Algorithm:
+            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
+
+        """    
         
+        #Create exercise instance
+        row = self.megbook_store.get_classrow(unique_name)
+        if not row:
+            print "Exercise %s not found." % unique_name
+            return
+
+        if ekey or edict:
+            return self.exerciseinstance(row,ekey,edict)
+        else:
+            return self.exerciseclass(row) 
+
+
+
+    def thesis(self,problem_list):
+        r"""
+        Generates a tex file ready in standard LaTeX to put in a thesis.
+
+        INPUT:
+        
+        - `problem_list`: see below.
+
+        Structure example:
+            Simple: no division in groups ("sections") in the final examination sheet.
+            [ 
+                "E12X34_Calc_001", 10,  #specific problem key
+                "E12X34_Calc_001", 20,  #specific problem key (repeat the template)
+                "E12X34_Deriv_001"      #select a random key for this problem
+            ]
+
+        """
+
+        #Build paired list (ex,ekey) adding a random ekey when
+        #no key is given.
+        i = 0
+        n = len(problem_list)
+
+        for j in range(n):
+            #if problem_list[i] is unicode convert to str 
+            #for the next ifs
+            if type(problem_list[j])==unicode:
+                problem_list[j] = str(problem_list[j])
+
+        paired_list = []
+        #print random.__module__
+        rn = randomlib.randint(0,10**5) #if user did not supplied an ekey.
+        while i < (n-1):
+
+            if type(problem_list[i])==str and type(problem_list[i+1])==str: #two problems
+                paired_list.append( (problem_list[i], rn) ) 
+                i += 1 #advance to position i+1
+            elif type(problem_list[i])==str and type(problem_list[i+1])!=str: #!= probably a number
+                paired_list.append( (problem_list[i], problem_list[i+1]) )
+                i += 2 #advance to position i+2, consuming the ekey
+        if i < n: #add last problem 
+            paired_list.append( (problem_list[i], rn) )
+
+
+
+        #amc template without groups for each question
+        allproblems_text = ''
+        for (problem_name,ekey) in paired_list:
+
+            print "Generating sample of",problem_name
+
+            #print "Write",(problem_name,ekey),"in thesis."
+
+            #generate problem and answer text (choices are in the answer part)
+
+            #Get summary, problem and answer and class_text
+            row = self.megbook_store.get_classrow(problem_name)
+            if not row:
+                print "meg.thesis(): %s cannot be accessed on database" % problem_name
+                continue
+            #Create and print the instance
+            ex_instance = exerciseinstance(row, int(ekey) )
+
+            summary =  ex_instance.summary() 
+            problem = ex_instance.problem()
+            answer = ex_instance.answer()
+            problem_name =  ex_instance.name
+    
+            #Adapt for appropriate URL for images
+            if ex_instance.image_list != []:
+                problem = self._adjust_images_url(problem)
+                answer = self._adjust_images_url(answer)
+                #see siacua functions: self.send_images()
+
+
+
+            #TODO: this lines are a copy of code in "siacua()".
+            if ex_instance.has_multiplechoicetag:
+                if ex_instance.image_list != []:
+                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
+                else:
+                    answer_list = ex_instance.collect_options_and_answer()
+            else:
+                answer_list = ex_instance.answer_extract_options()
+
+
+            #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
+
+            #generate amc problemtext
+
+            problem_string = self.template("thesis_problem.tex",
+                    problem_name=problem_name,
+                    slashedproblem_name=latexunderscore(problem_name),
+                    problem_text=html2latex(problem),
+                    correcttext=equation2display( html2latex(answer_list[0]) ),
+                    wrongtext1=equation2display( html2latex(answer_list[1]) ),
+                    wrongtext2=equation2display( html2latex(answer_list[2]) ),
+                    wrongtext3=equation2display( html2latex(answer_list[3]) ),
+                    summtxt=latexcommentthis(summary),
+                    detailedanswer=html2latex(answer_list[4]) 
+                      #expected at position 4 the full answer.
+            )
+
+            #Convert the link below to \includegraphics{images/E12A34_cilindricas_0001-fig4-10.png}
+            #<img src='https://dl.dropboxusercontent.com/u/10518224/megua_images/E12A34_cilindricas_0001-fig4-10.png'></img>
+            problem_string = re.subn(
+                """<img src='https://dl.dropboxusercontent.com/u/10518224/megua_images/(.*?)'></img>""",
+                r'\n\\begin{center}\n\includegraphics[width=8cm]{images/\1}\n\end{center}\n', 
+                problem_string, 
+                count=0,
+                flags=re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
+
+            #add this to allproblems_text
+            allproblems_text += problem_string
+
+
+        os.system("zip -r images images > /dev/null 2>&1")
+
+
+        #Apply to all "allproblems_text"
+        
+        r"""2. Convert
+                \questao{ 
+    
+                 $\displaystyle 7.95$ 
+                 }
+            to 
+                \questao{$\displaystyle 7.95$}
+            but it does not work right with
+                \questao{ 
+ 
+                    \begin{center}
+                    \includegraphics[width=8cm]{images/E97k40_grafico_tabela_001-fig1-9.png}
+                    \end{center}
+ 
+                 }
+        """
+
+        pos = 0
+        new_allproblems_text = ''  #below pattern is not perfect because last } could match \begin{center} <-- this }
+        for m in re.finditer(r'\\questao\{(.*?)\}', allproblems_text, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE):
+            inside = m.group(1)
+            inside,nc = re.subn("\n","",inside,re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
+            new_allproblems_text += allproblems_text[pos:m.start(1)] + inside  
+            pos = m.end(1)
+
+        new_allproblems_text += allproblems_text[pos:]
+
+        #Produce "Source Code" from each problem.
+        PDFLaTeXExporter(self,where='.',exerset=paired_list,debug=False)
+        f = codecs.open( "megua_ex.tex", encoding='latin1', mode='r') 
+        #f = open("megua_ex.tex","r")
+        source_code = f.read()
+        #print "type=",type(source_code)
+        f.close()
+
+        #Make a latex file to be compiled using amc program (or pdflatex).
+        latextext_string = self.template("thesis_latexfile.tex",
+            ungroupedquestions=new_allproblems_text,
+            sourcecode=source_code
+        )
+
+
+        f = open('thesis_problems.tex','w')
+        f.write(latextext_string.encode('latin1')) #utf8 #latin1  <-- another option
+        f.close()
+
+        #os.system("pdflatex -interact=nonstopmode {0} > /dev/null 2>&1".format("thesis_problems.tex"))
+        #os.system("rm thesis_problems.log thesis_problems.aux > /dev/null 2>&1") 
+        #os.system("rm -r images > /dev/null 2>&1")
+
+
+        print '\nInstrucoes:\n1. Use o botao direito e "Save link as..." para guardar "thesis_problems.tex" no seu computador.'
+        print '2. Se houver imagens, o conteudo do ficheiro "images.zip" deve ser colocado numa pasta "images".'
+        print '3. Sera necessaria paciencia para finalizar a pre conversao de HTML para LaTeX em cada exercicio.'
+        print '4. Recomenda-se adaptar um exercicio de cada vez compilado um por um.'
+    
+
+
+
+
+    def to_latex(self,problem_name):
+        r"""
+        Generates a tex file ready in standard LaTeX to put in a thesis.
+
+        INPUT:
+        
+        - `problem_name`: problem name.
+
+        #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
+        """
+
+        ofile = codecs.open(exercise_latex.html, mode='w', encoding='utf-8')
+
+        #amc template without groups for each question
+        exercise_text = u'<html>\n<body>\n\n'
+        exercise_text += u'meg.save(r"""\n'
+
+        #Get summary, problem and answer and class_text
+        row = self.megbook_store.get_classrow(problem_name)
+        if not row:
+            print "meg.to_latex(): %s cannot be accessed on database" % problem_name
+            return
+
+
+
+        exercise_text += u'""")\n'
+        exercise_text += u'</body>\n</html>\n'
+
+        ofile.write(html_string)
+        ofile.close()
+
+
+
+
+def m_get_sections(sectionstxt):
+    """
+
+    LINKS::
+
+       http://stackoverflow.com/questions/2054746/how-to-search-and-replace-utf-8-special-characters-in-python?rq=1
+    """   
+    s = "megua/"+sectionstxt.replace("; ","/") #case "; " by "/"
+    return s.replace(";","/") #possible case without space: ";" by "/"
+
+
+
         
 #end class MegBook
         

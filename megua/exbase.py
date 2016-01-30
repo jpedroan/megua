@@ -135,7 +135,9 @@ class ExerciseBase:
 
 
     def __init__(self,ekey=None, edict=None):
-        self.update(ekey,edict)
+        self.has_instance = False
+        if ekey or edict:
+            self.update(ekey,edict)
 
     def __str__(self):
         return str(self.__dict__)
@@ -166,6 +168,8 @@ class ExerciseBase:
         #TODO: warn that this is not to be used again
         self.solve()
 
+        self.has_instance = True
+
 
     def make_random(self,edict=None):
         """
@@ -195,7 +199,7 @@ class ExerciseBase:
 
 
     def check(self, maxtime=None):
-        pass
+        return self.check_sagepythoncode()
     
     
     def summary(self):
@@ -212,6 +216,9 @@ class ExerciseBase:
 
         If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
         """
+        
+        assert(self.has_instance)
+            
         if removemultitag:
             text1 = self.remove_multiplechoicetag(self._problem_text)
         else:
@@ -226,6 +233,9 @@ class ExerciseBase:
 
         If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
         """
+
+        assert(self.has_instance)
+
         if removemultitag:
             text1 = self.remove_multiplechoicetag(self._answer_text)
         else:
