@@ -437,6 +437,374 @@ def showmul(x):
         return x
 
 
+# ==================
+# MSC 15
+# ==================
+
+
+def before_minor(M,pivot_row,pivot_col):
+    """
+    A minor is the determinant of a submatrix of M.
+    This routine gives the matrix to which the determinant is calculated.
+    
+    INPUT:
+        
+    - ``M``: a square matrix n by n.
+
+    - ``pivot_row, pivot_col``: row and column nunbers (0 to n-1).
+    
+    OUTPUT:
+        
+        The submatrix of ``M`` extracting row ``pivot_row`` and column ``pivot_col``.
+
+    EXAMPLES::
+
+       sage: from msc15 import before_minor 
+       sage: M = matrix(ZZ, [ [  1, -25,  -1,   0], [  0,  -2,  -5,  -2], [  2,   1,  -1,   0], [  3,   1,  -2, -13] ]); M
+       [  1 -25  -1   0]
+       [  0  -2  -5  -2]
+       [  2   1  -1   0]
+       [  3   1  -2 -13]
+       sage: before_minor(M,0,0)
+       [ -2  -5  -2]
+       [  1  -1   0]
+       [  1  -2 -13]
+       sage: before_minor(M,0,3)
+       [ 0 -2 -5]
+       [ 2  1 -1]
+       [ 3  1 -2]
+       sage: before_minor(M,3,3)
+       [  1 -25  -1]
+       [  0  -2  -5]
+       [  2   1  -1]
+       sage: before_minor(M,3,0)
+       [-25  -1   0]
+       [ -2  -5  -2]
+       [  1  -1   0]
+       sage: before_minor(M,0,2)
+       [  0  -2  -2]
+       [  2   1   0]
+       [  3   1 -13]
+       sage: before_minor(M,3,2)
+       [  1 -25   0]
+       [  0  -2  -2]
+       [  2   1   0]
+       sage: before_minor(M,2,0)
+       [-25  -1   0]
+       [ -2  -5  -2]
+       [  1  -2 -13]
+       sage: before_minor(M,2,3)
+       [  1 -25  -1]
+       [  0  -2  -5]
+       [  3   1  -2]
+       sage: before_minor(M,1,1)
+       [  1  -1   0]
+       [  2  -1   0]
+       [  3  -2 -13]
+
+
+    AUTHORS:
+    - Pedro Cruz (2012/April)
+    - Paula Oliveira (2012/April)
+    
+    """
+    
+    nrows,ncols = M.parent().dims()
+    
+    #put values in 0-n-1 range.
+    nrows -= 1
+    ncols -= 1
+    
+    if pivot_row==0 and pivot_col==0:
+        #pivot is at left top corner
+        return M[1:,1:]
+
+    elif pivot_row==0 and pivot_col==ncols:
+        #pivot is at right top corner
+        return M[1:,:-1]
+
+    elif pivot_row==nrows and pivot_col==ncols: 
+        #pivot is at right bottom corner
+        return M[:-1,:-1]
+
+    elif pivot_row==nrows and pivot_col==0:     
+        #pivot is at left bottom corner
+        return M[:-1,1:]
+
+    elif pivot_row==0: 
+        #pivot is at first row any other col
+        M.subdivide( 1, [pivot_col,pivot_col+1])
+        return block_matrix( [ [M.subdivision(1,0),M.subdivision(1,2)]], subdivide=False)
+
+    elif pivot_row==nrows: 
+        #pivot is at last row any other col
+        M.subdivide( nrows, [pivot_col,pivot_col+1])
+        return block_matrix( [ [M.subdivision(0,0),M.subdivision(0,2)]], subdivide=False)
+
+    elif pivot_col==0:
+        #pivot is at column 0 and any other row
+        M.subdivide( [pivot_row,pivot_row+1], 1)
+        return block_matrix( [ [M.subdivision(0,1)],[M.subdivision(2,1)]], subdivide=False)
+
+    elif pivot_col==ncols: 
+        #pivot is at last column and any other row
+        M.subdivide( [pivot_row,pivot_row+1], ncols)
+        return block_matrix( [ [M.subdivision(0,0)],[M.subdivision(2,0)]], subdivide=False)
+
+    else:
+        M.subdivide( [pivot_row,pivot_row+1], [pivot_col,pivot_col+1])
+        return block_matrix( [ [M.subdivision(0,0),M.subdivision(0,2)], [M.subdivision(2,0),M.subdivision(2,2)] ], subdivide=False)
+
+
+
+
+# ==================
+# MSC 26
+# ==================
+
+
+# ==================
+# MSC 60
+# ==================
+
+from ur import ur
+
+from sage.all import RealNumber
+
+def random_alpha():
+    """
+    Returns a random alpha value (significance level). 
+    (Used in statistics).
+
+    EXAMPLES::
+
+    sage: from msc60 import random_alpha
+    sage: random_alpha()
+    (5.00000000000000, 0.0500000000000000)
+
+    """
+    #Significance Level
+    d = ur.iunif(0,3)
+    if d==0:
+        return (RealNumber('0.1'),RealNumber('0.001'))
+    elif d==2:
+        return (RealNumber('1'),RealNumber('0.01'))
+    elif d==3:
+        return (RealNumber('5'),RealNumber('0.05'))
+    else:
+        return (RealNumber('10'),RealNumber('0.1'))
+
+
+def Percent(value):
+    """
+    Given an alpha or 1-alpha value return the textual version without %.
+
+    EXAMPLES::
+
+    sage: from msc60 import Percent
+    sage: Percent(0.1) + "%"
+    '10%'
+    sage: Percent(0.12) + "%"
+    '12%'
+    """
+    value = float(value)
+    if value == 0.01:
+        return r"1"
+    elif value == 0.05:
+        return r"5"
+    elif value == 0.10:
+        return r"10"
+    elif value == 0.90:
+        return r"90"
+    elif value == 0.95:
+        return r"95"
+    elif value == 0.975:
+        return r"97.5"
+    elif value == 0.99:
+        return r"99"
+    elif value == 0.995:
+        return r"99.5"
+    else:
+        return r"{0:g}".format(value*100)
+
+
+
+
+#def random_pmf(n=6):
+#    #restart random number generator
+#    # See class Exercise for seed.activate()
+#    #Support (random)
+#    x0 = ur.iunif(-2,3) #start x_0
+#    h = ur.runif(0,2,1) #h space between
+#    #n = iunif(4,6) # fixed for start
+#    values = [x0 + h * i for i in range(n)]
+#    #Probabilities (random)
+#    lst = [runif(0,1,1) for i in range(n)]
+#    sumlst = sum(lst)#weighted sum
+#    probabilities = [fround(i/sumlst,2) for i in lst]
+#    #Correction
+#    newsum = sum(probabilities)
+#    probabilities[0] =  probabilities[0] + (1-newsum)
+#    return {'values': values,'probabilities': probabilities}
+
+
+
+
+# ==================
+# MSC 62
+# ==================
+
+
+#Talvez isto nÃ£o seja Ãºtil porque all.py contÃ©m tudo!
+#importar tudo do primeiro grupo msc que abrange a estatÃ­stica
+#from meg.msc60.msc60 import *
+#esclarecer o ststistics.py em meg/
+
+
+
+
+#Random numbers from R using RPy2
+# 1. Always do casts to python rpy2 commands.
+# 2. To do: study how does rpy2 works.
+import rpy2.robjects as robjects
+
+def qt(p,df,prec=None):
+    """
+    Quantil from a t-student distribution.
+
+    NOTES:
+
+    * Based on RPy2 module (seed is from RPy2).
+
+    INPUT:
+
+    - ``p`` -- probability.
+    - ``df`` -- degree of freedom (distribution parameter).
+    - ``prec`` -- number of decimal digits (default all).
+
+    OUTPUT:
+        Quantil from t-student distribution.
+
+    EXAMPLES::
+
+        sage: from msc62 import qt
+        sage: qt(0.95,12)
+        1.7822875556493196
+        sage: qt(0.95,12,2)
+        1.78
+
+    """
+    #qt(p, df, ncp, lower.tail = TRUE, log.p = FALSE)
+    qt = robjects.r['qt']
+    res = qt(float(p),int(df))[0]
+    if prec:
+        res = round(res,prec)
+    return res
+
+def pnorm(x,mean,stdev,prec=None):
+    """
+    Probability of a normal distribution(mean, stdev).
+
+    NOTES:
+
+    * Based on RPy2 module (seed is from RPy2).
+
+    INPUT:
+
+    - ``x`` -- some quantil.
+    - ``mean`` -- mean of the normal distribution.
+    - ``stdev`` -- standar deviation.
+    - ``prec`` -- number of decimal digits (default all).
+
+    OUTPUT:
+        :math:``P(X<=x) where X~Norm(mean,stdev).
+
+    EXAMPLES::
+
+        sage: from msc62 import pnorm
+        sage: pnorm(0,0,1)
+        0.5
+        sage: pnorm(1.644854,0.0,1.0)
+        0.95000003847458692
+
+    """
+    #qt(p, df, ncp, lower.tail = TRUE, log.p = FALSE)
+    pnorm = robjects.r['pnorm']
+    res = pnorm(float(x),float(mean),float(stdev))[0]
+    if prec:
+        res = round(res,prec)
+    return res
+
+
+
+
+# ==================
+# MSC 65
+# ==================
+
+
+
+"""
+About polynomials
+
+https://groups.google.com/group/sage-support/msg/4abc7d2c5ea97c2b?hl=pt
+http://ask.sagemath.org/question/202/identification-polynomial
+
+http://www.sagemath.org/doc/reference/sage/rings/polynomial/polynomial_ring_constructor.html
+http://www.sagemath.org/doc/reference/sage/rings/polynomial/multi_polynomial_ring_generic.html
+ P.<x,y,z> = PolynomialRing(QQ)
+ P.random_element(2, 5)
+-6/5*x^2 + 2/3*z^2 - 1
+ P.random_element(2, 5, choose_degree=True)
+-1/4*x*y - 1/5*x*z - 1/14*y*z - z^2
+
+"""
+
+
+
+def support_set(fun,a,b,n,rdecimals):
+    """ 
+    INPUT:
+     - ``fun``: some expression or function.
+     - ``a``: lower interval limit.
+     - ``b``: upper interval limit.
+     - ``n``: number of intervals.
+    OUTPUT:
+     -
+    """
+    h = (b-a)/n
+    xset = [a + i * h for i in range(n+1)] #n+1points
+    xyset = [ (xv,fun.subs(x=xv)) for xv in xset]
+    return xyset
+
+
+def random_basicLU3():
+    """
+    Generate random matrix A (3x3) and decomposition LU where A=LU without permutation.
+
+    TODO: create a random dominant diagonal matrix module. MatrixSpace(QQ,3,3).
+    Used on exercise: E65F05_LU_001. Any change could afect it.
+    """
+
+    A = random_matrix(ZZ,3,x=-3,y=3)
+    #d = A.diagonal()
+    A[0,0] = max( abs(A[0,0]) , abs(A[0,1])+abs(A[0,2])+ZZ.random_element(1,3) ) 
+    A[1,1] = max( abs(A[1,1]) , abs(A[1,0])+abs(A[1,2])+ZZ.random_element(1,3) )
+    A[2,2] = max( abs(A[2,2]) , abs(A[2,0])+abs(A[2,1])+ZZ.random_element(1,3) )
+
+    import numpy as np
+    import scipy.linalg as sl
+    npA = np.matrix(A)
+    npP,npL,npU = sl.lu(npA)
+    #print "MATRIZ A=",A
+    #print sl.lu(npA)
+    L = matrix(R15,npL)
+    U = matrix(R15,npU)
+    return A,L,U
+
+
+
+
 
 #END mathcommon.py
 
