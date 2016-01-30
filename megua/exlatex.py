@@ -23,6 +23,10 @@ AUTHORS:
   
 from exbase import *
 
+#Import the random generator object.
+from ur import ur 
+from cr import r_stem
+
 
 class ExLaTeX(ExerciseBase):
     
@@ -69,10 +73,79 @@ class ExLaTeX(ExerciseBase):
     destination_folder = '.'      
     autosave = True
 
-          
-    def __init__(self,ekey=None, edict=None):
-        self.update(ekey,edict)
+     def update(self,ekey=None,edict=None):
+        #reset image list for the new parameters
+        #TODO: this can generate inconsistency if make_random or solve are called alone.
+        self.image_list = []
+
+        #Case when exercise is multiplechoice
+        self.all_choices = []
+        self.has_multiplechoicetag = None #Don't know yet.
+        self.detailed_answer= None
+
+        #Initialize all random generators.
+        self.ekey = ur.set_seed(ekey)
+
+        #Call user derived function to generate a set of random variables.
+        self.make_random(edict)
+
+        #Call user derived function to solve it.
+        #TODO: warn that this is not to be used again
+        self.solve()
+
+        self.has_instance = True
+
+    def problem(self,removemultitag=False):
+        """
+        Use class text self._problem_text and replace for parameters on dictionary. 
+        Nothing is saved.
+
+        If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
+        """
+        
+        assert(self.has_instance)
             
+        if removemultitag:
+            text1 = self.remove_multiplechoicetag(self._problem_text)
+        else:
+            text1 = self._problem_text
+        text2 = parameter_change(text1,self.__dict__)
+        self.current_problem = self._change_text(text2)
+        
+        return self.current_problem
+    def answer(self,removemultitag=False):
+        """
+        Use class text self._answer_text and replace for parameters on dictionary. 
+        Nothing is saved.
+
+        If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
+        """
+
+        assert(self.has_instance)
+
+        if removemultitag:
+            text1 = self.remove_multiplechoicetag(self._answer_text)
+        else:
+            text1 = self._answer_text
+        text2 = parameter_change(text1,self.__dict__)
+        
+        self.current_answer = self._change_text(text2)
+
+        return self.current_answer
+
+
+    def change_text(self,text1):
+        """Called after parameter_change call. See above."""
+        text2 = self.rewrite(text1)
+        if text2 is None:
+            raise NameError('rewrite(s,text) function is not working.')
+        text3 = self.latex_images(text2)
+        text4 = self.show_one(text3)
+        text5 = self.old_html(text4)
+        self.multiplechoice_parser(text5)  #extract information but don't change text
+        return text5
+
+
 
 
     def _latex_string(self):
@@ -90,7 +163,7 @@ class ExLaTeX(ExerciseBase):
         return latex_string         
 
         
-    def check(self,maxtime=None):
+    def check(self):
         r"""
         Check if exercise is well written before saving it to the database.
 
@@ -106,7 +179,7 @@ class ExLaTeX(ExerciseBase):
         # programming errors:
         #     syntax and few instances execution. 
         # -------------------------------
-        self.check_sagepythoncode(maxtime,silent=ExLaTeX.silent_python_test)
+        assert(ExerciseBase.check(self))
 
 
         # --------------------------
@@ -146,7 +219,6 @@ class ExLaTeX(ExerciseBase):
             print "================"
             return None
 
-        return ex_instance
 
 
 

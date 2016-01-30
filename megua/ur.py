@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 r"""
 Group together random generators for Sage, Python, Numpy and R (RPy2 module). 
 

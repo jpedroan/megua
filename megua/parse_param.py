@@ -77,7 +77,7 @@ import re
 #Meg module
 #Named placeholders need functions in mathcommon: latex, R15, ...
 from mathcommon import *
-from msc60 import *
+
 
 
 # Why is this here?
@@ -89,7 +89,7 @@ from msc60 import *
 #old prog = re.compile(r'(\w+)@(\s|\(\)|\[(.*)\]|{(.*)})',re.MULTILINE|re.DOTALL|re.IGNORECASE)
 
 
-def parameter_change(inputtext,datadict):
+def parameter_change(inputtext,datadict, latex_filter = True):
     """
     Substitution on a given input text with names acting as placeholders by their values on a provided dict.
 
@@ -181,10 +181,9 @@ def parameter_change(inputtext,datadict):
                 #Get data from dict for this match
                 keyname = match.group(1)
                 data_value = datadict[keyname]
-                if data_value<0:
-                    outputtext += inputtext[text_last:match.start()+1] + ur'\left(' + ulatex(data_value) + ur'\right)'
-                else:
-                    outputtext += inputtext[text_last:match.start()+1] +  ulatex(data_value)
+                outputtext += \
+                    inputtext[text_last:match.start()+1] + \
+                    ulatex(data_value,latex_filter,parentesis=True)
             elif match.group(2) is not None and match.group(3) is not None:
                 #case name@f{0.2g}
                 keyname = match.group(2)
@@ -223,10 +222,10 @@ def parameter_change(inputtext,datadict):
                     #        str_value = unicode(str_value,'utf-8')
 
                 except SyntaxError as e:
-                    value = keyname
+                    #value = keyname
                     print "Syntax problem on %s." % match.group(7)
                 except NameError as e:
-                    value = keyname
+                    #value = keyname
                     print "Use double quotes even on names (case: %s in '%s')." % (e,match.group(7))
                 #print type(str_value), " ", str_value
                 if type(str_value) == str:
@@ -241,7 +240,7 @@ def parameter_change(inputtext,datadict):
                 elif type(data_value) is unicode:
                     outputtext += inputtext[text_last:match.start()+1] + data_value
                 else:
-                    outputtext += inputtext[text_last:match.start()+1] + ulatex(data_value)
+                    outputtext += inputtext[text_last:match.start()+1] + ulatex(data_value,latex_filter)
         except KeyError:
                 #outputtext += inputtext[text_last:match.start()+1] + unicode(keyname,'utf-8')
                 outputtext += inputtext[text_last:match.start()+1] + keyname
@@ -253,9 +252,17 @@ def parameter_change(inputtext,datadict):
     return outputtext
 
 
-
-def ulatex(s):
-    return unicode(latex(s),'utf-8')
+def ulatex(s,latex_filter=True,parentesis=False):
+    if latex_filter:
+        if parentesis and bool(s<0):
+            return ur'\left(' + unicode(latex(s),'utf-8') + ur'\right)'
+        else:
+            return unicode(latex(s),'utf-8')
+    else:
+        if parentesis and bool(s<0):
+            return r'(' + unicode(s) + r')'
+        else:
+            return unicode(s)  #unicode(s,'utf-8')
 
 
 """

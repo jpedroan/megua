@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 r"""
-MegBook -- build your own database of exercises in several markup languages.
+MegBook -- Repository and functionalities for managing exercises.
+
+MEGUA build your own database of exercises in several markup languages.
 
 AUTHORS:
 
@@ -27,8 +29,11 @@ from mconfig import *
 
 #megua modules:
 from localstore import LocalStore,ExIter
-from ex import *
 from parse_ex import parse_ex
+from platex import pcompile
+from xmoodle import MoodleExporter
+from xsphinx import SphinxExporter
+from xlatex import * #including PDFLaTeXExporter
 
 
 #Because sage.plot.plot.EMBEDDED_MODE
@@ -49,15 +54,9 @@ import random
 import re
 import codecs
 import random as randomlib #random is imported as a funtion somewhere
-import json
-import httplib, urllib
 
 
 #Megua modules:
-from platex import pcompile
-from xmoodle import MoodleExporter
-from xsphinx import SphinxExporter
-from xlatex import * #including PDFLaTeXExporter
 
 
 # Jinja2 package
@@ -259,7 +258,7 @@ class MegBook:
         ex_instance = self.exerciseinstance(row)            
             
         #Third check: creating several instances; create content.
-        ex_instance.check(maxtime=3) #3 seconds
+        ex_instance.check() #3 seconds
 
 
         #After all that, save it on database:                        
@@ -593,6 +592,74 @@ class MegBook:
         else:
             return self.exerciseclass(row) 
 
+    def check_sagepythoncode(row,start=0,many=5, edict=None,silent=False):
+        r"""
+        Test an exercise with random keys.
+    
+        INPUT:
+    
+         - ``row`` -- dictionary with class textual definitions.
+         - ``start`` -- the parameteres will be generated for this random seed for start.
+         - ``many`` -- how many keys to generate. 
+         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
+    
+        OUTPUT:
+    
+            Printed message and True/False value.
+    
+        TODO: change this function name to exercise_test.
+        """
+    
+        success = True
+    
+        
+    
+        #Testing for SyntaxErrors
+        if not silent:
+            print "Check '%s' for syntatical errors on Python code." % row['unique_name'] #TODO: add here a link to common syntatical error 
+    
+        try:
+            #compiles and produces a class in memory (but no instance)
+            exerciseclass(row)
+            if not silent:
+                print "    No syntatical errors found on Python code."
+        except:
+            success = False
+        
+    
+        if success:
+    
+            #Testing for semantical errors
+            if not silent:
+                #print "Execute python class '%s' with %d different keys searching for semantical errors in the algorithm." % (row['unique_name'],many)
+                print "Execute python class '%s' with %d different keys" % (row['unique_name'],many)
+    
+            try:
+    
+                for ekey in range(start,start+many):
+                    if not silent:
+                        print "    Testing for random key: ekey=",ekey
+                    exerciseinstance(row,ekey=ekey,edict=edict)
+    
+            except: # Exception will be in memory.
+                print "    Error on exercise '{0}' with parameters edict={1} and ekey={2}".format(row['unique_name'],edict,ekey)
+                success = False #puxar para a frente
+                #NOTES:
+                #TODO: check http://docs.python.org/2/tutorial/errors.html 
+                # ("One may also instantiate an exception first" ...)
+                #TODO: remove this
+    
+            
+        #Conclusion
+        if not silent:
+            if success:
+                print "    No problems found in Python."
+            else:
+                print "    Please review the code '%s' based on the reported cases." % row['unique_name']
+    
+        return success
+    
+    
 
 
     def thesis(self,problem_list):

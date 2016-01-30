@@ -1,4 +1,6 @@
-"""
+# -*- coding: utf-8 -*-
+
+r"""
 Generic Mathematical routines for MEGUA.
 
 AUTHORS:
@@ -438,7 +440,7 @@ def showmul(x):
 
 
 # ==================
-# MSC 15
+# MSC 15 -- Algebra
 # ==================
 
 
@@ -559,12 +561,12 @@ def before_minor(M,pivot_row,pivot_col):
 
 
 # ==================
-# MSC 26
+# MSC 26 -- 
 # ==================
 
 
 # ==================
-# MSC 60
+# MSC 60 -- probability
 # ==================
 
 from ur import ur
@@ -651,7 +653,7 @@ def Percent(value):
 
 
 # ==================
-# MSC 62
+# MSC 62 -- statistics
 # ==================
 
 
@@ -739,7 +741,7 @@ def pnorm(x,mean,stdev,prec=None):
 
 
 # ==================
-# MSC 65
+# MSC 65 -- numerical analysis
 # ==================
 
 
