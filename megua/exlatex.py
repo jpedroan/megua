@@ -21,7 +21,7 @@ AUTHORS:
 #*****************************************************************************
 
   
-from ex import *
+from exbase import *
 
 
 class ExLaTeX(ExerciseBase):
