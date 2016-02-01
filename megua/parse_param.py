@@ -28,7 +28,7 @@ An example of each kind::
 
 The text "1) name  2) name2@() 3) name@f{2.3g} 4) name2@s{sin}" has 4 placeholders that will be changed.
 
-   >>> from paramparse import parameter_change
+   >>> from parse_param import parameter_change
    >>> txt = r'''Examples: 1) name  2) name2@() 3) name@f{2.3g} 4) name@s{sin} 5) name3@c{"text0", "tex-t1"}'''
    >>> newdict = {'name': -12.123456, 'name2': -34.32, 'name3': 1, '__init__': 'the init', 'self': 'the self' }
    >>> parameter_change(txt,newdict)
@@ -46,7 +46,7 @@ The text "1) name  2) name2@() 3) name@f{2.3g} 4) name2@s{sin}" has 4 placeholde
 IMPLEMENTATION NOTES:
 
 1. If this module is modified to a pure Python module then:
-   a. sage -python -m doctest paramparse.py
+   a. sage -python -m doctest parse_param.py
    b. In Python the example could return "Examples: 1) -12.123456  2) (-34.32) 3) -12.1 4) R15(-34.32)"
 
 

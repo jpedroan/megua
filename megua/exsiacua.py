@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 
 r"""
-ExSiacua -- build exercises for siacua.
+ExSiacua -- Siacua exercise.
 
 AUTHORS:
 
@@ -31,17 +31,18 @@ Test with::
 
 """
 
-
-#python modules
-#import json
+#PYTHON modules
 import httplib, urllib
+import os
+#import json
 
-#megua modules  
-from exbase import *
+
+#MEGUA modules  
+from megua.exbase import ExerciseBase
+from megua.ur import ur 
+
 
 #Import the random generator object.
-from ur import ur 
-from cr import r_stem
 
 #, edict=" + str(edict) + ")\n")
 #import tikzmod
@@ -53,11 +54,12 @@ from cr import r_stem
 
 #Warnings
 # http://www.doughellmann.com/PyMOTW/warnings/
-import warnings
+#import warnings
 
 #import re
 #import tempfile
 #import os
+
 
 
 class ExSiacua(ExerciseBase):    
@@ -65,25 +67,26 @@ class ExSiacua(ExerciseBase):
 
     Creation a LaTeX exercise::
         
-       >>> meg.save(r'''
-       ... %Summary Primitives
-       ... Here one can write few words, keywords about the exercise.
-       ... For example, the subject, MSC code, and so on.
-       ...   
-       ... %Problem
-       ... What is the primitive of ap x + bp@() ?
-       ... 
-       ... %Answer
-       ... The answer is prim+C, with C a real number.
-       ... 
-       ... class E28E28_pdirect_001(ExSiacua):
-       ... 
-       ...     def make_random(self,edict):
-       ...         self.ap = ZZ.random_element(-4,4)
-       ...         self.bp = self.ap + QQ.random_element(1,4)
-       ...         x=SR.var('x')
-       ...         self.prim = integrate(self.ap * x + self.bp,x)
-       ... ''')
+       sage: meg = MegBook(r'_temp/megbook.sqlite') 
+       sage: meg.save(r'''
+       ....: %Summary Primitives
+       ....: Here one can write few words, keywords about the exercise.
+       ....: For example, the subject, MSC code, and so on.
+       ....: 
+       ....: %Problem
+       ....: What is the primitive of ap x + bp@() ?
+       ....: 
+       ....: %Answer
+       ....: The answer is prim+C, with C a real number.
+       ....: 
+       ....: class E28E28_pdirect_001(ExSiacua):
+       ....: 
+       ....:    def make_random(self,edict):
+       ....:        self.ap = ZZ.random_element(-4,4)
+       ....:        self.bp = self.ap + QQ.random_element(1,4)
+       ....:        x=SR.var('x')
+       ....:        self.prim = integrate(self.ap * x + self.bp,x)
+       ....: ''')
        Each problem can have a suggestive name. 
        Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
        <BLANKLINE>
@@ -92,6 +95,16 @@ class ExSiacua(ExerciseBase):
           Compiling 'E28E28_pdirect_001' with pdflatex.
           No errors found during pdflatex compilation. Check E28E28_pdirect_001.log for details.
     """
+
+
+    def __init__(self,ekey=None, edict=None):
+        
+        #Base class call
+        ExerciseBase.__init__(self,ekey,edict)
+        
+        #Create a directory for images and compilation
+        os.system("mkdir -p _images") #The "-p" ommits errors if it exists.
+
  
     def update(self,ekey=None,edict=None):
         #reset image list for the new parameters
@@ -133,6 +146,8 @@ class ExSiacua(ExerciseBase):
         self.current_problem = self._change_text(text2)
         
         return self.current_problem
+        
+        
     def answer(self,removemultitag=False):
         """
         Use class text self._answer_text and replace for parameters on dictionary. 
@@ -321,22 +336,22 @@ class ExSiacua(ExerciseBase):
 
         gfilename = '%s-%s-%d'%(self.name,varname,self.ekey)
         #create if does not exist the "image" directory
-        os.system("mkdir -p images") #The "-p" ommits errors if it exists.
+        #os.system("mkdir -p _images") #The "-p" ommits errors if it exists.
 
         #graphobj could be sage or matplotlib object.
 
         if type(graphobj)==sage.plot.graphics.Graphics:
-            graphobj.save("images/"+gfilename+'.png',figsize=(dimx/2.54,dimy/2.54),dpi=100)
+            graphobj.save("_images/"+gfilename+'.png',figsize=(dimx/2.54,dimy/2.54),dpi=100)
         else: #matplotlib assumed
             #http://stackoverflow.com/questions/9622163/matplotlib-save-plot-to-image-file-instead-of-displaying-it-so-can-be-used-in-b
             import matplotlib.pyplot as plt
             from pylab import savefig
             fig = plt.gcf() #Get Current Figure: gcf
             fig.set_size_inches(dimx/2.54,dimy/2.54)
-            savefig("images/"+gfilename+'.png') #,figsize=(dimx/2.54,dimy/2.54),dpi=100)
+            savefig("_images/"+gfilename+'.png') #,figsize=(dimx/2.54,dimy/2.54),dpi=100)
             
         self.image_list.append(gfilename) 
-        return r"<img src='images/%s.png'></img>" % gfilename
+        return r"<img src='_images/%s.png'></img>" % gfilename
 
 
 
@@ -352,12 +367,12 @@ class ExSiacua(ExerciseBase):
             - see also ``s.sage_graphic``.
         """ 
         #create if does not exist the "image" directory
-        os.system("mkdir -p images") #The "-p" ommits errors if it exists.
-        os.system("cp %s images" % fullfilename)
+        #os.system("mkdir -p _images") #The "-p" ommits errors if it exists.
+        os.system("cp %s _images" % fullfilename)
         gfilename = os.path.split(fullfilename)[1]
         #print "gfilename=",gfilename
         self.image_list.append(gfilename) 
-        return r"<img src='images/%s' alt='%s' height='%d' width='%d'></img>" % (gfilename,self.name+' graphic',dimx,dimy)
+        return r"<img src='_images/%s' alt='%s' height='%d' width='%d'></img>" % (gfilename,self.name+' graphic',dimx,dimy)
 
     def latex_images(self,input_text):
         """When <latex percent%> ... </latex> is present, then 
@@ -380,7 +395,7 @@ class ExSiacua(ExerciseBase):
         latex_error_pattern = re.compile(r"!.*?l\.(\d+)(.*?)$",re.DOTALL|re.M)
 
         #create if does not exist the "image" directory
-        os.system("mkdir -p images") #The "-p" ommits errors if it exists.
+        #os.system("mkdir -p _images") #The "-p" ommits errors if it exists.
 
         #Cycle through existent tikz code and produce pdf and png files.
         graphic_number = 0
@@ -400,13 +415,13 @@ class ExSiacua(ExerciseBase):
                                 pgfrealjobname=r"\pgfrealjobname{%s}"%self.name, 
                                 beginname=r"\beginpgfgraphicnamed{%s}"%gfilename, 
                                 tikz_picture=tikz_picture)
-                pcompile(tikz_tex,'images','%s-%d-%02d'%(self.name,self.ekey, graphic_number))
+                pcompile(tikz_tex,'_images','%s-%d-%02d'%(self.name,self.ekey, graphic_number))
                 #convert -density 600x600 pic.pdf -quality 90 -resize 800x600 pic.png
-                cmd = "cd images;convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
+                cmd = "cd _images;convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
                     gfilename,match.group(1),gfilename)
                 #print "============== CMD: ",cmd
                 os.system(cmd)
-                os.system("cp images/%s.tex ." % gfilename)
+                os.system("cp _images/%s.tex ." % gfilename)
                 graphic_number += 1
                 self.image_list.append(gfilename) 
             except subprocess.CalledProcessError as err:
@@ -423,7 +438,7 @@ class ExSiacua(ExerciseBase):
                 #if latex inside codemirror does not work
                 #this is the best choice: 
                 #print "You can download %s.tex and use your windows LaTeX editor to help find the error." % gfilename
-                os.system("mv images/%s.tex ." % gfilename)
+                os.system("mv _images/%s.tex ." % gfilename)
 
                 #Using HTML and CodeMirror to show the error.
                 print "You can open %s.html to help debuging." % gfilename
@@ -446,11 +461,11 @@ class ExSiacua(ExerciseBase):
         #Cycle through existent tikz code and produce a new html string .
         graphic_number = 0
         gfilename = '%s-%d-%02d'%(self.name,self.ekey,graphic_number)
-        (new_text,number) = latex_pattern.subn(r"<img src='images/%s.png'></img>" % gfilename, input_text, count=1)
+        (new_text,number) = latex_pattern.subn(r"<img src='_images/%s.png'></img>" % gfilename, input_text, count=1)
         while number>0:
             graphic_number += 1
             gfilename = '%s-%d-%02d'%(self.name,self.ekey,graphic_number)
-            (new_text,number) = latex_pattern.subn(r"<img src='images/%s.png'></img>" % gfilename, new_text, count=1)
+            (new_text,number) = latex_pattern.subn(r"<img src='_images/%s.png'></img>" % gfilename, new_text, count=1)
         
         #TODO: falta gravar as imagens na lista deste exercicio.
 
@@ -484,21 +499,21 @@ class ExSiacua(ExerciseBase):
         #base name for the graphic file
         gfilename = '%s-%s-%d'%(self.name,varname,self.ekey)
         #create if does not exist the "image" directory
-        os.system("mkdir -p images") #The "-p" ommits errors if it exists.
+        #os.system("mkdir -p images") #The "-p" ommits errors if it exists.
 
-        f = open("images/%s.R" % gfilename,"w")
+        f = open("_images/%s.R" % gfilename,"w")
         #f.write("setwd('images')")
         f.write("png('%s.png',width = %d, height = %d, units = 'cm', res=100)\n" % (gfilename,dimx,dimy) )
         f.write(r_commands + '\n')
         f.write("dev.off()\n")
         f.close()
-        #os.system("/usr/bin/R --silent --no-save < images/%s.R" % gfilename)
-        os.system("cd images; unset R_HOME; /usr/bin/R CMD BATCH --quiet --no-environ --no-save --slave -- %s.R" % gfilename)
-        #os.system("/usr/bin/R --slave --no-save -f images/%s.R" % gfilename)
+        #os.system("/usr/bin/R --silent --no-save < _images/%s.R" % gfilename)
+        os.system("cd _images; unset R_HOME; /usr/bin/R CMD BATCH --quiet --no-environ --no-save --slave -- %s.R" % gfilename)
+        #os.system("/usr/bin/R --slave --no-save -f _images/%s.R" % gfilename)
 
         #Check ex.py:sage_graphic(): this will add a new image to the exercise.
         self.image_list.append(gfilename) 
-        return r"<img src='images/%s.png'></img>" % gfilename
+        return r"<img src='_images/%s.png'></img>" % gfilename
 
 
     def multiplechoice_parser(self,input_text):
@@ -852,7 +867,7 @@ class ExSiacua(ExerciseBase):
 
 
         #When producing instances of exercise a folder images is created.
-        os.system("rm -r images")
+        #os.system("rm -r images")
 
         #While POST is working do not need this.
         #Ending _siacua_sqlprint
@@ -867,16 +882,16 @@ class ExSiacua(ExerciseBase):
         """Send images to siacua: now is to put them in a drpobox public folder"""
         # AttributeError: MegBookWeb instance has no attribute 'image_list'
         #for fn in self.image_list:
-        #    os.system("cp -uv images/%s.png /home/nbuser/megua_images" % fn)
-        os.system("cp -ru images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
+        #    os.system("cp -uv _images/%s.png /home/nbuser/megua_images" % fn)
+        os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
 
 
     def _adjust_images_url(self, input_text):
-        """the url in problem() and answer() is <img src='images/filename.png'>
-        Here we replace images/ by the public dropbox folder"""
+        """the url in problem() and answer() is <img src='_images/filename.png'>
+        Here we replace _images/ by the public dropbox folder"""
 
         target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
-        img_pattern = re.compile(r"src='images/", re.DOTALL|re.UNICODE)
+        img_pattern = re.compile(r"src='_images/", re.DOTALL|re.UNICODE)
 
         (new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
         #print "===> Replacement for %d url images." % number

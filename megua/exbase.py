@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 
 r"""
-This module defines the base class for exercise templating.
+ExerciseBase - This module defines the base class for exercise templating.
 
 To build a database of exercise templates read details of module ``megbook``.
  
@@ -13,6 +13,17 @@ AUTHORS:
 - Pedro Cruz (2011-08): documentation strings with tests
 - Pedro Cruz (2016-01): refactoring for SMC.
 
+INSPIRATION:
+
+- https://github.com/sagemath/sage/blob/master/src/sage/structure/sage_object.pyx
+- https://github.com/sagemath/sage/blob/master/src/sage/games/quantumino.py
+
+Test examples using::
+
+   sage -t exbase.py
+   
+   
+   sage -python -m doctest exbase.py
 
 """
 
@@ -23,17 +34,20 @@ AUTHORS:
 #  Distributed under the terms of the GNU General Public License (GPL)
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
-  
+
+
+#SAGEMATH modules
+from sage.all import SageObject  
 
 #MEGUA modules
-from parse_param import parameter_change
-from ur import *
+from megua.parse_param import parameter_change
+from megua.ur import ur
 
 #PYTHON modules
 import warnings
 
 
-class ExerciseBase:
+class ExerciseBase(SageObject):
     """Class ``ExerciseBase`` is the base class for an exercise.
 
 
@@ -52,53 +66,58 @@ class ExerciseBase:
     
     Test examples using::
     
-        sage -python -m doctest exbase.py
+        
+        sage -t exbase.py
+
+        .. old: sage -python -m doctest exbase.py
     
     Defining a new exercise template::
-    
-       >>> from exbase import *
-       >>> class AddingTwoIntegers(ExerciseBase):
-       ...     _unique_name  = "AddingTwoIntegers"
-       ...     _summary_text = "Adding two integers."
-       ...     _problem_text = "Calculate a1 + a2@()."
-       ...     _answer_text  = "Result is a1 + a2@() = r1."
-       ...     def make_random(self,edict):
-       ...         self.a1 = ZZ.random_element(-10,10+1)
-       ...         self.a2 = ZZ.random_element(-10,10+1)
-       ...         if edict:
-       ...             self.update_dict(edict)
-       ...         self.r1 = self.a1 + self.a2 
-       >>> adding_template = AddingTwoIntegers(ekey=10)
-       >>> print adding_template.summary()
+
+       sage: from megua.exbase import *
+       sage: class AddingTwoIntegers(ExerciseBase):
+       ....:     #class variables   
+       ....:     _unique_name  = "AddingTwoIntegers"
+       ....:     _summary_text = "Adding two integers."
+       ....:     _problem_text = "Calculate a1 + a2@()."
+       ....:     _answer_text  = "Result is a1 + a2@() = r1."
+       ....:
+       ....:     def make_random(self,edict):
+       ....:        self.a1 = ZZ.random_element(-10,10+1)
+       ....:        self.a2 = ZZ.random_element(-10,10+1)
+       ....:        if edict:
+       ....:            self.update_dict(edict)
+       ....:        self.r1 = self.a1 + self.a2 
+       sage: adding_template = AddingTwoIntegers(ekey=10)
+       sage: print adding_template.summary()
        Adding two integers.
-       >>> print adding_template.problem()
+       sage: print adding_template.problem()
        Calculate -4 + 1.
-       >>> print adding_template.answer()
+       sage: print adding_template.answer()
        Result is -4 + 1 = -3.
-       >>> print adding_template.unique_name()
+       sage: print adding_template.unique_name()
        AddingTwoIntegers
     
     
     Changing randomly the set of parameters::
     
-       >>> adding_template.instance_with(ekey=15) #another set of random parameters
-       >>> print adding_template.problem()
+       sage: adding_template.update(ekey=15) #another set of random parameters
+       sage: print adding_template.problem()
        Calculate 2 + 10.
-       >>> print adding_template.answer()
+       sage: print adding_template.answer()
        Result is 2 + 10 = 12.
        
     Changing randomly but setting one of them::
         
-       >>> adding_template.instance_with(ekey=15,edict={'a1':99}) #another set of random parameters
-       >>> print adding_template.problem()
+       sage: adding_template.update(ekey=15,edict={'a1':99}) #another set of random parameters
+       sage: print adding_template.problem()
        Calculate 99 + 10.
-       >>> print adding_template.answer()
+       sage: print adding_template.answer()
        Result is 99 + 10 = 109.
     
-       >>> adding_template.instance_with(ekey=15,edict={'a2':-5}) #another set of random parameters
-       >>> print adding_template.problem()
+       sage: adding_template.update(ekey=15,edict={'a2':-5}) #another set of random parameters
+       sage: print adding_template.problem()
        Calculate 2 + (-5).
-       >>> print adding_template.answer()
+       sage: print adding_template.answer()
        Result is 2 + (-5) = -3.
 
     """
@@ -131,7 +150,7 @@ class ExerciseBase:
         self.current_answer = None
         
         if ekey or edict:
-            self.instance_with(ekey,edict)
+            self.update(ekey,edict)
 
     def __str__(self):
         return "%s(%s)" % (self._unique_name,str(self.__dict__))
@@ -142,7 +161,7 @@ class ExerciseBase:
         return "%s(%s)" % (self._unique_name,repr(self.__dict__))
 
 
-    def instance_with(self,ekey=None,edict=None):
+    def update(self,ekey=None,edict=None):
         #Initialize all random generators.    
         self.ekey = ur.set_seed(ekey)
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 
 r"""
 Generic Mathematical routines for MEGUA.
@@ -38,9 +38,18 @@ does not work.
 
 """
 
+#PYTHON modules
+import jinja2
+import os
+
+#SAGEMATH modules
+#from sage.all import var,RealField,SR,function,e
 from sage.all import *
 
-import jinja2
+#MEGUA modules
+from megua.ur import ur
+
+
 
 
 """
@@ -461,7 +470,7 @@ def before_minor(M,pivot_row,pivot_col):
 
     EXAMPLES::
 
-       sage: from msc15 import before_minor 
+       sage: from megua.mathcommon import before_minor 
        sage: M = matrix(ZZ, [ [  1, -25,  -1,   0], [  0,  -2,  -5,  -2], [  2,   1,  -1,   0], [  3,   1,  -2, -13] ]); M
        [  1 -25  -1   0]
        [  0  -2  -5  -2]
@@ -569,9 +578,6 @@ def before_minor(M,pivot_row,pivot_col):
 # MSC 60 -- probability
 # ==================
 
-from ur import ur
-
-from sage.all import RealNumber
 
 def random_alpha():
     """
@@ -580,7 +586,7 @@ def random_alpha():
 
     EXAMPLES::
 
-    sage: from msc60 import random_alpha
+    sage: from megua.mathcommon import random_alpha
     sage: random_alpha()
     (5.00000000000000, 0.0500000000000000)
 
@@ -603,7 +609,7 @@ def Percent(value):
 
     EXAMPLES::
 
-    sage: from msc60 import Percent
+    sage: from megua.mathcommon import Percent
     sage: Percent(0.1) + "%"
     '10%'
     sage: Percent(0.12) + "%"
@@ -657,18 +663,13 @@ def Percent(value):
 # ==================
 
 
-#Talvez isto nÃ£o seja Ãºtil porque all.py contÃ©m tudo!
-#importar tudo do primeiro grupo msc que abrange a estatÃ­stica
-#from meg.msc60.msc60 import *
-#esclarecer o ststistics.py em meg/
-
-
-
-
 #Random numbers from R using RPy2
 # 1. Always do casts to python rpy2 commands.
 # 2. To do: study how does rpy2 works.
+
+import rpy2
 import rpy2.robjects as robjects
+
 
 def qt(p,df,prec=None):
     """
@@ -689,7 +690,7 @@ def qt(p,df,prec=None):
 
     EXAMPLES::
 
-        sage: from msc62 import qt
+        sage: from megua.mathcommon import qt
         sage: qt(0.95,12)
         1.7822875556493196
         sage: qt(0.95,12,2)
@@ -723,11 +724,11 @@ def pnorm(x,mean,stdev,prec=None):
 
     EXAMPLES::
 
-        sage: from msc62 import pnorm
+        sage: from megua.mathcommon import pnorm
         sage: pnorm(0,0,1)
         0.5
         sage: pnorm(1.644854,0.0,1.0)
-        0.95000003847458692
+        0.9500000384745869
 
     """
     #qt(p, df, ncp, lower.tail = TRUE, log.p = FALSE)
@@ -737,6 +738,122 @@ def pnorm(x,mean,stdev,prec=None):
         res = round(res,prec)
     return res
 
+
+
+#from sage.rings.integer import Integer
+
+def r_stem(p_list,html=True):
+    """
+    Return a string with a stem-and-leaf diagram based on R.
+
+    INPUT:
+
+    - `p_list': a python list
+    
+    OUTPUT:
+
+       Return string with the diagram.
+
+    EXAMPLES:
+
+       TODOsage: from megua.mathcommon import r_stem
+       TODOsage: r_stem( [random() for _ in range(20)] ) #random
+       u'\n  O ponto decimal est\xe1 1 d\xedgitos para a esquerda de |\n\n  0 | 283\n  2 | 334\n  4 | 468117\n  6 | 3348169\n  8 | 5\n\n'
+       TODOsage: r_stem( [int(100*random()) for _ in range(20)] ) 
+       u'\n  O ponto decimal est\xe1 1 d\xedgito para a direita de |\n\n  0 | 60\n  2 | 1660\n  4 | 169\n  6 | 03457\n  8 | 091779\n\n'
+
+    #TODO : put this examples to work !
+    from random import random
+    l = [int(100*random()) for _ in range(20)]
+    print l
+    b = r_stem2( l ) 
+    #b = r_stem( [random() for _ in range(30)] )
+    print b
+       
+       This module defines functions that use R software for statistics.
+
+    AUTHORS:
+
+    - Pedro Cruz (2014-03-07): initial version
+
+    LINKS:
+
+     - http://www.sagemath.org/doc/reference/interfaces/sage/interfaces/r.html
+
+
+    CODE STARTS HERE:
+    =============================    
+    TODO: rebuild  this function.
+    =============================    
+    
+    stemf = robjects.r['stem']
+
+    buf = []
+    def f(x):
+        # function that append its argument to the list 'buf'
+        buf.append(x)
+
+    # output from the R console will now be appended to the list 'buf'
+    rpy2.rinterface.setWriteConsole(f)
+
+
+    if type(p_list[0])==int: # or type(p_list[0])==sage.rings.integer.Integer:
+        stemf( robjects.IntVector(p_list) )
+    else:
+        stemf( robjects.FloatVector(p_list) )
+
+
+
+    #Parsing: The decimal point is 1 digit(s) to the right of the |
+    #The answer is a list of string in the "buf" variable.
+
+    #Keep record
+    buf1 = buf[1]
+    buf2 = buf[2]
+
+
+    #if buf[1] == '  The decimal point is ':
+    buf[1] = u"  O ponto decimal está "
+    
+    #get space position after the number.
+    sp = buf[2].index(' ')
+
+    
+    if 'left' in buf[2]:
+        sideword = 'esquerda'
+        sideflag = True
+    elif 'right' in buf[2]:
+        sideword = 'direita'
+        sideflag = True
+    else:
+        sideword = 'em |\n'
+        sideflag = False
+
+    
+    if sideflag:
+        if buf[2][:sp]=='1':
+            buf[2] = buf[2][:sp] + u" dígito para a %s de |\n\n" % sideword
+        else:
+            buf[2] = buf[2][:sp] + u" dígitos para a %s de |\n\n" % sideword
+    else:
+        buf[2] = sideword
+
+    #For debug only
+    buf.insert(3,buf1)
+    buf.insert(4,buf2)
+
+    jbuf = u''.join(buf)
+
+    #print jbuf
+    #print type(jbuf)
+
+    if html:
+        jbuf = u'''<div style="font-family: 'Courier New', monospace;"><pre>''' + jbuf + u"</pre></div>"
+
+    return jbuf
+    """
+    
+    return 'stem: todo things. call the programmer.'
 
 
 

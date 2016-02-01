@@ -1,3 +1,5 @@
+\.spyderproject
+spyder_session
 *.swp
 *.pyc
 \.testoutput/

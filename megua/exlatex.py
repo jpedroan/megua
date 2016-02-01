@@ -20,12 +20,17 @@ AUTHORS:
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 
-  
-from exbase import *
 
-#Import the random generator object.
-from ur import ur 
-from cr import r_stem
+#SAGE modules
+from sage.all import ZZ
+
+#MEGUA modules
+from exbase import ExerciseBase
+from parse_param import parameter_change
+from ur import ur
+
+#PYTHON modules
+import warnings
 
 
 class ExLaTeX(ExerciseBase):

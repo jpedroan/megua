@@ -467,7 +467,7 @@ class MegBook:
             tmp = tempfile.mkdtemp()
             pfilename = tmp+"/"+row["unique_name"]+".sage"
             pcode = open(pfilename,"w")
-            pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8") )
+            pcode.write("# -*- coding: utf-8 -*\nfrom megua import *\n" + row['class_text'].encode("utf-8") )
             pcode.close()
             errfilename = "%s/err.log" % tmp
             os.system("sage -python %s 2> %s" % (pfilename,errfilename) )
@@ -531,7 +531,7 @@ class MegBook:
             tmp = tempfile.mkdtemp()
             pfilename = tmp+"/"+row["unique_name"]+".sage"
             pcode = open(pfilename,"w")
-            pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8")+"\n")
+            pcode.write("# -*- coding: utf-8 -*\nfrom megua import *\n" + row['class_text'].encode("utf-8")+"\n")
             pcode.write(row['unique_name'] + "(ekey=" + str(ekey) + ", edict=" + str(edict) + ")\n")
             pcode.close()
             errfilename = "%s/err.log" % tmp

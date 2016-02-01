@@ -7,10 +7,16 @@ AUTHORS:
 
 - Pedro Cruz (2011-05-06): initial version.
 - Pedro Cruz (2011-08-23): documentation test strings.
+- Pedro Cruz (2016-01): review doc tests.
 
-EXAMPLES
 
-.. test with: sage -t ur.py
+EXAMPLES:
+
+Test examples using::
+    
+    sage -t ut.py
+
+..        sage -python -m doctest ur.py
 
 Using Sage random numbers::
 
@@ -137,22 +143,38 @@ LINKS and FILES:
 #*****************************************************************************
   
 
-
-#Random numbers from Sage
-from sage.all import *
+#================
+# PYTHON modules
+#================
 
 #Random numbers from numpy
 #http://docs.scipy.org/doc/numpy/reference/routines.random.html
 import numpy.random as nprandom
 
-#Random numbers with python
-import random
-import time #re-start random
 
 #Random numbers from R using RPy2
 # 1. Always do casts to python rpy2 commands.
 # 2. To do: study how does rpy2 works.
 import rpy2.robjects as robjects
+
+#re-start random
+import time 
+
+
+#====================
+# SAGEMATH modules
+#====================
+#Random numbers from Sage
+from sage.all import *
+
+
+
+#Random numbers with python
+#TODO: sagemath prandom.py redefined random and here 
+#      we define it again as python module.
+import random 
+
+
 
 
 
@@ -207,10 +229,11 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
 
         Seed commands:
 
-        1. Sage: set_random_seed, seed.
-        2. R: set.seed
+        1. for sage: set_random_seed, seed.
+        2. for R: set.seed
+        3. for python: TODO ????
 
-        To do: 
+        TODO: 
 
         1. check what happens with simultaneous notebooks 
         and worksheets and also in a shared "sage" instance.
@@ -219,22 +242,22 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
 
         """
 
-        #NOTE: change this.
-        random_seed = int(time.time())
-
         #Keep in memory, use int to convert from sage to python int
         if seed_value==None:
-            self.seed_value = random_seed
+            self.seed_value = int(time.time()) #NOTE: change this.
         else:
             self.seed_value = int(seed_value)
 
-        #set SAGE random seed
+        #set SAGE seed
         set_random_seed(self.seed_value)
-        #set PYTHON random seed
+        
+        #set PYTHON RANDOM module seed
         random.seed(self.seed_value)
+        
         #set R from rpy2
         self._rpy2_setseed(self.seed_value) 
-        #Set NUMPY seed
+        
+        #Set PYTHON NUMPY MODULE seed
         nprandom.seed(int(self.seed_value))
 
         return self.seed_value
@@ -534,9 +557,9 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         IMPLEMENTATION NOTES:
 
         1. Check class variable UnifiedRandom._qlist.
-        2. This module is a pure python module so 1/3 results in 0. One must use Integer(1)/Integer(3)::
+        2. This module is a pure python module so 1/3 results in 0. One must use
+ Integer(1)/Integer(3)::
         3. Testing::
-
             sage: from sage.all import *
             sage: qq = [ Integer(a+1)/Integer(b+1) for b in range(9) for a in range(b)]
             sage: ql = list(set(qq)); ql
