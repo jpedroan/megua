@@ -1,0 +1,24 @@
+{# 
+
+Check this variables also:
+
+  from sage.misc.latex import LATEX_HEADER
+  from sage.misc.latex import COMMON_HEADER
+  from sage.misc.latex import latex_extra_preamble
+
+TODO CHECK: standalone package must be instaled on linux server.
+
+#}
+
+\documentclass[varwidth=true, border=10pt]{standalone}
+
+
+{% include 'common.tex' %}
+
+\begin{document}
+
+{{latex_source}}
+
+\end{document}
+
+

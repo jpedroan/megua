@@ -1,5 +1,6 @@
+# coding=utf-8
+
 # vim:fileencoding=utf-8
-# -*- coding: utf-8 -*-
 
 #The above python directive allows the testing for european accented characters.
 #The vim for python coding directive informs vim  of the use of iso-....
@@ -16,6 +17,7 @@ AUTHORS:
 
 - Pedro Cruz (2011-02-17): initial version
 - Pedro Cruz (2011-10): another version
+- Pedro Cruz (2016-02): Prepare for SMC
 
 NOTES:
 
@@ -51,8 +53,11 @@ import os
 import re
 import shutil
 
-from convertdb import convertdb
-from ex import to_unicode
+
+
+#MEGUA modules
+from megua.convertdb import convertdb
+from megua.tounicode import to_unicode
 
 
 __VERSION__ = '0.2.1'
@@ -100,44 +105,47 @@ class LocalStore:
     r"""
     LocalStore class implements the database of a MegBook over sqlite3.
 
-    .. test with: sage -python -m doctest localstore.py
+    .. test with: OLD sage -python -m doctest localstore.py
+    
+    
+    .. sage -t localstore.py
 
     EXAMPLES::
 
-    >>> from localstore import LocalStore
-    >>> filename = r"/tmp/localstore.sqlite"
-    >>> import os
-    >>> if os.access(filename,os.F_OK):        #Remove previous test if exists:
-    ...     os.remove(filename)
-    >>> lstore = LocalStore(filename,natlang='pt_pt',markuplang='latex')
-    >>> LocalStore._debug = True
-    >>> row = {'unique_name': u'keyone', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name1',
-    ... 'summary_text': u'summary1 \xe1\xe9', 'problem_text': u'problem1', 'answer_text': u'answer1', 'class_text': u'class Ex1'}
-    >>> r = lstore.insertchange(row) 
+    sage: from megua.localstore import LocalStore
+    sage: filename = r"/tmp/localstore.sqlite"
+    sage: import os
+    sage: if os.access(filename,os.F_OK):        #Remove previous test if exists:
+    ....:     os.remove(filename)
+    sage: lstore = LocalStore(filename,natlang='pt_pt',markuplang='latex')
+    sage: LocalStore._debug = True
+    sage: row = {'unique_name': u'keyone', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name1',
+    ....: 'summary_text': u'summary1 \xe1\xe9', 'problem_text': u'problem1', 'answer_text': u'answer1', 'class_text': u'class Ex1'}
+    sage: r = lstore.insertchange(row) 
     Exercise 'keyone' inserted in database.
-    >>> slist = lstore.search("áé") #str 
-    >>> lstore.print_row(slist[0]) #print the only record
+    sage: slist = lstore.search("áé") #str 
+    sage: lstore.print_row(slist[0]) #print the only record
     Record 001: keyone
     <BLANKLINE>
     problem1
     <BLANKLINE>
-    >>> row = {'unique_name': u'keytwo', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name2',
-    ... 'summary_text': u'summary2 \xe9\xf3', 'problem_text': u'problem2', 'answer_text': u'answer2', 'class_text': u'class Ex2'}
-    >>> r = lstore.insertchange(row)
+    sage: row = {'unique_name': u'keytwo', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name2',
+    ....: 'summary_text': u'summary2 \xe9\xf3', 'problem_text': u'problem2', 'answer_text': u'answer2', 'class_text': u'class Ex2'}
+    sage: r = lstore.insertchange(row)
     Exercise 'keytwo' inserted in database.
-    >>> slist = lstore.search(u"\xe9\xf3") #unicode
-    >>> lstore.print_row(slist[0])
+    sage: slist = lstore.search(u"\xe9\xf3") #unicode
+    sage: lstore.print_row(slist[0])
     Record 002: keytwo
     <BLANKLINE>
     problem2
     <BLANKLINE>
-    >>> row = {'unique_name': u'keyone', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name1',\
-    ... 'summary_text': u'summary1 modified', 'problem_text': u'problem1 modified', 'answer_text': u'answer1 modified', \
-    ... 'class_text': u'class Ex1 modified'}
-    >>> r = lstore.insertchange(row)
+    sage: row = {'unique_name': u'keyone', 'sections_text': u'Section; SubSection; Subsubsection', 'suggestive_name': u'Some Name1',\
+    ....: 'summary_text': u'summary1 modified', 'problem_text': u'problem1 modified', 'answer_text': u'answer1 modified', \
+    ....: 'class_text': u'class Ex1 modified'}
+    sage: r = lstore.insertchange(row)
     Exercise 'keyone' changed in database.
-    >>> slist = lstore.search(u"\xe1\xe9") #unicode
-    >>> print slist
+    sage: slist = lstore.search(u"\xe1\xe9") #unicode
+    sage: print slist
     []
 
     """

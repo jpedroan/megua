@@ -1,16 +1,150 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 
 r"""
 MegBook -- Repository and functionalities for managing exercises.
 
 MEGUA build your own database of exercises in several markup languages.
 
+This module provides a means to produce a database of exercises 
+that can be seen as a book of some author or authors.
+
+Using exercices:
+
+- create, edit and delete exercises from a database.
+- search for an exercise or set of exercises.
+- create a random instance from a set or single exercise
+- create an instance based on specific parameters
+- create latex (and PDF) from a single or a set of exercises.
+
 AUTHORS:
 
 - Pedro Cruz (2012-06): initial version (based on megbook.py)
 - Pedro Cruz (2016-01): first modifications for use in SMC.
 
+
+TESTS:
+
+::
+
+    sage -t megbook.py
+
+
+Create or edit a database:
+
+::
+   sage: from megua.megbook import MegBook
+   sage: from megua.exbase import ExerciseBase
+   sage: meg = MegBook(r'_output/megbasedb.sqlite')
+
+
+Save a new or changed exercise:
+
+::
+
+   sage: meg.save(r'''
+   ....: %Summary Primitives
+   ....: Here one can write few words, keywords about the exercise.
+   ....: For example, the subject, MSC code, and so on.
+   ....:   
+   ....: %Problem
+   ....: What is the primitive of ap x + bp@() ?
+   ....: 
+   ....: %Answer
+   ....: prim1
+   ....: 
+   ....: class E28E28_pdirect_001(ExerciseBase):
+   ....: 
+   ....:     def make_random(self,edict=None):
+   ....:         self.ap = ZZ.random_element(-4,4)
+   ....:         self.bp = self.ap + QQ.random_element(1,4)
+   ....:         x=SR.var('x')
+   ....:         self.prim1 = integrate(self.ap * x + self.bp,x)
+   ....: ''')
+   Each problem can have a suggestive name. 
+   Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
+   <BLANKLINE>
+   -------------------------------
+   Instance of: E28E28_pdirect_001
+   -------------------------------
+   ==> Summary:
+   Here one can write few words, keywords about the exercise.
+   For example, the subject, MSC code, and so on.
+   ==> Problem instance
+   What is the primitive of -1 x + (-5/4) ?
+   ==> Answer instance
+   prim1
+
+   Long computation? Two examples follow:
+   
+   sage: meg.save(r'''
+   ....: %Summary Long Computations Section; Example 1
+   ....: Testing the production of exercises with long computations.
+   ....:   
+   ....: %Problem Long Computation Problem
+   ....: What is the long primitive of ap x + bp@() ?
+   ....: 
+   ....: %Answer
+   ....: 
+   ....: class E28E28_pdirect_001(ExerciseBase):
+   ....: 
+   ....:     def make_random(self,edict=None):
+   ....:         #suppose a 15 seconds computation here
+   ....:         #maximum by default is 10 (see MegBook)
+   ....:         sleep(15)  
+   ....:         #do something else.
+   ....: ''')
+   Exercise is taking too long to calculate!
+   Check make_random() routine or increase max_computation_time = ... in save().
+   Exercise was not saved.
+
+   sage: meg.save(r'''
+   ....: %Summary Long Computations Section; Example 2
+   ....: Changing maximum length of computation time.
+   ....:   
+   ....: %Problem Long Computation Problem
+   ....: What is the long primitive of ap x + bp@() ?
+   ....: 
+   ....: %Answer
+   ....: 
+   ....: class E28E28_pdirect_001(ExerciseBase):
+   ....: 
+   ....:     def make_random(self,edict=None):
+   ....:         #suppose a 15 seconds computation here
+   ....:         #maximum by default is 10 (see MegBook)
+   ....:         sleep(15)  
+   ....:         #do something else.
+   ....: ''', max_computation_time = 30) #increase patience.
+   -------------------------------
+   Instance of: E28E28_pdirect_001
+   -------------------------------
+   ==> Summary:
+   Changing maximum length of computation time.
+   ==> Problem instance
+   What is the long primitive of ap x + bp ?
+   ==> Answer instance
+   <BLANKLINE>
+
+   
+Search an exercise:
+
+::
+
+  sage: meg.search("primitive")
+  Exercise name E28E28_pdirect_001
+  What is the long primitive of ap x + bp@() ?
+  <BLANKLINE>
+
+Remove an exercise:
+
+::
+
+   sage: meg.remove('E28E28_pdirect_001',dest=r'_output')
+   Exercise 'E28E28_pdirect_001' stored on text file _output/E28E28_pdirect_001.txt.
+   sage: meg.remove('E28E28_nonexistant',dest=r'_output')
+   Exercise E28E28_nonexistant is not on the database.
+
 """
+
 
 # Abstract function
 # raise NotImplementedError( "Should have implemented this" )
@@ -23,127 +157,56 @@ AUTHORS:
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
   
-  
-#megua configuration file: server side settings.
-from mconfig import * 
-
-#megua modules:
-from localstore import LocalStore,ExIter
-from parse_ex import parse_ex
-from platex import pcompile
-from xmoodle import MoodleExporter
-from xsphinx import SphinxExporter
-from xlatex import * #including PDFLaTeXExporter
 
 
-#Because sage.plot.plot.EMBEDDED_MODE
-#This variable indicates if notebook is present.
-#Trying no include now the EMBEDDED_MODE and wait for some place else:
-#from sage.all import * #REMOVE IS EVERYTHONG IS WORKING
 
-
-#Python modules:
+#PYTHON modules:
+import tempfile
 import sqlite3 #for row objects as result from localstore.py
 import shutil
 import os
 import random
-
 #import codecs
-
-#Python Modules
 import re
 import codecs
 import random as randomlib #random is imported as a funtion somewhere
 
 
-#Megua modules:
+
+#SAGE modules
+from sage.all import * #needed in exec (see exerciseinstance)
+#from sage.repl.preparse import preparse_file,preparse
+#sage_eval does not work with class definitions?
+#from sage.misc.sage_eval import sage_eval
 
 
-# Jinja2 package
-import jinja2
-#from jinja2 import Environment, PackageLoader,FileSystemLoader,Template, TemplateNotFound
-#Note on Jinja2:
-# di = { 'ex_10_0_4': 10 }
-# template.stream(di).dump('new.tex')
-# print "Template folders are: " + str(env.loader.searchpath)
+  
+#MEGUA configuration file: server side settings.
+from megua.mconfig import * 
+
+
+
+#MEGUA modules:
+from megua.exbase import ExerciseBase
+from megua.localstore import LocalStore,ExIter
+from megua.parse_ex import parse_ex
+from megua.tounicode import to_unicode
+from megua.jinjatemplates import templates
+from megua.ur import ur
+#from platex import pcompile
+#from xmoodle import MoodleExporter
+#from xsphinx import SphinxExporter
+#from xlatex import * #including PDFLaTeXExporter
+
+
+
+
 
 
 class MegBook:
     r"""
     A book of exercises of several markup languages.
     
-    This module provides a means to produce a database of exercises 
-    that can be seen as a book of some author or authors.
-
-    Using exercices:
-
-    - create, edit and delete exercises from a database.
-    - search for an exercise or set of exercises.
-    - create a random instance from a set or single exercise
-    - create an instance based on specific parameters
-    - create latex (and PDF) from a single or a set of exercises.
-
-
-    Examples of use:
-
-    .. test with: sage -python -m doctest megbook.py
-
-    Create or edit a database::
-
-       >>> from all import *
-       >>> meg = MegBook(r'.testoutput/megbasedb.sqlite')
-
-
-    Save a new or changed exercise::
-
-       >>> ex=ExLaTeX(r'''
-       ... %Summary Primitives
-       ... Here one can write few words, keywords about the exercise.
-       ... For example, the subject, MSC code, and so on.
-       ...   
-       ... %Problem
-       ... What is the primitive of ap x + bp@() ?
-       ... 
-       ... %Answer
-       ... The answer is prim+C, with C a real number.
-       ... 
-       ... class E28E28_pdirect_001(Exercise):
-       ... 
-       ...     def make_random(self):
-       ...         self.ap = ZZ.random_element(-4,4)
-       ...         self.bp = self.ap + QQ.random_element(1,4)
-       ... 
-       ...     def solve(self):
-       ...         x=SR.var('x')
-       ...         self.prim = integrate(self.ap * x + self.bp,x)
-       ... ''')
-       Each problem can have a suggestive name. 
-       Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
-       <BLANKLINE>
-       Testing python/sage class 'E28E28_pdirect_001' with 100 different keys.
-           No problems found in this test.
-          Compiling 'E28E28_pdirect_001' with pdflatex.
-          No errors found during pdflatex compilation. Check E28E28_pdirect_001.log for details.
-       >>> meg.save(ex,dest=r'.testoutput')
-       Exercise name E28E28_pdirect_001 inserted.
-
-    Search an exercise:
-
-      >>> meg.search("primitive")
-      Exercise name E28E28_pdirect_001
-      <BLANKLINE>
-      %problem 
-      What is the primitive of ap x + bp@() ?
-      <BLANKLINE>
-      <BLANKLINE>
-      <BLANKLINE>
-
-    Remove an exercise:
-
-       >>> meg.remove('E28E28_pdirect_001',dest=r'.testoutput')
-       Exercise 'E28E28_pdirect_001' stored on text file .testoutput/E28E28_pdirect_001.txt.
-       >>> meg.remove('E28E28_nonexistant',dest=r'.testoutput')
-       Exercise E28E28_nonexistant is not on the database.
     """
 
     #TODO 1: increase docstring examples.
@@ -151,7 +214,7 @@ class MegBook:
     #TODO 2: assure that there is a natlang folder in templates (otherwise put it in english). Warn for existing languages if specifies lan does not exist.
 
 
-    def __init__(self,filename=None): 
+    def __init__(self,filename=None,natlang='pt_pt',markuplang='latex'): 
         r"""
 
         INPUT::
@@ -173,21 +236,14 @@ class MegBook:
             print "Filename couldn't be opened: " , e.args[0], "\n"
             raise e
 
-        #Templating (with Jinja2)
-        if os.environ.has_key('MEGUA_TEMPLATE_PATH'):
-            TEMPLATE_PATH = os.environ['MEGUA_TEMPLATE_PATH']
-        else:
-            from pkg_resources import resource_filename
-            TEMPLATE_PATH = os.path.join(resource_filename(__name__,''),'template',natlang)
-        print "Templates for '%s' language at %s" % (natlang,TEMPLATE_PATH)
-        #print "Templates in: " + TEMPLATE_PATH
-        self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_PATH))
 
         #For template. See template_create function.
         self.template_row = None
 
+        #(default, in seconds) author can change this value.
+        self.max_computation_time = 10 
 
-        ExerciseBase.megbook = self
+        ExerciseBase._megbook = self
 
 
     def __str__(self):
@@ -197,49 +253,19 @@ class MegBook:
         return "MegBook('%s','%s','%s')" % (self.local_store_filename)
 
     def make_index(self,where='.',debug=False):
-        warnings.warn("make_index() is deprecated. TODO: what to do ?", DeprecationWarning)
+        #warnings.warn("make_index() is deprecated. TODO: what to do ?", DeprecationWarning)
+        raise NotImplementedError
         
-    def template(self, filename, **user_context):
-        """
-        Returns HTML, CSS, LaTeX, etc., for a template file rendered in the given
-        context.
-
-        INPUT:
-
-        - ``filename`` - a string; the filename of the template relative
-          to ``sagenb/data/templates``
-
-        - ``user_context`` - a dictionary; the context in which to evaluate
-          the file's template variables
-
-        OUTPUT:
-
-        - a string - the rendered HTML, CSS, etc.
-
-        BASED ON:
-
-           /home/.../sage/devel/sagenb/sagenb/notebook/tempate.py
-
-        """
-
-        try:
-            tmpl = self.env.get_template(filename)
-        except jinja2.exceptions.TemplateNotFound:
-            return "MegBook: missing template %s"%filename
-        r = tmpl.render(**user_context)
-        return r
-
-
-
-
-    def save(self,uexercise):
+        
+    def save(self,uexercise,max_computation_time = None):
         r"""
         Save an exercise defined on a `python string`_ using a specific sintax defined here_.
 
         INPUT::
 
         - ``uexercise`` -- an exercise textual description (unicode string).
-
+        - ``max_computation_time`` -- max time!
+        
         OUTPUT::
         
         - Textual messages with errors.
@@ -250,30 +276,32 @@ class MegBook:
 
         """
 
-        #First check: syntatic level ("megua" script)
-        row =  parse_ex(to_unicode(exercise))
-
-    
-        #Second check: syntatic and runtime  ("python/sagemath" script)
-        ex_instance = self.exerciseinstance(row)            
-            
-        #Third check: creating several instances; create content.
-        ex_instance.check() #3 seconds
-
-
-        #After all that, save it on database:                        
-        self.megbook_store.insertchange(row)
+        if max_computation_time:
+            assert(1<max_computation_time<5*60)
+            self.max_computation_time = max_computation_time
         
-        #Check if saved.
-        try:
-            self.new(row["unique_name"], ekey=0, returninstance=True).print_instance()
-        except e:
-            print 'Problem name %s must be reviewed.' % row["unique_name"]
-            raise e
+        
+        #First check: syntatic level ("megua" script)
+        row =  parse_ex(to_unicode(uexercise))
+
+        #Second check: syntatic and runtime  ("python/sagemath" script)
+        ex_instance = self.exerciseinstance(row,ekey=0)            
+        
+        if ex_instance:
+            
+            #Third check: creating several instances; create content.
+            ex_instance.check(self.max_computation_time) #3 seconds
 
 
+            #After all that, save it on database:                        
+            self.megbook_store.insertchange(row)
+        
+            ex_instance.print_instance()
 
-
+        else:
+            
+            print "megbook module: the exercise was not saved."
+            
 
     def check_all(self,dest='.'):
         r""" 
@@ -414,7 +442,7 @@ class MegBook:
 
 
 
-    def new(self,unique_name, ekey=None, edict=None, returninstance=False):
+    def new(self, unique_name, ekey=None, edict=None, returninstance=False):
         r"""Prints an exercise instance of a given type
 
         INPUT:
@@ -425,71 +453,97 @@ class MegBook:
          - ``returninstance`` -- if True, this function return a python object.
 
         OUTPUT:
-            An instance of class named ``unique_namestring``.
+            An instance of class named ``unique_name``.
 
         """
         #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(unique_namestring)
+        row = self.megbook_store.get_classrow(unique_name)
         if not row:
-            print "%s cannot be accessed on database" % unique_namestring
+            print "%s cannot be accessed on database" % unique_name
             return
         
         #Create and print the instance
         ex_instance = self.exerciseinstance(row, ekey, edict)
-        ex_instance.print_instance()
         
         if returninstance:
             return ex_instance
+        else:
+            ex_instance.print_instance()
+            return
 
     
 
 
     def exerciseclass(self, row):
         r"""
-        Interpret the `exercise class` (not an object) from text fields.
+        Interpret the `exercise class` (not an object) from text fields:
+
+        - Put the class designed by an author in the global namespace 
+        - (not yet the instance)
+        
+        DEVELOPMENT:
+
+        Check:
+        
+        - global namespace has the class name.
+        
+        Instructions that did not work but don't know why::
+
+            #sage_class_string = preparse_file(row['class_text'],globals=globals())
+            #sage_class_string = u"# -*- coding: utf-8 -*\nfrom sage.all import *\nfrom megua.all import *\n" + sage_class_string
+            #sage_class_string = u"from sage.all import *\nfrom megua.all import *\n" + sage_class_string
+            #exec(...), only exec statment works.
+
+            #exec compile(sage_class,row["unique_name"],'eval')
+            #sage_eval did not work. Why ?
+            #http://www.sagemath.org/doc/reference/misc/sage/misc/sage_eval.html
+            #and spread this for more points in code.
+
         """
     
-        #Create the class (not yet the instance)
-    
-        #TODO:
-        #   put class in globals(). 
-        #   Now ex_name is on global space ?? 
-        #   or is in this module space?
         # TODO: control the time and the process
-    
+
         try:
-            #exec compile(sage_class,row["unique_name"],'eval')
-            #TODO: http://www.sagemath.org/doc/reference/misc/sage/misc/sage_eval.html
-            # and spread this for more points in code.
-            sage_class = preparse(row['class_text'])
-            exec sage_class
-        except: 
-            tmp = tempfile.mkdtemp()
-            pfilename = tmp+"/"+row["unique_name"]+".sage"
-            pcode = open(pfilename,"w")
-            pcode.write("# -*- coding: utf-8 -*\nfrom megua import *\n" + row['class_text'].encode("utf-8") )
-            pcode.close()
-            errfilename = "%s/err.log" % tmp
-            os.system("sage -python %s 2> %s" % (pfilename,errfilename) )
-            errfile = open(errfilename,"r")
-            err_log = errfile.read()
-            errfile.close()
-            #TODO: adjust error line number by -2 lines HERE.
-            #....
-            #remove temp directory
-            #print "=====> tmp = ",tmp
-            os.system("rm -r %s" % tmp)
-            print err_log #user will see errors on syntax.
-            raise SyntaxError  #to warn user #TODO: not always SyntaxError
-    
+            alarm(self.max_computation_time)
+            sage_class_string = preparse(row['class_text'])
+            sage_class_string = u"from megua.all import *\n" + sage_class_string
+            exec sage_class_string
+        except KeyboardInterrupt:
+            print 'Exercise is taking too long to calculate!'
+            print 'Check __init__ routine or increase max_computation_time = ... in save().'
+            # if the computation finished early, though, the alarm is still ticking!
+            # so let's turn it off below.
+            return None
+# TODO NOW: ACABAR ISTO
+#        except: 
+#            tmp = "_temp" #tempfile.mkdtemp()
+#            pfilename = tmp+"/"+row["unique_name"]+".sage"
+#            pcode = open(pfilename,"w")
+#            pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8") )
+#            pcode.close()
+#            errfilename = "%s/err.log" % tmp
+#            os.system("sage %s 2> %s" % (pfilename,errfilename) ) # sage -python ???
+#            errfile = open(errfilename,"r")
+#            err_log = errfile.read()
+#            errfile.close()
+#            #TODO: adjust error line number by -2 lines HERE.
+#            #....
+#            #remove temp directory
+#            #print "=====> tmp = ",tmp
+#            #os.system("rm -r %s" % tmp)
+#            print "Error log:", err_log #user will see errors on syntax.
+#            raise SyntaxError  #to warn user #TODO: not always SyntaxError
     
         #Get class name
-        ex_class = eval(row['unique_name']) #String contents row['unique_name'] is now a valid identifier.
+        #The string contents row['unique_name'] is now a valid identifier.
+        ex_class = eval(row['unique_name']) 
+
     
         #class fields
         ex_class._summary_text = row['summary_text']
         ex_class._problem_text = row['problem_text']
         ex_class._answer_text  = row['answer_text']
+        ex_class._unique_name  = row['unique_name']
     
         return ex_class
     
@@ -504,8 +558,6 @@ class MegBook:
     
         INPUT:
     
-         - ``unique_namestring`` -- the class name (python string).
-         - ``ex_class`` -- a class definition in memory.
          - ``row``-- the sqlite row containing fields: 'summary_text', 'problem_text',  'answer_text'.
          - ``ekey`` -- the parameteres will be generated for this random seed.
          - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
@@ -513,39 +565,53 @@ class MegBook:
         OUTPUT:
             An instance of class named ``unique_namestring``.
     
-        NOTES:
+        DEVELOP:
     
-            http://docs.python.org/library/exceptions.html#exceptions.Exception
-    
-        # TODO: control the time and the process
+        - http://docs.python.org/library/exceptions.html#exceptions.Exception
+        - TODO: control the time and the process
 
         """
-    
-        #Create the class (not yet the instance). See exerciseclass definition above.
-        ex_class = exerciseclass(row)
+
+        #Create the class (not yet the instance). 
+        #See exerciseclass definition above.
+        ex_class = self.exerciseclass(row)    
     
         #Create one instance of ex_class
-        try:
-            ex_instance = ex_class(row['unique_name'],ekey,edict)
-        except: 
-            tmp = tempfile.mkdtemp()
-            pfilename = tmp+"/"+row["unique_name"]+".sage"
-            pcode = open(pfilename,"w")
-            pcode.write("# -*- coding: utf-8 -*\nfrom megua import *\n" + row['class_text'].encode("utf-8")+"\n")
-            pcode.write(row['unique_name'] + "(ekey=" + str(ekey) + ", edict=" + str(edict) + ")\n")
-            pcode.close()
-            errfilename = "%s/err.log" % tmp
-            os.system("sage %s 2> %s" % (pfilename,errfilename) )
-            errfile = open(errfilename,"r")
-            err_log = errfile.read()
-            errfile.close()
-            #TODO: adjust error line number by -2 lines HERE.
-            #....
-            #remove temp directory
-            #print "=====> tmp = ",tmp
-            os.system("rm -r %s" % tmp)
-            print err_log
-            raise Exception  #to warn user #TODO: not always SyntaxError
+        ex_instance = ex_class(ekey,edict)
+# TODO NOW: ACABAR ISTO
+#        try:
+#            alarm(self.max_computation_time)
+#            ex_instance = ex_class(ekey,edict)
+#        except KeyboardInterrupt:
+#            print 'Exercise is taking too long to calculate!'
+#            print 'Check make_random() routine or increase max_computation_time = ... in save().'
+#            # if the computation finished early, though, the alarm is still ticking!
+#            # so let's turn it off below.
+#            return None
+#        except: 
+#            tmp = "_temp" # tempfile.mkdtemp()
+#            pfilename = tmp+"/"+row["unique_name"]+".sage"
+#            pcode = open(pfilename,"w")
+#            pcode.write("# coding=utf-8\nfrom megua.all import *\n" + row['class_text'].encode("utf-8")+"\n")
+#            pcode.write(row['unique_name'] + "(ekey=" + str(ekey) + ", edict=" + str(edict) + ")\n")
+#            pcode.close()
+#            errfilename = "%s/err.log" % tmp
+#            os.system("sage %s 2> %s" % (pfilename,errfilename) )
+#            errfile = open(errfilename,"r")
+#            err_log = errfile.read()
+#            errfile.close()
+#            #TODO: adjust error line number by -2 lines HERE.
+#            #....
+#            #remove temp directory
+#            #print "=====> tmp = ",tmp
+#            ######os.system("rm -r %s" % tmp)
+#            print err_log
+#            return None #raise #Need to specify "raise Exception"?  
+
+        #Turn off alarm.
+        cancel_alarm()             
+
+        ex_instance = ex_class(ekey,edict)        
         
         return ex_instance
     
@@ -568,13 +634,6 @@ class MegBook:
 
         - you can export between 3 and 6 wrong options and 1 right.
 
-        EXAMPLE:
-
-            #OLD sage: meg.siacuapreview(exname="E12X34",ekeys=[1,2,5])
-
-            #Current:
-            sage: meg.get("E12X34").siacuapreview([12,34,56])
-            sage: meg.get("E12X34",ekey=10).siacuapreview([12,34,56])
             
         Algorithm:
             1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
@@ -874,7 +933,52 @@ class MegBook:
         ofile.write(html_string)
         ofile.close()
 
+    #TODO: rever isto tudo
+    def siacua(self,exname,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
+        r"""
 
+        INPUT:
+
+        - ``exname``: problem name (name in "class E12X34_something_001(Exercise):").
+
+        - ``ekeys``: list of numbers that generate the same problem instance.
+
+        - ``sendpost``: if True send information to siacua.
+
+        - ``course``: Right now could be "calculo3", "calculo2". Ask siacua administrator for more.
+
+        - ``usernamesiacua``: username used by the author in the siacua system.
+
+        - ``grid2x2``: write user options in multiplechoice in a 2x2 grid (useful for graphics) values in {0,1}.
+
+        OUTPUT:
+
+        - this command prints the list of sended exercises for the siacua system.
+
+        NOTE:
+
+        - you can export between 3 and 6 wrong options and 1 right.
+
+        EXAMPLE:
+
+            ssssage: meg.siacua(exname="E12X34",ekeys=[1,2,5],sendpost=True,course="calculo2",usernamesiacua="jeremias")
+
+        TODO:
+
+        - securitykey: implemenent in a megua-server configuration file.
+
+        LINKS:
+            http://docs.python.org/2/library/json.html
+            http://stackoverflow.com/questions/7122015/sending-post-request-to-a-webservice-from-python
+
+        Algorithm:
+            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
+
+        TESTS:
+            ~/Dropbox/all/megua/archive$ sage jsontest.sage
+
+        """
+        raise
 
 
 def m_get_sections(sectionstxt):

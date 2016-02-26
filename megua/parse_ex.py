@@ -1,5 +1,5 @@
 # -*- coding: iso-8859-15 -*-
-# vim:fileencoding=iso-8859-15
+
 r"""
 Convert an input text containing an exercise template into a tuple ``(unique_name,txt_summary,txt_problem,txt_answer,txt_class)`` extracted from text.
 See ``exer_parse`` function.
@@ -9,6 +9,7 @@ AUTHORS:
 
 - Pedro Cruz (2011-06): initial version
 - Pedro Cruz (2011-08): documentation string as tests.
+- Pedro Cruz (2016-02): Prepare for SMC.
 
 
 IMPLEMENTATION NOTES:
@@ -26,8 +27,11 @@ IMPLEMENTATION NOTES:
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 
-
+#PYTHON  modules
 import re
+
+#MEGUA modules
+from megua.tounicode import to_unicode
 
 
 #Old form
@@ -55,7 +59,7 @@ re_answer = re.compile(ur'[ \t]*%[ \t]*answer[ \t]*(.*)\n',re.IGNORECASE|re.U)
 #Includes grammar for class name in form: E dd letter dd
 #re_class = re.compile(ur'^class[ \t]+(E(\d\d(\b|[\-a-zA-Z])(\b|\d\d))_\w+_\d+)\(Exercise\):\s*',re.U)
 #In this re_class the prefix is less rigorous.
-re_class = re.compile(ur'^class[ \t]+(E([a-zA-Z0-9]+)_\w+_\d+)\(Exercise\):\s*',re.U)
+re_class = re.compile(ur'^class[ \t]+(E([a-zA-Z0-9]+)_\w+_\d+)\(\w+\):\s*',re.U)
 
 re_wrongclass = re.compile(ur'[ \t]*class[ \t]+(.+):\s*',re.U)
 
@@ -181,49 +185,64 @@ def parse_ex(inputtext):
 
     EXAMPLES:
 
-    ... test with: sage -python -m doctest parse_ex.py
+    ... OLD test with: sage -python -m doctest parse_ex.py
 
-
+    sage -t parse_ex.py
+    
+    
     Example of the standard situation::
 
-    >>> from parse_es import parse_ex
-    >>> parse_ex(r'''
-    ... %summary Section
-    ...  My summary.
-    ... %problem Suggestive Textual Name
-    ...  My Problem.
-    ... %answer
-    ...  My answer.
-    ... class E12A34_name_001(Exercise):
-    ...   more lines here''')
-    {'unique_name': 'E12A34_name_001', 'summary_text': '\n%summary Section\n My summary.\n', 'problem_text': '\n%problem Suggestive Textual Name\n My Problem.\n', 'suggestive_name': 'Suggestive Textual Name', 'class_text': 'class E12A34_name_001(Exercise):\n  more lines here', 'sections_text': 'Section', 'answer_text': '\n%answer\n My answer.\n'}
+    sage: from megua.parse_ex import parse_ex
+    sage: parse_ex(r'''
+    ....: %summary Section
+    ....:  My summary.
+    ....: %problem Suggestive Textual Name
+    ....:  My Problem.
+    ....: %answer
+    ....:  My answer.
+    ....: class E12A34_name_001(ExerciseBase):
+    ....:   more lines here''')
+    {'answer_text': '\n My answer.\n',
+     'class_text': 'class E12A34_name_001(ExerciseBase):\n  more lines here',
+     'problem_text': '\n My Problem.\n',
+     'sections_text': 'Section',
+     'suggestive_name': 'Suggestive Textual Name',
+     'summary_text': '\n My summary.\n',
+     'unique_name': 'E12A34_name_001'}
+     
 
     Example when there are comments in front of tags::
 
-    >>> exerc_parse(r'''
-    ... %summary Section
-    ...      My summary.
-    ... %problem Suggestive Textual Name
-    ...      My Problem.
-    ... %answer Answer Comment
-    ...     My answer.
-    ... class E12A34_name_001(Exercise):
-    ...       more lines ''')
+    sage: parse_ex(r'''
+    ....: %summary Section
+    ....:      My summary.
+    ....: %problem Suggestive Textual Name
+    ....:      My Problem.
+    ....: %answer Answer Comment
+    ....:     My answer.
+    ....: class E12A34_name_001(ExerciseBase):
+    ....:       more lines ''')
     Ignoring text 'Answer Comment' in %answer tag at line 6.
     <BLANKLINE>
-    {'unique_name': 'E12A34_name_001', 'summary_text': '\n%summary Section\n     My summary.\n', 'problem_text': '\n%problem Suggestive Textual Name\n     My Problem.\n', 'suggestive_name': 'Suggestive Textual Name', 'class_text': 'class E12A34_name_001(Exercise):\n      more lines ', 'sections_text': 'Section', 'answer_text': '\n%answer\n    My answer.\n'}
+    {'answer_text': '\n    My answer.\n',
+     'class_text': 'class E12A34_name_001(ExerciseBase):\n      more lines ',
+     'problem_text': '\n     My Problem.\n',
+     'sections_text': 'Section',
+     'suggestive_name': 'Suggestive Textual Name',
+     'summary_text': '\n     My summary.\n',
+     'unique_name': 'E12A34_name_001'}
 
     Example when class name is malformed::
 
-    >>> exerc_parse(r'''
-    ... %summary
-    ...      My summary.
-    ... %problem
-    ...      My Problem.
-    ... %answer
-    ...      My answer.
-    ... class name_001(Exercise):
-    ...       more lines ''')
+    sage: parse_ex(r'''
+    ....: %summary
+    ....:      My summary.
+    ....: %problem
+    ....:      My Problem.
+    ....: %answer
+    ....:      My answer.
+    ....: class name_001(ExerciseBase):
+    ....:       more lines ''')
     Each exercise can belong to a section/subsection/subsubsection. 
     Write sections using ';' in the '%summary' line. For ex., '%summary Section; Subsection; Subsubsection'.
     <BLANKLINE>
@@ -358,26 +377,15 @@ def parse_ex(inputtext):
     else:
         #old way: return (unique_name,txt_sections,txt_summary,txt_problem,txt_answer,txt_class)
         return  {
-            'unique_name': unique_name, 
-            'sections_text': txt_sections, 
-            'suggestive_name': txt_problemname,
-            'summary_text': txt_summary, 
-            'problem_text': txt_problem, 
-            'answer_text': txt_answer, 
-            'class_text': txt_class
+            'unique_name': unique_name.strip(), 
+            'sections_text': txt_sections.strip(), 
+            'suggestive_name': txt_problemname.strip(),
+            'summary_text': txt_summary.strip(), 
+            'problem_text': txt_problem.strip(), 
+            'answer_text': txt_answer.strip(), 
+            'class_text': txt_class.strip()
         }
 
-
-
-"""
-Helper functions.
-"""
-
-def to_unicode(s):
-    if type(s)!=unicode:
-        return unicode(s,'utf-8')
-    else:
-        return s
 
 
 

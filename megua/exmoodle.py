@@ -1,3 +1,12 @@
+
+
+https://docs.moodle.org/30/en/Moodle_XML_format
+
+imagens no package exams: como eles fazem isso?
+
+Outro formato Moodle:
+https://docs.moodle.org/30/en/Aiken_format
+
 r"""
 This module defines the base class for exercise templating.
 

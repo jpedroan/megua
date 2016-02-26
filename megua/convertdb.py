@@ -29,12 +29,14 @@ EXAMPLES:
 
 
 
-#Standard python library
+#PYTHON library
 from optparse import OptionParser
 import sqlite3
 
-#MegUA library
-from ex import exerciseinstance, to_unicode
+
+#MEGUA library
+#from megua.exbase import exerciseinstance
+from megua.tounicode import to_unicode
 
 
 def convertdb(dbname,new_store,from_v):
@@ -132,11 +134,11 @@ def remove_underscore2(txt):
     
     EXAMPLES::
         
-        sage: remove_underscore("ABC_caso_123")
+        sage: remove_underscore2("ABC_caso_123")
         'ABC caso 123'
-        sage: remove_underscore("ABC_caso")
+        sage: remove_underscore2("ABC_caso")
         'ABC caso'
-        sage: remove_underscore("ABC")
+        sage: remove_underscore2("ABC")
         'ABC'
     """
         
@@ -149,6 +151,7 @@ def remove_underscore2(txt):
         pos = txt.find("_",s_pos)
     out_t += txt[s_pos:]
     return out_t
+
 
 if __name__=='__main__':
 

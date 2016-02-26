@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 
 r"""
 Group together random generators for Sage, Python, Numpy and R (RPy2 module). 
@@ -16,18 +16,16 @@ Test examples using::
     
     sage -t ut.py
 
-..        sage -python -m doctest ur.py
-
 Using Sage random numbers::
 
     sage: from megua.ur import ur
-    sage: ur.set_seed(10)
+    sage: ur.start_at(10)
     10
     sage: print ZZ.random_element(-10,11) 
     -4
     sage: print ZZ.random_element(-10,11) 
     1
-    sage: ur.set_seed(10) #test if set_seed guarantees the same sequence
+    sage: ur.start_at(10) #test if start_at guarantees the same sequence
     10
     sage: print ZZ.random_element(-10,11)
     -4
@@ -38,13 +36,13 @@ Using python random numbers::
 
     sage: from megua.ur import *
     sage: #python module 'random' is imported above.
-    sage: ur.set_seed(10) 
+    sage: ur.start_at(10) 
     10
     sage: print random.randint(-10,10)
     1
     sage: print random.randint(-10,10)
     -1
-    sage: ur.set_seed(10) #after import random
+    sage: ur.start_at(10) #after import random
     10
     sage: print random.randint(-10,10)
     1
@@ -56,13 +54,13 @@ Using numpy random numbers::
 
     sage: from megua.ur import ur
     sage: #python module 'numpy.random' as 'nprandom' is imported above.
-    sage: ur.set_seed(10)
+    sage: ur.start_at(10)
     10
     sage: print nprandom.randint(-10,10)
     -1
     sage: print nprandom.randint(-10,10)
     -6
-    sage: ur.set_seed(10)
+    sage: ur.start_at(10)
     10
     sage: print nprandom.randint(-10,10)
     -1
@@ -74,13 +72,13 @@ Using numpy random numbers::
 Using RPy2 random numbers::
 
     sage: from megua.ur import ur
-    sage: ur.set_seed(10)
+    sage: ur.start_at(10)
     10
     sage: ur.rpy2_rnorm(0,1)
     0.018746170941826425
     sage: ur.rpy2_rnorm(0,1)
     -0.18425254206906366
-    sage: ur.set_seed(10)
+    sage: ur.start_at(10)
     10
     sage: ur.rpy2_rnorm(0,1)
     0.018746170941826425
@@ -93,13 +91,13 @@ Using ur (this module) random functions::
     Integers::
 
     sage: from megua.ur import ur
-    sage: ur.set_seed(10)
+    sage: ur.start_at(10)
     10
     sage: ur.iunif(-10,10)
     -4
     sage: ur.iunif(-10,10)
     1
-    sage: ur.set_seed(10)
+    sage: ur.start_at(10)
     10
     sage: ur.iunif(-10,10)
     -4
@@ -109,7 +107,7 @@ Using ur (this module) random functions::
     Random set::
 
     sage: from megua.ur import ur
-    sage: ur.set_seed(10)
+    sage: ur.start_at(10)
     10
     sage: ur.random_element() 
     sqrt(2)
@@ -157,7 +155,7 @@ import numpy.random as nprandom
 # 2. To do: study how does rpy2 works.
 import rpy2.robjects as robjects
 
-#re-start random
+#to restart random
 import time 
 
 
@@ -191,41 +189,42 @@ To do: Use RealField from Sage.
 
 """
 
-class UnifiedRandom:
+class UnifiedRandom(SageObject):
 
     """Check every function in the module for how to use details.
     """
 
     #See squnif for details about this list. 
-    _qlist = [Integer(1)/Integer(9), Integer(1)/Integer(8), Integer(1)/Integer(7),
-Integer(1)/Integer(6), Integer(1)/Integer(5), Integer(2)/Integer(9),
-Integer(1)/Integer(4), Integer(2)/Integer(7), Integer(1)/Integer(3),
-Integer(3)/Integer(8), Integer(2)/Integer(5), Integer(3)/Integer(7),
-Integer(4)/Integer(9), Integer(1)/Integer(2), Integer(5)/Integer(9),
-Integer(4)/Integer(7), Integer(3)/Integer(5), Integer(5)/Integer(8),
-Integer(2)/Integer(3), Integer(5)/Integer(7), Integer(3)/Integer(4),
-Integer(7)/Integer(9), Integer(4)/Integer(5), Integer(5)/Integer(6),
+    _qlist = [Integer(1)/Integer(9), Integer(1)/Integer(8), Integer(1)/Integer(7),\
+Integer(1)/Integer(6), Integer(1)/Integer(5), Integer(2)/Integer(9),\
+Integer(1)/Integer(4), Integer(2)/Integer(7), Integer(1)/Integer(3),\
+Integer(3)/Integer(8), Integer(2)/Integer(5), Integer(3)/Integer(7),\
+Integer(4)/Integer(9), Integer(1)/Integer(2), Integer(5)/Integer(9),\
+Integer(4)/Integer(7), Integer(3)/Integer(5), Integer(5)/Integer(8),\
+Integer(2)/Integer(3), Integer(5)/Integer(7), Integer(3)/Integer(4),\
+Integer(7)/Integer(9), Integer(4)/Integer(5), Integer(5)/Integer(6),\
 Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
 
     _qlen = len(_qlist)
 
 
     def _init_(self,seed_value=None):
-        self.set_seed(seed_value)
+        self.seed(seed_value)
 
     def __repr__(self):
         return "UnifiedRandom(%d)" % self.seed_value
 
-    def set_seed(self,seed_value=None):
-        """ Set seeds from all random number libraries to the "same" value.
+
+    def start_at(self,seed_value=None):
+        """ Set or get seeds from all random number libraries to the "same" value.
 
         INPUT:
 
-        - ``seed_value`` -- an Integer.
+        - ``seed_value`` -- an Integer or None
 
         OUTPUT:
 
-           Same integer.
+        - return self.seed_number 
 
         Seed commands:
 
@@ -298,7 +297,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
 
             sage: from megua.ur import ur
-            sage: ur.set_seed(10)
+            sage: ur.start_at(10)
             10
             sage: ur.iunif(-10,10)
             -4
@@ -329,7 +328,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
 
             sage: from megua.ur import ur
-            sage: ur.set_seed(10)
+            sage: ur.start_at(10)
             10
             sage: ur.iunif_nonset(-10,10,[-1,0,1]) #exclude [-1,0,1]
             -4
@@ -385,7 +384,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
 
             sage: from megua.ur import ur
-            sage: ur.set_seed(10)
+            sage: ur.start_at(10)
             10
             sage: ur.different_integers(5,-10,10)
             [1, -1, -4, -3, -10]
@@ -437,7 +436,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
 
             sage: from megua.ur import ur
-            sage: ur.set_seed(10)
+            sage: ur.start_at(10)
             10
             sage: ur.runif(-10,10,2)
             7.44
@@ -475,7 +474,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
 
             sage: from megua.ur import ur
-            sage: ur.set_seed(10)
+            sage: ur.start_at(10)
             10
             sage: ur.rnorm(0,1,2) 
             1.33
@@ -511,7 +510,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
 
             sage: from megua.ur import ur
-            sage: ur.set_seed(10)
+            sage: ur.start_at(10)
             10
             sage: ur.rbernoulli() 
             1
@@ -547,7 +546,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
  
             sage: from megua.ur import ur
-            sage: ur.set_seed(10)
+            sage: ur.start_at(10)
             10
             sage: ur.squnif() 
             -1/4
@@ -562,8 +561,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         3. Testing::
             sage: from sage.all import *
             sage: qq = [ Integer(a+1)/Integer(b+1) for b in range(9) for a in range(b)]
-            sage: ql = list(set(qq)); ql
-            [2/3, 1/3, 4/7, 1/5, 1/4, 3/5, 3/4, 1/9, 1/8, 8/9, 3/8, 4/9, 5/7, 7/9, 7/8, 1/2, 3/7, 2/7, 6/7, 1/7, 2/5, 4/5, 2/9, 5/9, 5/8, 1/6, 5/6]
+            sage: ql = list(set(qq))
             sage: ql.sort()
             sage: print ql
             [1/9, 1/8, 1/7, 1/6, 1/5, 2/9, 1/4, 2/7, 1/3, 3/8, 2/5, 3/7, 4/9, 1/2, 5/9, 4/7, 3/5, 5/8, 2/3, 5/7, 3/4, 7/9, 4/5, 5/6, 6/7, 7/8, 8/9]
@@ -599,7 +597,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
     def _rpy2_setseed(self,seed):
         """
         Set seed for RPy2 module.
-        See set_seed on this module.
+        See start_at on this module.
         """
         setseed = robjects.r['set.seed']
         setseed(int(seed))
@@ -628,7 +626,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
  
             sage: from megua.ur import ur
-            sage: ur.set_seed(10)
+            sage: ur.start_at(10)
             10
             sage: ur.rpy2_rnorm(0,1,2) #two decimals 
             0.02

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 
 r"""
 exlatex -- an exercise in LaTeX.
@@ -37,32 +37,34 @@ class ExLaTeX(ExerciseBase):
     
     r"""
 
-    .. test with: sage -python -m doctest exlatex.py
-
+    .. OLD test with: sage -python -m doctest exlatex.py
+  
+    sage -t exlatex.py
 
     Creation a LaTeX exercise::
         
-       >>> meg.save(r'''
-       ... %Summary Primitives
-       ... Here one can write few words, keywords about the exercise.
-       ... For example, the subject, MSC code, and so on.
-       ...   
-       ... %Problem
-       ... What is the primitive of ap x + bp@() ?
-       ... 
-       ... %Answer
-       ... The answer is prim+C, with C a real number.
-       ... 
-       ... class E28E28_pdirect_001(ExLaTeX):
-       ... 
-       ...     def make_random(self):
-       ...         self.ap = ZZ.random_element(-4,4)
-       ...         self.bp = self.ap + QQ.random_element(1,4)
-       ... 
-       ...     def solve(self):
-       ...         x=SR.var('x')
-       ...         self.prim = integrate(self.ap * x + self.bp,x)
-       ... ''')
+       sage: from  
+       sage: meg.save(r'''
+       ....: %Summary Primitives
+       ....: Here one can write few words, keywords about the exercise.
+       ....: For example, the subject, MSC code, and so on.
+       ....:   
+       ....: %Problem
+       ....: What is the primitive of ap x + bp@() ?
+       ....: 
+       ....: %Answer
+       ....: The answer is prim+C, with C a real number.
+       ....: 
+       ....: class E28E28_pdirect_001(ExLaTeX):
+       ....: 
+       ....:     def make_random(self):
+       ....:         self.ap = ZZ.random_element(-4,4)
+       ....:         self.bp = self.ap + QQ.random_element(1,4)
+       ....: 
+       ....:     def solve(self):
+       ....:         x=SR.var('x')
+       ....:         self.prim = integrate(self.ap * x + self.bp,x)
+       ....: ''')
        Each problem can have a suggestive name. 
        Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
        <BLANKLINE>
@@ -78,7 +80,7 @@ class ExLaTeX(ExerciseBase):
     destination_folder = '.'      
     autosave = True
 
-     def update(self,ekey=None,edict=None):
+    def update(self,ekey=None,edict=None):
         #reset image list for the new parameters
         #TODO: this can generate inconsistency if make_random or solve are called alone.
         self.image_list = []
@@ -155,7 +157,7 @@ class ExLaTeX(ExerciseBase):
 
     def _latex_string(self):
 
-        %TODO: criar
+        #TODO: criar
 
         latex_string = Exercise.megbook.template("print_instance_latex.tex",
             sname=ex_instance.name,

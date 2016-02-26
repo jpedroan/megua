@@ -14,8 +14,8 @@ AUTHOR:
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
   
-
-from localstore import ExIter
+#MEGUA modules
+from megua.localstore import ExIter
 
 class SectionClassifier:
     """
@@ -43,90 +43,92 @@ class SectionClassifier:
 
     EXAMPLES::
 
-    .. test with: sage -python -m doctest csection.py 
+    .. OLD test with: sage -python -m doctest csection.py 
+
+    sage -t csection.py
 
     Create or edit a database::
 
-       >>> from all import *
-       >>> meg = MegBook(r'./.testoutput/csection.sqlite')
+       sage: from megua.megbook import MegBook
+       sage: meg = MegBook(r'./.testoutput/csection.sqlite')
        MegBook opened. Execute `MegBook?` for examples of usage.
        Templates for 'pt_pt' language.
 
 
     Save a new or changed exercise::
 
-       >>> txt=r'''
-       ... %Summary Primitives; Imediate primitives; Trigonometric 
-       ...   
-       ... %Problem Some Name
-       ... What is the primitive of $a x + b@()$ ?
-       ... 
-       ... %Answer
-       ... The answer is $prim+C$, for $C in \mathbb{R}$.
-       ... 
-       ... class E28E28_pimtrig_001(Exercise):
-       ...     pass
-       ... '''
-       >>> meg.save(txt,dest='.testoutput')
+       sage: txt=r'''
+       ....: %Summary Primitives; Imediate primitives; Trigonometric 
+       ....:   
+       ....: %Problem Some Name
+       ....: What is the primitive of $a x + b@()$ ?
+       ....: 
+       ....: %Answer
+       ....: The answer is $prim+C$, for $C in \mathbb{R}$.
+       ....: 
+       ....: class E28E28_pimtrig_001(Exercise):
+       ....:     pass
+       ....: '''
+       sage: meg.save(txt,dest='.testoutput')
        Testing python/sage class 'E28E28_pimtrig_001' with 100 different keys.
            No problems found in this test.
           Compiling 'E28E28_pimtrig_001' with pdflatex.
           No errors found during pdflatex compilation. Check E28E28_pimtrig_001.log for details.
        Exercise name E28E28_pimtrig_001 inserted or changed.
 
-       >>> txt=r'''
-       ... %Summary Primitives; Imediate primitives; Trigonometric 
-       ...   
-       ... %Problem Some Name2
-       ... What is the primitive of $a x + b@()$ ?
-       ... 
-       ... %Answer
-       ... The answer is $prim+C$, for $C in \mathbb{R}$.
-       ... 
-       ... class E28E28_pimtrig_002(Exercise):
-       ...     pass
-       ... '''
-       >>> meg.save(txt,dest='.testoutput')
+       sage: txt=r'''
+       ....: %Summary Primitives; Imediate primitives; Trigonometric 
+       ....:   
+       ....: %Problem Some Name2
+       ....: What is the primitive of $a x + b@()$ ?
+       ....: 
+       ....: %Answer
+       ....: The answer is $prim+C$, for $C in \mathbb{R}$.
+       ....: 
+       ....: class E28E28_pimtrig_002(Exercise):
+       ....:     pass
+       ....: '''
+       sage: meg.save(txt,dest='.testoutput')
        Testing python/sage class 'E28E28_pimtrig_002' with 100 different keys.
            No problems found in this test.
           Compiling 'E28E28_pimtrig_002' with pdflatex.
           No errors found during pdflatex compilation. Check E28E28_pimtrig_002.log for details.
        Exercise name E28E28_pimtrig_002 inserted or changed.
 
-       >>> txt=r'''
-       ... %Summary Primitives; Imediate primitives; Polynomial 
-       ...   
-       ... %Problem Some Problem 1
-       ... What is the primitive of $a x + b@()$ ?
-       ... 
-       ... %Answer
-       ... The answer is $prim+C$, for $C in \mathbb{R}$.
-       ... 
-       ... class E28E28_pdirect_001(Exercise):
-       ...     pass
-       ... '''
+       sage: txt=r'''
+       ....: %Summary Primitives; Imediate primitives; Polynomial 
+       ....:   
+       ....: %Problem Some Problem 1
+       ....: What is the primitive of $a x + b@()$ ?
+       ....: 
+       ....: %Answer
+       ....: The answer is $prim+C$, for $C in \mathbb{R}$.
+       ....: 
+       ....: class E28E28_pdirect_001(Exercise):
+       ....:     pass
+       ....: '''
 
-       >>> meg.save(txt,dest='.testoutput')
+       sage: meg.save(txt,dest='.testoutput')
        Testing python/sage class 'E28E28_pdirect_001' with 100 different keys.
            No problems found in this test.
           Compiling 'E28E28_pdirect_001' with pdflatex.
           No errors found during pdflatex compilation. Check E28E28_pdirect_001.log for details.
        Exercise name E28E28_pdirect_001 inserted or changed.
-       >>> txt=r'''
-       ... %Summary  
-       ...   
-       ... No summary problem.
-       ...
-       ... %Problem 
-       ... What is the primitive of $a x + b@()$ ?
-       ... 
-       ... %Answer
-       ... The answer is $prim+C$, for $C in \mathbb{R}$.
-       ... 
-       ... class E28E28_pdirect_003(Exercise):
-       ...     pass
-       ... '''
-       >>> meg.save(txt,dest='.testoutput')
+       sage: txt=r'''
+       ....: %Summary  
+       ....:   
+       ....: No summary problem.
+       ....:
+       ....: %Problem 
+       ....: What is the primitive of $a x + b@()$ ?
+       ....: 
+       ....: %Answer
+       ....: The answer is $prim+C$, for $C in \mathbb{R}$.
+       ....: 
+       ....: class E28E28_pdirect_003(Exercise):
+       ....:     pass
+       ....: '''
+       sage: meg.save(txt,dest='.testoutput')
        Each exercise can belong to a section/subsection/subsubsection. 
        Write sections using ';' in the '%summary' line. For ex., '%summary Section; Subsection; Subsubsection'.
        <BLANKLINE>
@@ -139,8 +141,8 @@ class SectionClassifier:
           No errors found during pdflatex compilation. Check E28E28_pdirect_003.log for details.
        Exercise name E28E28_pdirect_003 inserted or changed.
 
-       >>> s = SectionClassifier(meg.megbook_store)
-       >>> s.textprint()
+       sage: s = SectionClassifier(meg.megbook_store)
+       sage: s.textprint()
        Primitives
         Imediate primitives
          Polynomial

@@ -48,7 +48,7 @@ from sage.all import *
 
 #MEGUA modules
 from megua.ur import ur
-
+from tounicode import to_unicode
 
 
 
@@ -152,12 +152,6 @@ def svg_pie_chart(valueslist, chartid="chart1", title="Chart", width=400, height
 
     return r
 
-
-def to_unicode(s):
-    if type(s)!=unicode:
-        return unicode(s,'utf-8')
-    else:
-        return s
 
 
 

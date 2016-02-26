@@ -18,12 +18,109 @@ INSPIRATION:
 - https://github.com/sagemath/sage/blob/master/src/sage/structure/sage_object.pyx
 - https://github.com/sagemath/sage/blob/master/src/sage/games/quantumino.py
 
-Test examples using::
+SUMMARY:
 
-   sage -t exbase.py
+- `make_random` receives `edict`: allow the author to control attributes.
+
+
+
+EXAMPLES:
+
+
+Test examples using:
+
+::
+
+    sage -t exbase.py
    
-   
-   sage -python -m doctest exbase.py
+Defining a new exercise template:
+
+::
+
+       sage: from megua.exbase import *
+       sage: class AddingTwoIntegers(ExerciseBase):
+       ....:     #class variables   
+       ....:     _unique_name  = "AddingTwoIntegers"
+       ....:     _summary_text = "Adding two integers."
+       ....:     _problem_text = "Calculate a1 + a2@()."
+       ....:     _answer_text  = "Result is a1 + a2@() = r1."
+       ....:     def make_random(self,edict=None):
+       ....:         self.a1 = ZZ.random_element(-10,10+1)
+       ....:         self.a2 = ZZ.random_element(-10,10+1)
+       ....:         if edict:
+       ....:            self.update_dict(edict)
+       ....:         self.r1 = self.a1 + self.a2 
+       sage: adding_template = AddingTwoIntegers(ekey=10)
+       sage: print adding_template.summary()
+       Adding two integers.
+       sage: print adding_template.problem()
+       Calculate -4 + 1.
+       sage: print adding_template.answer()
+       Result is -4 + 1 = -3.
+       sage: print adding_template.unique_name()
+       AddingTwoIntegers
+    
+    
+Changing, randomly, the set of parameters:
+    
+::
+
+       sage: adding_template.update(ekey=15) #another set of random parameters
+       sage: print adding_template.problem()
+       Calculate 2 + 10.
+       sage: print adding_template.answer()
+       Result is 2 + 10 = 12.
+       
+Changing randomly but setting one of them:
+        
+::
+
+       sage: adding_template.update(ekey=15,edict={'a1':99}) #another set of random parameters
+       sage: print adding_template.problem()
+       Calculate 99 + 10.
+       sage: print adding_template.answer()
+       Result is 99 + 10 = 109.
+    
+       sage: adding_template.update(ekey=15,edict={'a2':-5}) #another set of random parameters
+       sage: print adding_template.problem()
+       Calculate 2 + (-5).
+       sage: print adding_template.answer()
+       Result is 2 + (-5) = -3.
+
+Call "old megua" solve(self) method, if exists:
+
+::
+
+       sage: class CallSolveTest(ExerciseBase):
+       ....:     #class variables   
+       ....:     _unique_name  = "AddingTwoIntegers"
+       ....:     _summary_text = "Adding two integers."
+       ....:     _problem_text = "Calculate a1 + a2@()."
+       ....:     _answer_text  = "Result is a1 + a2@() = r1."
+       ....:
+       ....:     def make_random(self):
+       ....:        self.a1 = ZZ.random_element(-10,10+1)
+       ....:        self.a2 = ZZ.random_element(-10,10+1)
+       ....:     def solve(self): #old megua uses def solve()
+       ....:        self.r1 = self.a1 + self.a2 
+       sage: adding_template = CallSolveTest(ekey=10)
+       sage: print adding_template.answer()
+       Result is -4 + 1 = -3.
+
+Make a static, ie, non parameterized exercise:
+
+::
+
+       sage: class StaticExercise(ExerciseBase):
+       ....:     #class variables   
+       ....:     _unique_name  = "StaticExercise"
+       ....:     _summary_text = "Adding two integers."
+       ....:     _problem_text = "Calculate 10 + 20."
+       ....:     _answer_text  = "Result is 30."
+       ....:     # No make_random in this exercise.
+       sage: adding_template = StaticExercise()
+       sage: print adding_template.answer()
+       Result is 30.
 
 """
 
@@ -36,18 +133,25 @@ Test examples using::
 #*****************************************************************************
 
 
+#PYTHON modules
+import warnings
+import re
+import os
+
+
 #SAGEMATH modules
 from sage.all import SageObject  
+
 
 #MEGUA modules
 from megua.parse_param import parameter_change
 from megua.ur import ur
+from megua.ug import UnifiedGraphics
+from megua.mconfig import MEGUA_OUTPUT_DIR
 
-#PYTHON modules
-import warnings
-
-
-class ExerciseBase(SageObject):
+       
+        
+class ExerciseBase(SageObject,UnifiedGraphics):
     """Class ``ExerciseBase`` is the base class for an exercise.
 
 
@@ -62,63 +166,6 @@ class ExerciseBase(SageObject):
     * Give a textual (semi-latex) representation of the dictionary (question and full, non pedagogical, answer).
     * Give a textual description of the template.
     
-    EXAMPLES:
-    
-    Test examples using::
-    
-        
-        sage -t exbase.py
-
-        .. old: sage -python -m doctest exbase.py
-    
-    Defining a new exercise template::
-
-       sage: from megua.exbase import *
-       sage: class AddingTwoIntegers(ExerciseBase):
-       ....:     #class variables   
-       ....:     _unique_name  = "AddingTwoIntegers"
-       ....:     _summary_text = "Adding two integers."
-       ....:     _problem_text = "Calculate a1 + a2@()."
-       ....:     _answer_text  = "Result is a1 + a2@() = r1."
-       ....:
-       ....:     def make_random(self,edict):
-       ....:        self.a1 = ZZ.random_element(-10,10+1)
-       ....:        self.a2 = ZZ.random_element(-10,10+1)
-       ....:        if edict:
-       ....:            self.update_dict(edict)
-       ....:        self.r1 = self.a1 + self.a2 
-       sage: adding_template = AddingTwoIntegers(ekey=10)
-       sage: print adding_template.summary()
-       Adding two integers.
-       sage: print adding_template.problem()
-       Calculate -4 + 1.
-       sage: print adding_template.answer()
-       Result is -4 + 1 = -3.
-       sage: print adding_template.unique_name()
-       AddingTwoIntegers
-    
-    
-    Changing randomly the set of parameters::
-    
-       sage: adding_template.update(ekey=15) #another set of random parameters
-       sage: print adding_template.problem()
-       Calculate 2 + 10.
-       sage: print adding_template.answer()
-       Result is 2 + 10 = 12.
-       
-    Changing randomly but setting one of them::
-        
-       sage: adding_template.update(ekey=15,edict={'a1':99}) #another set of random parameters
-       sage: print adding_template.problem()
-       Calculate 99 + 10.
-       sage: print adding_template.answer()
-       Result is 99 + 10 = 109.
-    
-       sage: adding_template.update(ekey=15,edict={'a2':-5}) #another set of random parameters
-       sage: print adding_template.problem()
-       Calculate 2 + (-5).
-       sage: print adding_template.answer()
-       Result is 2 + (-5) = -3.
 
     """
 
@@ -130,57 +177,114 @@ class ExerciseBase(SageObject):
     # - a derivation of class ``ExerciseBase`` will inherit the values below.
     # - a derivation of class ``ExerciseBase`` should change this class parameters to new ones.
 
+    #All of the folowing variables must be set before __init__
+    #They are set in MegBook.save()
 
     # This is set in MegBook
     _megbook = None 
-
+    
     # This are set in MegBook
     # by MegBook.exerciseclass() and 
     #   MegBook.exerciseinstance()
+    #TODO: change _text to _source in all megua modules.
     _unique_name = None
     _summary_text = None
     _problem_text = None
     _answer_text  = None
 
 
-    def __init__(self,ekey=None, edict=None):
+    def __init__(self,ekey=None, edict=None, rendermethod='base64',dimx=150,dimy=150,dpi=100):
+        
+        #Considered part of the class definition and not the instance.
+        assert(self._unique_name)
+        assert(self._summary_text)
+        assert(self._problem_text)
+        assert(self._answer_text)
+
+
+        #Create if not exist: exercise working directory (images, latex,...)
+        self.working_dir = os.path.join(MEGUA_OUTPUT_DIR,self._unique_name)
+        if not os.path.exists(self.working_dir):
+            os.makedirs(self.working_dir)
+
+           
+        UnifiedGraphics.__init__(self,
+            imagedirectory=self.working_dir,
+            rendermethod=rendermethod,
+            dimx=dimx,
+            dimy=dimy,
+            dpi=dpi
+        )        
+
 
         self.has_instance = False
-        self.current_problem = None
-        self.current_answer = None
-        
-        if ekey or edict:
-            self.update(ekey,edict)
+        self._current_problem = None
+        self._current_answer = None   
+        self.update(ekey,edict)
+
 
     def __str__(self):
-        return "%s(%s)" % (self._unique_name,str(self.__dict__))
+        return "%s(edict=%s)" % (self._unique_name,str(self.__dict__))
 
 
 
     def _repr_(self): 
-        return "%s(%s)" % (self._unique_name,repr(self.__dict__))
+        return "%s(edict=%s)" % (self._unique_name,repr(self.__dict__))
 
 
-    def update(self,ekey=None,edict=None):
+    def update(self,ekey=None,edict=None, render_method=None):
+        r"""Does this:
+        - set random seed in module `ur`
+        - initialize this exercise local variables
+        - call make_random passing `edict` for author control
+        
+        It could be derive for other exercise base.
+        
+        DEVELOPER NOTES:
+        
+        - http://stackoverflow.com/questions/5268404/what-is-the-fastest-way-to-check-if-a-class-has-a-function-defined
+        
+        """
+
+        #Graphics
+        if render_method:
+            self.render_method(render_method)
+        
         #Initialize all random generators.    
-        self.ekey = ur.set_seed(ekey)
-
+        self.ekey = ur.start_at(ekey) #get new if ekey=None
 
         #Call user derived function to generate a set of random variables.
-        self.make_random(edict)
+        #See developer notes.
+        make_random = getattr(self, "make_random", None)
+        if callable(make_random):
+            try:
+                make_random(edict) #calls self.make_random(edict)
+            except TypeError:
+                make_random() #calls old self.make_random(), no args
+
+        #        self.make_random(edict)
 
         #Call user derived function to solve it.
         #TODO: warn that this is not to be used again
-        self.solve()
+        #self.solve()
+        solve = getattr(self, "solve", None)
+        if callable(solve):
+            solve()
+
+        #create current problem and answer
+        self._current_problem = self.searchreplace(self._problem_text)
+        self._current_answer = self.searchreplace(self._answer_text)
 
         self.has_instance = True
 
 
-    def update_dict(self,edict):
-        #make_random() can call this.
-        #in another way.
-        #Change all or some parameters existing in pdict.     
-        if edict is not None:
+    def update_dict(self,edict=None):
+        """
+        - make_random() can call this if author decides.
+        - update the state of the exercise by changing all 
+          or some parameters existing in edict.     
+        """
+        if edict:
             self.__dict__.update(edict) 
 
 
@@ -189,7 +293,10 @@ class ExerciseBase(SageObject):
         """
         Derive this function and change behaviour.
         """    
-        update_dict(edict)
+        #The author of an exercise must program make_random.
+        #The following instruction is optional and user can call it 
+        #only when his algorithm decides.
+        self.update_dict(edict)
 
 
     def solve(self):
@@ -197,7 +304,7 @@ class ExerciseBase(SageObject):
         Derive this function.
         """    
         warnings.warn("def solve() is deprecated. Use only def make_random(edict) and configure ", DeprecationWarning) 
-        pass
+                
 
     def rewrite(self,text):
         """
@@ -212,54 +319,45 @@ class ExerciseBase(SageObject):
         return text
 
 
-    def check(self):
+    def check(self,max_computation_time):
         #TODO: test several keys for maxtime.
         #1. test code several times
         #2. test compilations, for example
+        #Use alarm(max_computation_time)
         pass
 
+
+    def get_ekey(self):
+        return self.ekey
  
     def unique_name(self):
+        assert(self._unique_name)
         return self._unique_name
-
 
    
     def summary(self):
-        """#, edict=" + str(edict) + ")\n")
-        Use class text self._summary_text and replace for parameters on dictionary. Nothing is saved.
-        #TODO: maybe summary does not need replacements!
-        """
-        #return parameter_change(self._summary_text,self.__dict__)
+        assert(self._summary_text)
         return self._summary_text
 
 
     def problem(self):
-        """
-        Use class text self._problem_text and replace for parameters on dictionary. 
-        Nothing is saved.
-
-        If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
-        """
-        
         assert(self.has_instance)
-            
-        self.current_problem = parameter_change(self._problem_text,self.__dict__,latex_filter=False)
-        
-        return self.current_problem
+        return self._current_problem
+
 
     def answer(self):
-        """
-        Use class text self._answer_text and replace for parameters on dictionary. 
-        Nothing is saved.
-
-        If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
-        """
-
         assert(self.has_instance)
+        return self._current_answer
 
-        self.current_answer = parameter_change(self._answer_text,self.__dict__,latex_filter=False)
-        
-        return self.current_answer
+
+    def searchreplace(self,text_source):
+        """Change this routine in derivations"""
+        text1 = parameter_change(text_source,self.__dict__,latex_filter=False)
+        text2 = self.rewrite(text1)
+        if text2 is None: 
+            raise NameError('rewrite(s,text) function is not working.')
+        return text2    
+
 
     def print_instance(self):
         """
@@ -274,14 +372,63 @@ class ExerciseBase(SageObject):
         answtxt =  self.answer()
         uname   =  self.unique_name()
 
-        print '-'*len(uname)
-        print uname 
-        print '-'*len(uname)
-        print summtxt.encode('utf8')
-        print probtxt.encode('utf8')
-        print answtxt.encode('utf8')
+        print '-'*13 + '-'*len(uname)
+        print "Instance of:", uname 
+        print '-'*13 + '-'*len(uname)
+        print "==> Summary:"
+        print summtxt #.encode('utf8')
+        print "==> Problem instance"
+        print probtxt #.encode('utf8')
+        print "==> Answer instance"
+        print answtxt #.encode('utf8')
+
+    def show_one(self,input_text):
+        """Find all <showone value>...</showone> tags and select proper <thisone>...</thisone>
+        Change it in the original text leaving only the selected ... in <thisone>...</thisone>
+        """
+
+        showone_pattern = re.compile(r'<\s*showone\s+(\d+)\s*>(.+?)<\s*/showone\s*>', re.DOTALL|re.UNICODE)
+
+        #Cycle through all <showone> tags
+        match_iter = re.finditer(showone_pattern,input_text)#create an iterator
+        new_text = ''
+        last_pos = 0
+        for match in match_iter:
+
+            #Get list of possibilities
+            #print "===>",match.group(2)
+            possibilities = self._showone_possibilities(match.group(2))
+
+            #Get selected possibility
+            #TODO: check range and if group(1) is a number.
+            pnum = int(match.group(1))
+            #print "===>",pnum
+
+            #Text to be written on the place of all options
+            possibility_text = possibilities[pnum]
+
+            #new_text = new_text[:match.start()] + possibility_text + new_text[match.end():] 
+            new_text += input_text[last_pos:match.start()] + possibility_text
+            last_pos = match.end()
+
+        new_text += input_text[last_pos:]
+
+        return new_text
 
 
+    def _showone_possibilities(self,text_with_options):
+        """Find all tags <thisone>...</thisone> and make a list with all `...`
+        """
+
+        thisone_pattern = re.compile(r'<\s*thisone.*?>(.+?)<\s*/thisone\s*>', re.DOTALL|re.UNICODE)
+
+        #Cycle through all <showone> tags
+        match_iter = re.finditer(thisone_pattern,text_with_options)#create an iterator
+        options = []
+        for match in match_iter:
+            options.append( match.group(1) )
+
+        return options
 
     
 #end of exbase.py

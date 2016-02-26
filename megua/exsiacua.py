@@ -1,17 +1,203 @@
 # coding=utf-8
 
 r"""
-ExSiacua -- Siacua exercise.
+ExSiacua -- Siacua exercises 
+
+Siacua are single choice (also called multiple choice) exercises to be
+used in siacua system (developed at Univ. Aveiro in a different project than
+this MEGUA package).
 
 AUTHORS:
 
 - Pedro Cruz (2016-01): first modifications for use in SMC.
 
+
+EXAMPLES:
+
+
+A Siacua exercise in portuguese:
+
+::
+
+       sage: from megua.megbook import MegBook 
+       sage: from megua.exsiacua import ExSiacua
+       sage: meg = MegBook(r'_input/megbook.sqlite') 
+       sage: meg.save(r'''
+       ....: %SUMMARY Probabilidade; Regra de Laplace
+       ....:  
+       ....:  
+       ....: Este exercício é um problema básico de Regra de Laplace
+       ....:  
+       ....: SIACUAstart
+       ....: level=1
+       ....: slip=0.2
+       ....: guess=0.25
+       ....: discr=0.3
+       ....: concepts = [(4731, 1)]
+       ....: SIACUAend
+       ....:  
+       ....: %PROBLEM Exemplo
+       ....:  
+       ....: A Maria gravou v1 CD, v2 de música rock e v3 com 
+       ....: música popular, mas esqueceu-se de identificar cada um deles. 
+       ....: Qual é a probabilidade de ao escolher dois CD ao acaso, 
+       ....: um ser de música rock e o outro ser de música popular?
+       ....:  
+       ....: %ANSWER
+       ....:  
+       ....: <multiplechoice>
+       ....: <choice> $$vresposta$$ </choice>
+       ....: <choice> $$errada1$$ </choice>
+       ....: <choice> $$errada2$$ </choice>
+       ....: <choice> $$errada3$$ </choice>
+       ....: </multiplechoice>
+       ....:  
+       ....: A resposta é $vresposta$.<br>
+       ....:  
+       ....: Utilizaremos a Regra de Laplace
+       ....: $$p(A)=\frac{\text{nº de casos favoráveis}}{\text{nº de casos possíveis}}$$
+       ....: Nº de casos possíveis: $v1\times(v1-1)=cp$<br>
+       ....:  
+       ....: Nº de casos favoráveis: $2\times v2\times v3=cf$
+       ....:  
+       ....: $$P(A)=\frac{cf}{cp}=vresposta$$
+       ....:  
+       ....: class E97K50_Laplace_002(ExSiacua):
+       ....:     _unique_name = "E97K50_Laplace_002"
+       ....:     def make_random(s,edict=None):
+       ....:         #problem 
+       ....:         s.v1 = ur.iunif(5,15)
+       ....:         s.v2 = ur.iunif(1,s.v1-2)
+       ....:         s.v3 = s.v1-s.v2
+       ....:         #answer
+       ....:         s.cp=s.v1*(s.v1-1)
+       ....:         s.cf=2*s.v2*s.v3
+       ....:         s.vresposta = s.cf/s.cp
+       ....:         #Opções Erradas
+       ....:         s.errada1 = s.cp/s.cf
+       ....:         s.errada2 = s.v1*s.v1/s.cp
+       ....:         s.errada3 = s.cf/(s.cp/2)
+       ....: ''')
+       exsiacua module: open file _output/E97K50_Laplace_002/E97K50_Laplace_002.html in the browser and press F5.
+       sage: ex = meg.new("E97K50_Laplace_002", returninstance=True)
+       sage: ex.print_instance()
+       exsiacua module: open file _output/E97K50_Laplace_002/E97K50_Laplace_002.html in the browser and press F5.       
+       sage: ex.siacuapreview(ekeys=[10,20,30])
+       exsiacua module, siacuapreview: open file _output/E97K50_Laplace_002/E97K50_Laplace_002_siacuapreview.html in the browser and press F5.
+
+
+
+Another example that is sent to siacua system:
+    
+::
+
+       sage: from megua.megbook import MegBook 
+       sage: #from megua.exsiacua import ExSiacua
+       sage: meg = MegBook(r'_input/megbook.sqlite') 
+       sage: meg.save(r'''
+       ....: %summary Regra de Laplace
+       ....:  
+       ....: SIACUAstart
+       ....: level=1
+       ....: slip=0.2
+       ....: guess=0.25
+       ....: discr=0.3
+       ....: concepts = [(4731, 1)]
+       ....: SIACUAend 
+       ....:  
+       ....: %problem Números Bolas e Caixas
+       ....:  
+       ....: Considera uma caixa com v1 bolas indestiguiveis ao tato, numeradas de 1 a v1.
+       ....: Considera também um dado equilibrado com as faces numeradas de 1 a 6.
+       ....: Lança-se o dado e tira-se, ao acaso, uma bola da caixa.
+       ....: Qual é a probabilidade de os números saídos serem ambos menores que v2?  
+       ....:  
+       ....: %answer
+       ....:  
+       ....: <multiplechoice>
+       ....: <choice> $$vresp$$ </choice>
+       ....: <choice> $$err1$$ </choice>
+       ....: <choice> $$err2$$ </choice>
+       ....: <choice> $$err3$$ </choice>
+       ....: </multiplechoice>
+       ....:  
+       ....: A resposta é $vresp$.
+       ....:  
+       ....: <br> Pretendemos saber a probabilidade de os números obtidos serem ambos menores que v2.<br>
+       ....:  
+       ....: <br> Para determinar a probabilidade pedida utilizaremos a Regra de Laplace 
+       ....: $$P(\text{ambos os números menores que v2})=\frac{\text{nº de casos favoráveis}}{\text{nº de casos possíveis}}$$
+       ....:  
+       ....: Comecemos por construir uma tabela que nos permita verificar todas as hipóteses possíveis de resultado:<br>
+       ....:  
+       ....: $$\begin{array}{|a|a|c|c|c|c|c|}
+       ....: \hline
+       ....:     B/D & 1 & 2 & 3 & 4 & 5 & 6\\ \hline
+       ....:      
+       ....:     linhas
+       ....: \end{array}$$
+       ....:  
+       ....: A caixa tem v1 bolas numeradas de 1 a v1 e o dado tem 6 faces também numeradas de 1 a 6. Portanto:
+       ....:   
+       ....:    $$\text{O número de casos possíveis é dado por: } v1 \times 6 = v3$$
+       ....:  
+       ....: Pretendemos saber a probabilidade de, ao retirar uma bola do saco e lançar o dado, 
+       ....: obter dois numeros menores que v2.<br>
+       ....: <br> Pela tabela podemos verificar que 
+       ....:     $$\text{O número de casos favoráveis são } cf$$ 
+       ....:      
+       ....: Logo a probabilidade pedida é dada por:
+       ....:     $$P(\text{ambos os números menores que v2}) = \frac{cf}{cp} = vresp$$  
+       ....:  
+       ....: class E97K50_Laplace_001(ExSiacua):
+       ....:  
+       ....:     def make_random(s):
+       ....:  
+       ....:         s.v1 = ur.iunif(6,10)
+       ....:         s.v2 = ur.iunif(2,s.v1)
+       ....:  
+       ....:         #d={1:0,2:1,3:4,4:9,5:16,6:25,7:36}
+       ....:         if s.v2<=7:
+       ....:             s.cf = (s.v2-1)^2
+       ....:         else:
+       ....:             s.cf = 36 + 6*(s.v2 - 7)
+       ....:         s.cp = 6*s.v1
+       ....:         #s.cf = d[s.v1]
+       ....:         s.vresp= round(s.cf/s.cp,2)
+       ....:          
+       ....:         s.linhas = ""
+       ....:         for i in range(s.v1):
+       ....:             linha = str(i+1) 
+       ....:             for j in range(6):
+       ....:                 linha = linha + s.C(i+1,j+1)
+       ....:             s.linhas = s.linhas + linha + r" \\ \hline" 
+       ....:         s.v3 = s.v1 * 6
+       ....:          
+       ....:         #Opções Erradas 
+       ....:         s.err1 = round(s.vresp*0.9,2)
+       ....:         s.err2 = round(s.vresp*1.2,2)
+       ....:         s.err3 = round(s.vresp*1.3,2)
+       ....:      
+       ....:     def C(s,B,D):
+       ....:         if B < s.v2 and D < s.v2:
+       ....:             return '&(%d,%d)' % (B,D)
+       ....:         else:
+       ....:             return '& '
+       ....:  
+       ....: ''')
+       exsiacua module: open file _output/E97K50_Laplace_001/E97K50_Laplace_001.html in the browser and press F5.
+       sage: ex = meg.new("E97K50_Laplace_001", returninstance=True)
+       sage: ex.siacua(ekeys=[9],sendpost=True,course="matsec",usernamesiacua="f1183",siacuatest=True) #long output
+
+
+DEVELOPER NOTES:
+
+Some ideas:
+
+- For students that don't ue LaTeX: http://asciimath.org/
+
+
 """
-
-# Abstract function
-# raise NotImplementedError( "Should have implemented this" )
-
 
 #*****************************************************************************
 #       Copyright (C) 2012,2016 Pedro Cruz <PedroCruz@ua.pt>
@@ -21,167 +207,71 @@ AUTHORS:
 #*****************************************************************************
 
 
-r"""
-TECHINCAL NOTES:
-
-Test with:: 
-
-    sage -python -m doctest exlatex.py
-
-
-"""
-
 #PYTHON modules
 import httplib, urllib
 import os
+import re
+import codecs
+
 #import json
+#Warnings
+# http://www.doughellmann.com/PyMOTW/warnings/
+#import warnings
+#import tempfile
+#import tikzmod
+#import subprocess
+
+
+
+#SAGEMATH modules
+#from sage.all import *
 
 
 #MEGUA modules  
 from megua.exbase import ExerciseBase
-from megua.ur import ur 
-
-
-#Import the random generator object.
-
-#, edict=" + str(edict) + ")\n")
-#import tikzmod
-#import subprocess
-#import codecs
-
-#Sage
-#from sage.all import *
-
-#Warnings
-# http://www.doughellmann.com/PyMOTW/warnings/
-#import warnings
-
-#import re
-#import tempfile
-#import os
-
+from megua.ug import UnifiedGraphics  
+from megua.ur import ur
+from megua.jinjatemplates import templates
+from megua.mconfig import *
 
 
 class ExSiacua(ExerciseBase):    
-    r"""
-
-    Creation a LaTeX exercise::
-        
-       sage: meg = MegBook(r'_temp/megbook.sqlite') 
-       sage: meg.save(r'''
-       ....: %Summary Primitives
-       ....: Here one can write few words, keywords about the exercise.
-       ....: For example, the subject, MSC code, and so on.
-       ....: 
-       ....: %Problem
-       ....: What is the primitive of ap x + bp@() ?
-       ....: 
-       ....: %Answer
-       ....: The answer is prim+C, with C a real number.
-       ....: 
-       ....: class E28E28_pdirect_001(ExSiacua):
-       ....: 
-       ....:    def make_random(self,edict):
-       ....:        self.ap = ZZ.random_element(-4,4)
-       ....:        self.bp = self.ap + QQ.random_element(1,4)
-       ....:        x=SR.var('x')
-       ....:        self.prim = integrate(self.ap * x + self.bp,x)
-       ....: ''')
-       Each problem can have a suggestive name. 
-       Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
-       <BLANKLINE>
-       Testing python/sage class 'E28E28_pdirect_001' with 100 different keys.
-           No problems found in this test.
-          Compiling 'E28E28_pdirect_001' with pdflatex.
-          No errors found during pdflatex compilation. Check E28E28_pdirect_001.log for details.
-    """
 
 
-    def __init__(self,ekey=None, edict=None):
-        
-        #Base class call
-        ExerciseBase.__init__(self,ekey,edict)
-        
-        #Create a directory for images and compilation
-        os.system("mkdir -p _images") #The "-p" ommits errors if it exists.
-
- 
     def update(self,ekey=None,edict=None):
-        #reset image list for the new parameters
-        #TODO: this can generate inconsistency if make_random or solve are called alone.
-        self.image_list = []
 
-        #Case when exercise is multiplechoice
+        #For multiplechoice
         self.all_choices = []
         self.has_multiplechoicetag = None #Don't know yet.
-        self.detailed_answer= None
 
-        #Initialize all random generators.
-        self.ekey = ur.set_seed(ekey)
+        #Extract, from summary, details about baysian network
+        self._siacua_extractparameters()
 
         #Call user derived function to generate a set of random variables.
-        self.make_random(edict)
+        ExerciseBase.update(self,ekey,edict)
 
-        #Call user derived function to solve it.
-        #TODO: warn that this is not to be used again
-        self.solve()
-
-        self.has_instance = True
-
-    def problem(self,removemultitag=False):
-        """
-        Use class text self._problem_text and replace for parameters on dictionary. 
-        Nothing is saved.
-
-        If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
-        """
-        
-        assert(self.has_instance)
-            
-        if removemultitag:
-            text1 = self.remove_multiplechoicetag(self._problem_text)
+        #If exist information about MC
+        #extracts it to local variables.
+        #All after all replacements
+        if "multiplechoice" in self.problem():
+            self._multiplechoice_parser(self.problem(),where="problem")
+            self.detailed_answer = self.answer()
         else:
-            text1 = self._problem_text
-        text2 = parameter_change(text1,self.__dict__)
-        self.current_problem = self._change_text(text2)
-        
-        return self.current_problem
-        
-        
-    def answer(self,removemultitag=False):
-        """
-        Use class text self._answer_text and replace for parameters on dictionary. 
-        Nothing is saved.
-
-        If removemultitag=true, the tags <multiplechoice> ... </multiplechoice> are removed.
-        """
-
-        assert(self.has_instance)
-
-        if removemultitag:
-            text1 = self.remove_multiplechoicetag(self._answer_text)
-        else:
-            text1 = self._answer_text
-        text2 = parameter_change(text1,self.__dict__)
-        
-        self.current_answer = self._change_text(text2)
-
-        return self.current_answer
+            self._multiplechoice_parser(self.answer(),where="answer")
 
          
-    def change_text(self,text1):
+    def searchreplace(self,input_text):
         """Called after parameter_change call. See above."""
-        text2 = self.rewrite(text1)
-        if text2 is None:
-            raise NameError('rewrite(s,text) function is not working.')
-        text3 = self.latex_images(text2)
-        text4 = self.show_one(text3)
-        text5 = self.old_html(text4)
-        self.multiplechoice_parser(text5)  #extract information but don't change text
-        return text5
 
+        #Base tranformation
+        text = ExerciseBase.searchreplace(self,input_text)
 
-
+        #Other transformations
+        text = self.latex_render(text) #ver UnifiedGraphics
+        text = self.show_one(text)
+        text = _old_html(text)
+        
+        return text
 
 
     def print_instance(self):
@@ -189,6 +279,8 @@ class ExSiacua(ExerciseBase):
         After producing an exercise template or requesting a new instance of some exercise
         this routine will print it on notebook notebook or command line mode. It also should
         give a file were the user can find text markup (latex or html, etc).
+        
+        TODO: this view should be almost equal to view the exercise in siacua
         """
 
         summtxt =  self.summary()   
@@ -212,311 +304,41 @@ class ExSiacua(ExerciseBase):
 
 
 
-        html_string = self.template("print_instance_html.html",
+        html_string = templates.render("exsiacua_print_instance.html",
                 uname=uname,
                 summtxt=summtxt,
                 probtxt=probtxt,
                 answtxt=answtxt_woCDATA,
                 ekey=self.ekey,
-                mathjax_link=mathjax_link)
+                mathjax_header=MATHJAX_HEADER)
+
+        #print html_string
 
         #Produce files for pdf and png graphics if any tikz code embed on exercise
         #Ver ex.py: now latex images are produced in ex.problem() and ex.answer()
         #html_string = self.publish_tikz(sname,html_string)
 
 
-        #show in notebook
-        #html(html_string.encode('utf-8'))
-
-        #file with html to export (extension txt prevents html display).
-
         #To be viewed on browser
         #f = open(sname+'.html','w')
         #f.write(html_string.encode('latin1'))
         #f.close()
 
-        #For megua 5.2
-        f = codecs.open(uname+'.html', mode='w', encoding='utf-8')
+        html_filename = os.path.join(self.working_dir,uname+'.html')
+        f = codecs.open(html_filename, mode='w', encoding='utf-8')
         f.write(html_string)
         f.close()
         
-        salvus.file(uname+'.html')
-        
-        salvus.html(html_string)
-        
-
-        #To be used on sphinx
-        #TODO: move this somewhere.
-        #f = codecs.open(sname+'.rst', mode='w', encoding='utf-8')
-        #f.write(html_string)
-        #f.close()
-
-        #file with html to export.
-        #f = open(sname+'.html','w')
-        #f.write(html_string.encode('latin1'))
-        #f.close()
-
-        #Problems with many things:
-        #html(html_string.encode('utf-8'))
-    
-
-    
-    
-    def show_one(self,input_text):
-        """Find all <showone value>...</showone> tags and select proper <thisone>...</thisone>
-        Change it in the original text leaving only the selected ... in <thisone>...</thisone>
-        """
-
-        showone_pattern = re.compile(r'<\s*showone\s+(\d+)\s*>(.+?)<\s*/showone\s*>', re.DOTALL|re.UNICODE)
-
-        #Cycle through all <showone> tags
-        match_iter = re.finditer(showone_pattern,input_text)#create an iterator
-        new_text = ''
-        last_pos = 0
-        for match in match_iter:
-
-            #Get list of possibilities
-            #print "===>",match.group(2)
-            possibilities = self._showone_possibilities(match.group(2))
-
-            #Get selected possibility
-            #TODO: check range and if group(1) is a number.
-            pnum = int(match.group(1))
-            #print "===>",pnum
-
-            #Text to be written on the place of all options
-            possibility_text = possibilities[pnum]
-
-            #new_text = new_text[:match.start()] + possibility_text + new_text[match.end():] 
-            new_text += input_text[last_pos:match.start()] + possibility_text
-            last_pos = match.end()
-
-        new_text += input_text[last_pos:]
-
-        return new_text
-
-
-    def _showone_possibilities(self,text_with_options):
-        """Find all tags <thisone>...</thisone> and make a list with all `...`
-        """
-
-        thisone_pattern = re.compile(r'<\s*thisone.*?>(.+?)<\s*/thisone\s*>', re.DOTALL|re.UNICODE)
-
-        #Cycle through all <showone> tags
-        match_iter = re.finditer(thisone_pattern,text_with_options)#create an iterator
-        options = []
-        for match in match_iter:
-            options.append( match.group(1) )
-
-        return options
-
-        
-
-    def sage_graphic(self,graphobj,varname,dimx=5,dimy=5):
-        """This function is to be called by the author in the make_random or solve part.
-        INPUT:
-
-        - `graphobj`: some graphic object.
-
-        - `varname`: user supplied string that will be part of the filename.
-
-        - `dimx` and `dimy`: size in centimeters.
-
-        """ 
-        #Arrows #TODO: this is not working
-        #if arrows:
-        #    xmin = graphobj.xmin()
-        #    xmax = graphobj.xmax()
-        #    ymin = graphobj.ymin()
-        #    ymax = graphobj.ymax()
-        #    xdelta= (xmax-xmin)/10.0
-        #    ydelta= (ymax-ymin)/10.0
-        #    graphobj += arrow2d((xmin,0), (xmax+xdelta, 0), width=0.1, arrowsize=3, color='black') 
-        #    graphobj += arrow2d((0,ymin), (0, ymax+ydelta), width=0.1, arrowsize=3, color='black') 
-
-        gfilename = '%s-%s-%d'%(self.name,varname,self.ekey)
-        #create if does not exist the "image" directory
-        #os.system("mkdir -p _images") #The "-p" ommits errors if it exists.
-
-        #graphobj could be sage or matplotlib object.
-
-        if type(graphobj)==sage.plot.graphics.Graphics:
-            graphobj.save("_images/"+gfilename+'.png',figsize=(dimx/2.54,dimy/2.54),dpi=100)
-        else: #matplotlib assumed
-            #http://stackoverflow.com/questions/9622163/matplotlib-save-plot-to-image-file-instead-of-displaying-it-so-can-be-used-in-b
-            import matplotlib.pyplot as plt
-            from pylab import savefig
-            fig = plt.gcf() #Get Current Figure: gcf
-            fig.set_size_inches(dimx/2.54,dimy/2.54)
-            savefig("_images/"+gfilename+'.png') #,figsize=(dimx/2.54,dimy/2.54),dpi=100)
             
-        self.image_list.append(gfilename) 
-        return r"<img src='_images/%s.png'></img>" % gfilename
+        if MEGUA_PLATFORM=='sagews':
+            salvus.file(html_filename)
+            salvus.html(html_string)
+        else: #MEGUA_PLATFORM=='commandline'
+            print "exsiacua module: open file",html_filename,"in the browser and press F5."        
 
 
 
-    def sage_staticgraphic(self,fullfilename,dimx=150,dimy=150):
-        """This function is to be called by the author in the make_random or solve part.
-
-        INPUT:
-
-        - `fullfilename`: full filename for the graphic or picture.
-        - `dimx` and `dimy`: display image in (dimx,dimy) pixels.
-
-        NOTES:
-            - see also ``s.sage_graphic``.
-        """ 
-        #create if does not exist the "image" directory
-        #os.system("mkdir -p _images") #The "-p" ommits errors if it exists.
-        os.system("cp %s _images" % fullfilename)
-        gfilename = os.path.split(fullfilename)[1]
-        #print "gfilename=",gfilename
-        self.image_list.append(gfilename) 
-        return r"<img src='_images/%s' alt='%s' height='%d' width='%d'></img>" % (gfilename,self.name+' graphic',dimx,dimy)
-
-    def latex_images(self,input_text):
-        """When <latex percent%> ... </latex> is present, then 
-        it is necessary to produce them.
-        """
-
-        #VER LATEXIMG.PY
-
-
-        #important \\ and \{
-
-        #old pattern:
-        #tikz_pattern = re.compile(r'\\begin\{tikzpicture\}(.+?)\\end\{tikzpicture\}', re.DOTALL|re.UNICODE)
-
-        #print "Group 0:",match.group(0) #all
-        #print "Group 1:",match.group(1) #scale (see http://www.imagemagick.org/script/command-line-processing.php#geometry)
-        #print "Group 2:",match.group(2) #what is to compile
-
-        latex_pattern = re.compile(r'<\s*latex\s+(\d+%)\s*>(.+?)<\s*/latex\s*>', re.DOTALL|re.UNICODE)
-        latex_error_pattern = re.compile(r"!.*?l\.(\d+)(.*?)$",re.DOTALL|re.M)
-
-        #create if does not exist the "image" directory
-        #os.system("mkdir -p _images") #The "-p" ommits errors if it exists.
-
-        #Cycle through existent tikz code and produce pdf and png files.
-        graphic_number = 0
-        match_iter = re.finditer(latex_pattern,input_text)#create an iterator
-        for match in match_iter:
-            #Graphic filename
-            gfilename = '%s-%d-%02d'%(self.name,self.ekey,graphic_number)
-            #print "=========="
-            #print gfilename
-            #print "=========="
-            #Compile what is inside <latex>...</latex> to a image
-            tikz_picture = match.group(2) 
-            #TODO: mudar tikz_graphics para latex_image.tex
-            #Note: compile only in a images/*.tex folder
-            try:
-                tikz_tex = Exercise.megbook.template("tikz_graphics.tex", 
-                                pgfrealjobname=r"\pgfrealjobname{%s}"%self.name, 
-                                beginname=r"\beginpgfgraphicnamed{%s}"%gfilename, 
-                                tikz_picture=tikz_picture)
-                pcompile(tikz_tex,'_images','%s-%d-%02d'%(self.name,self.ekey, graphic_number))
-                #convert -density 600x600 pic.pdf -quality 90 -resize 800x600 pic.png
-                cmd = "cd _images;convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
-                    gfilename,match.group(1),gfilename)
-                #print "============== CMD: ",cmd
-                os.system(cmd)
-                os.system("cp _images/%s.tex ." % gfilename)
-                graphic_number += 1
-                self.image_list.append(gfilename) 
-            except subprocess.CalledProcessError as err:
-                #Try to show the message to user
-                #print "Error:",err
-                #print "returncode:",err.returncode
-                #print "output:",err.output
-                print "================"
-                match = latex_error_pattern.search(err.output) #create an iterator
-                if match:
-                    print match.group(0)
-                else:
-                    print "There was a problem with an latex image file."
-                #if latex inside codemirror does not work
-                #this is the best choice: 
-                #print "You can download %s.tex and use your windows LaTeX editor to help find the error." % gfilename
-                os.system("mv _images/%s.tex ." % gfilename)
-
-                #Using HTML and CodeMirror to show the error.
-                print "You can open %s.html to help debuging." % gfilename
-                tikz_html = Exercise.megbook.template("latex_viewer.html", 
-                                pgfrealjobname=r"\pgfrealjobname{%s}"%self.name, 
-                                beginname=r"\beginpgfgraphicnamed{%s}"%gfilename, 
-                                tikz_tex=tikz_tex,
-                                sname=self.name,
-                                errmessage=match.group(0),
-                                linenum=match.group(1)
-                                )
-
-                f = codecs.open(gfilename+'.html', mode='w', encoding='utf-8')
-                f.write(tikz_html)
-                f.close()
-                print "================"
-                raise Exception
-
-
-        #Cycle through existent tikz code and produce a new html string .
-        graphic_number = 0
-        gfilename = '%s-%d-%02d'%(self.name,self.ekey,graphic_number)
-        (new_text,number) = latex_pattern.subn(r"<img src='_images/%s.png'></img>" % gfilename, input_text, count=1)
-        while number>0:
-            graphic_number += 1
-            gfilename = '%s-%d-%02d'%(self.name,self.ekey,graphic_number)
-            (new_text,number) = latex_pattern.subn(r"<img src='_images/%s.png'></img>" % gfilename, new_text, count=1)
-        
-        #TODO: falta gravar as imagens na lista deste exercicio.
-
-        return new_text
-
-
-
-    def r_graphic(self, r_commands, varname,dimx=7,dimy=7): #cm
-        """This function executes r_commands in a shell that should produce a plot (boxplot, etc) 
-           to a file that will be located inside
-           a "image/" directory.
-
-        NOTE: the sage interface "r." is not capable of ploting at 
-        least in version 5.2" because png was not compiled with R.
-        This function uses an external (to Sage) fresh R instalation.
-
-        INPUT:
-
-            - `r_commands`: valid sequence of R commands to be executed that should produce a graphic.
-
-            - `varname`: user supplied string that will be part of the filename.
-
-            - `dimx` and `dimy`: size in centimeters.
-        
-        OUTPUT:
-
-            - a graphic png boxplot inside directory "image/".
-
-        """
-
-        #base name for the graphic file
-        gfilename = '%s-%s-%d'%(self.name,varname,self.ekey)
-        #create if does not exist the "image" directory
-        #os.system("mkdir -p images") #The "-p" ommits errors if it exists.
-
-        f = open("_images/%s.R" % gfilename,"w")
-        #f.write("setwd('images')")
-        f.write("png('%s.png',width = %d, height = %d, units = 'cm', res=100)\n" % (gfilename,dimx,dimy) )
-        f.write(r_commands + '\n')
-        f.write("dev.off()\n")
-        f.close()
-        #os.system("/usr/bin/R --silent --no-save < _images/%s.R" % gfilename)
-        os.system("cd _images; unset R_HOME; /usr/bin/R CMD BATCH --quiet --no-environ --no-save --slave -- %s.R" % gfilename)
-        #os.system("/usr/bin/R --slave --no-save -f _images/%s.R" % gfilename)
-
-        #Check ex.py:sage_graphic(): this will add a new image to the exercise.
-        self.image_list.append(gfilename) 
-        return r"<img src='_images/%s.png'></img>" % gfilename
-
-
-    def multiplechoice_parser(self,input_text):
+    def _multiplechoice_parser(self,input_text,where):
         """When <multiplechoice>...</multiplecoice> is present it parses them
         and puts each option in exercise fields: 
 
@@ -537,11 +359,11 @@ class ExSiacua(ExerciseBase):
 
         #Find and extract text inside <multiplechoice>...</multiplechoice>
         choices_match = re.search(r'<\s*multiplechoice\s*>(.+?)<\s*/multiplechoice\s*>', input_text, re.DOTALL|re.UNICODE)
-        
-        if choices_match is None:
-            return 
         #print "group 0=",choices_match.group(0)
         #print "group 1=",choices_match.group(1)
+        
+        if choices_match is None:
+            raise SyntaxError("exsiacua module: problem should have <multiplechoice>...</multiplechoice> tags.")
 
         #Text inside tags <multiplechoice> ... </multiplechoice>
         choice_text = choices_match.group(1)
@@ -556,18 +378,20 @@ class ExSiacua(ExerciseBase):
         #print self.all_choices
         #print "=========================="
         
-
-        #Find detailed answer and save it
-        self.detailed_answer = input_text[choices_match.end():].strip("\t\n ")
-        #print "=========================="
-        #print "Detailed answer"
-        #print self.detailed_answer
-        #print "=========================="
+        if where=="answer":
+            #Find detailed answer and save it
+            self.detailed_answer = input_text[choices_match.end():].strip("\t\n ")
+            #print "=========================="
+            #print "Detailed answer"
+            #print self.detailed_answer
+            #print "=========================="
 
         #For sending it's important to know where options are stored.
         self.has_multiplechoicetag = True
 
-    def remove_multiplechoicetag(input_text):
+
+
+    def _remove_multiplechoicetag(self,input_text):
         """When <multiplechoice>...</multiplecoice> removes it from input_text.
         It returns the text but no changes are made in fields.
         """
@@ -590,7 +414,8 @@ class ExSiacua(ExerciseBase):
 
         return new_text
 
-    def collect_options_and_answer(self):
+
+    def _collect_options_and_answer(self):
         r"""
         This routine applies when using <multiplechoice>...</multiplechoice>.
         """
@@ -599,77 +424,34 @@ class ExSiacua(ExerciseBase):
         l = centered_all_choices + [self.detailed_answer] #join two lists
 
         if len(l)<5:
-            raise NameError('Missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
+            raise NameError('exsiacua modukle: missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
 
         #print "==========="
         #print "For _siacua_answer:",l
         #print "=========="
         return l
 
-    def answer_extract_options(self):
+    def _answer_extract_options(self):
         r"""
         Does the parsing of answer to extract options and complete answer.
         This routine applies when using moodle template with CDATA.
         """
-        l = re.findall('<!\[CDATA\[(.*?)\]\]>', self.c_answer, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
+        l = re.findall('<!\[CDATA\[(.*?)\]\]>', self.answer(), re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
         if len(l)<5:
-            raise NameError('Missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
+            raise NameError("""exsiacua: missing multiple choice options."""\
+               """At least 4 options must be given and the first must be """\
+               """the correct one. Also the full answer must be given.""")
         return l
 
 
 
-    def old_html(self,input_text):
-        r"""Remove tags like the example and let
-        only the "show" part between <center>.        
-
-        EXAMPLE:: (testing this is not done with: sage -t ex.py)
-
-            sage: from ex import *
-            sage: ex = Exercise() #dummy
-            sage: print ex.old_html(r'''
-                <center>
-                <div style="display: None">
-                 closed set.
-                </div>
-                <div style="display: None">
-                 closed set.
-                </div>
-                <div style="display: Show">
-                open set 1.
-                </div>
-                <div style="display: None">
-                open set 2.
-                </div>
-                </center> 
-                ''')
-            open set 1.
-
-        """
-
-        # Replace all "display: None" by empty string.
-        (newtext1, nr) = re.subn(
-            ur'<div style="display: None">(.+?)</div>', '', 
-            input_text, count=0, flags=re.DOTALL|re.UNICODE|re.MULTILINE)
-
-        #print "old_html():", nr
-
-        # Replace all "display: Show" by \1.
-        (newtext2, nr) = re.subn(
-            ur'<div style="display: Show">(.+?)</div>', ur'\1', 
-            newtext1, count=0, flags=re.DOTALL|re.UNICODE|re.MULTILINE)
-
-        #print "old_html():", nr
-
-        return newtext2
 
 
 
-    def siacuapreview(self,ekeys=[]):
+    def siacuapreview(self,ekeys):
         r"""
 
         INPUT:
-
-        - ``exname``: problem name (name in "class E12X34_something_001(Exercise):").
 
         - ``ekeys``: list of numbers that generate the same problem instance.
 
@@ -683,7 +465,7 @@ class ExSiacua(ExerciseBase):
 
         EXAMPLE:
 
-            sage: meg.siacuapreview(exname="E12X34",ekeys=[1,2,5])
+            sssssage: ex.siacuapreview(ekeys=[1,2,5])
 
 
         Algorithm:
@@ -691,25 +473,17 @@ class ExSiacua(ExerciseBase):
 
         """
 
-        #Create exercise instance
-        row = self.megbook_store.get_classrow(exname)
-        if not row:
-            print "Exercise %s not found." % exname
-            return
-
-        (concept_dict,concept_list) = self._siacua_extract(row['summary_text'])
-
-        self.siacuaoption_template = self.env.get_template("siacuapreview_option.html")
+        siacuaoption_template = templates.get_template("exsiacua_previewoption.html")
 
         allexercises = u''
 
         for e_number in ekeys:
 
             #Create exercise instance
-            ex_instance = exerciseinstance(row, ekey=e_number)
+            self.update(ekey=e_number)
 
-            problem = ex_instance.problem(removemultitag=True)
-            answer  = ex_instance.answer(removemultitag=True)
+            problem = self._problem_whitoutmc()#m.c. options here?
+            answer  = self._answer_whitoutmc() #m.c. options here?
     
             #Adapt for appropriate URL for images
             #if ex_instance.image_list != []:
@@ -717,22 +491,24 @@ class ExSiacua(ExerciseBase):
             #    answer = self._adjust_images_url(answer)
             #    self.send_images()
     
-            #TODO: pass this to ex.py
-            if ex_instance.has_multiplechoicetag:
-                answer_list = ex_instance.collect_options_and_answer()
+            if self.has_multiplechoicetag:
+                answer_list = self._collect_options_and_answer()
             else:
-                print ex_instance.name,"has [CDATA] field. Please change to <showone> ... </showone> markers."
-                answer_list = ex_instance.answer_extract_options()
+                print "exsiacua module: exercise %s source has"\
+                  " [CDATA] fields."\
+                  " Please change to <showone> ... </showone> tags." % \
+                  self.unique_name()
+                answer_list = self._answer_extract_options()
 
             all_options = u'<table style="width:100%;">\n'
 
             for a in answer_list[:-1]:
-                option_html = self.siacuaoption_template.render(optiontext=a)
+                option_html = siacuaoption_template.render(optiontext=a)
                 all_options += option_html
             
             all_options += u'</table>\n'
 
-            ex_text = u'<h3>Concretizac\xe3o: ekey=' + str(e_number) + '</h3>'
+            ex_text = u'<h3>Random sequence index: ekey=' + str(e_number) + '</h3>'
             ex_text += problem + '<br/>'
             ex_text += all_options 
             ex_text += answer_list[-1]
@@ -740,34 +516,53 @@ class ExSiacua(ExerciseBase):
             #Add one more instance with ekey
             allexercises += ex_text
 
-        self.siacuapreview_header = self.env.get_template("siacuapreview_header.html")
-
-        all_html = self.siacuapreview_header.render(
-                exname = exname,
-                allexercises = allexercises
-            )
+        html_string = templates.render(
+                "exsiacua_previewheader.html",
+                uname = self.unique_name(),
+                allexercises = allexercises,
+                mathjax_header=MATHJAX_HEADER
+        )
 
 
         #write all to an html file.
-        f = codecs.open(exname+'.html', mode='w', encoding='utf-8')
-        f.write(all_html)
+        html_filename = os.path.join(self.working_dir,self.unique_name()+'_siacuapreview.html')
+        f = codecs.open(html_filename, mode='w', encoding='utf-8')
+        f.write(html_string)
         f.close()
+         
+        if MEGUA_PLATFORM=='sagews':
+            salvus.file(html_filename)
+            #salvus.html(html_string)
+        else: #MEGUA_PLATFORM=='commandline'
+            print "exsiacua module, siacuapreview: open file",html_filename,"in the browser and press F5."        
 
-        os.system("rm *.tex")	
+
+
+    def _problem_whitoutmc(self):
+        """
+        The problem text without multiple choice tag.
+        """
+        assert(self.has_instance)
+        return self._remove_multiplechoicetag(self._problem_text)
+        
+        
+    def _answer_whitoutmc(self):
+        """
+        The answer text without multiple choice tag.
+        """
+        assert(self.has_instance)
+        return self._remove_multiplechoicetag(self._answer_text)
 
 
 
-
-    def siacua(self,exname,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
+    def siacua(self,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
         r"""
 
         INPUT:
 
-        - ``exname``: problem name (name in "class E12X34_something_001(Exercise):").
-
         - ``ekeys``: list of numbers that generate the same problem instance.
 
-        - ``sendpost``: if True send information to siacua.
+        - ``sendpost``: if True send information to siacua, otherwise simulates.
 
         - ``course``: Right now could be "calculo3", "calculo2". Ask siacua administrator for more.
 
@@ -775,6 +570,8 @@ class ExSiacua(ExerciseBase):
 
         - ``grid2x2``: write user options in multiplechoice in a 2x2 grid (useful for graphics) values in {0,1}.
 
+        - ``siacuatest``: send data to a test machine.
+        
         OUTPUT:
 
         - this command prints the list of sended exercises for the siacua system.
@@ -783,13 +580,7 @@ class ExSiacua(ExerciseBase):
 
         - you can export between 3 and 6 wrong options and 1 right.
 
-        EXAMPLE:
-
-            sage: meg.siacua(exname="E12X34",ekeys=[1,2,5],sendpost=True,course="calculo2",usernamesiacua="jeremias")
-
-        TODO:
-
-        - securitykey: implemenent in a megua-server configuration file.
+        TODO: securitykey: implemenent in a megua-server configuration file.
 
         LINKS:
             http://docs.python.org/2/library/json.html
@@ -806,44 +597,31 @@ class ExSiacua(ExerciseBase):
         if usernamesiacua=="":
             print "Please do 'meg.siacua?' in a cell for usage details."
             return
-
-        #Create exercise instance
-        row = self.megbook_store.get_classrow(exname)
-        if not row:
-            print "Exercise %s not found." % exname
-            return
-
-        (concept_dict,concept_list) = self._siacua_extract(row['summary_text'])
-
-        #While POST is working do not need to print SQL statments in output.
-        #For _siacua_sqlprint
-        #f = codecs.open(exname+'.html', mode='w', encoding='utf-8')
-        #f.write(u"<html><body><h2>Copy/paste do conte\xFAdo e enviar ao Sr. Si\xE1cua por email. Obrigado.</h2>")
         
         for e_number in ekeys:
 
             #Create exercise instance
-            ex_instance = exerciseinstance(row, ekey=e_number)
+            self.update(ekey=e_number)
 
-            problem = ex_instance.problem()
-            answer = ex_instance.answer()
-    
-            #Adapt for appropriate URL for images
-            if ex_instance.image_list != []:
-                problem = self._adjust_images_url(problem)
-                answer = self._adjust_images_url(answer)
-                self.send_images()
+
+            # OLD OLD OLD OLD 
+            ##Adapt for appropriate URL for images
+            #if ex_instance.image_list != []:
+            #    problem = self._adjust_images_url(self.problem())
+            #    answer = self._adjust_images_url(self.answer())
+            #    self._send_images()
     
 
-            #TODO: pass this to ex.py
-            if ex_instance.has_multiplechoicetag:
-                if ex_instance.image_list != []:
-                    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
-                else:
-                    answer_list = ex_instance.collect_options_and_answer()
+            if self.has_multiplechoicetag:
+                # OLD OLD OLD OLD OLD
+                #if self.image_pathnames != []:
+                #    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
+                #else:
+                #   answer_list = ex_instance.collect_options_and_answer()
+                answer_list = self._collect_options_and_answer()
             else:
-                print ex_instance.name,"has [CDATA] field. Please change to <showone> ... </showone> markers."
-                answer_list = ex_instance.answer_extract_options()
+                print self.name,"has [CDATA] field. Please change to <showone> ... </showone> markers."
+                answer_list = self._answer_extract_options()
 
             #Create images for graphics (if they exist) 
                 #for problem
@@ -851,9 +629,9 @@ class ExSiacua(ExerciseBase):
                 #collect consecutive image numbers.
 
             #build json string
-            send_dict =  self._siacua_json(course, exname, e_number, problem, answer_list, concept_list)
+            send_dict =  self._siacua_json(course, self.unique_name(), e_number, self.problem(), answer_list, self.siacua_concepts)
             send_dict.update(dict({'usernamesiacua': usernamesiacua, 'grid2x2': grid2x2, 'siacuatest': siacuatest}))
-            send_dict.update(concept_dict)
+            send_dict.update(self.siacua_parameters)
 
             #Call siacua for store.
             if sendpost:
@@ -862,23 +640,10 @@ class ExSiacua(ExerciseBase):
             else:
                 print "Not sending to siacua. Dictionary is", send_dict
 
-            #While POST is working do not need this.
-            #self._siacua_sqlprint(send_dict,concept_list,f)
 
 
-        #When producing instances of exercise a folder images is created.
-        #os.system("rm -r images")
-
-        #While POST is working do not need this.
-        #Ending _siacua_sqlprint
-        #f.write(r"</body></html>")
-        #f.close()
-        #print r"Copy/paste of contents and send to Sr. Siacua using email. Merci."
-
-
-
-
-    def send_images(self):
+    #TODO: tirar isto.
+    def _send_images(self):
         """Send images to siacua: now is to put them in a drpobox public folder"""
         # AttributeError: MegBookWeb instance has no attribute 'image_list'
         #for fn in self.image_list:
@@ -914,7 +679,10 @@ class ExSiacua(ExerciseBase):
             #print response.status, response.reason
             #TODO: remove extra newlines that the user sees on notebook.
             data = response.read()
-            html(data.strip())
+            if MEGUA_PLATFORM=='sagews':
+                salvus.html(data.strip())
+            else: #MEGUA_PLATFORM=='commandline'
+                print data.strip()
         else:
             print "Could not send %s exercise to the server." % send_dict["exname"]
             print response.status, response.reason
@@ -958,7 +726,7 @@ class ExSiacua(ExerciseBase):
         #    } )
 
         d.update( {
-            "siacua_key": siacua_key,
+            "siacua_key": SIACUA_WEBKEY,
             "course": course,
             "exname": exname, 
             "ekey": str(e_number), 
@@ -966,7 +734,7 @@ class ExSiacua(ExerciseBase):
             "answer":   answer_list[-1].strip().encode("utf-8"),
             "rv":       answer_list[0].strip().encode("utf-8"),
             "nre": len(answer_list) - 2
-            } )
+        } )
 
         #Concept list
         l = len(concept_list)
@@ -1075,7 +843,7 @@ class ExSiacua(ExerciseBase):
                 slip    = send_dict["slip"],
                 guess   = send_dict["guess"],
                 discr   = send_dict["discr"],
-	)
+        )
 
         f.write(html_string)
 
@@ -1090,7 +858,7 @@ class ExSiacua(ExerciseBase):
 
 
 
-    def _siacua_extract(self,summary_text):
+    def _siacua_extractparameters(self):
         """
         Extract from summary:
             SIACUAstart
@@ -1103,11 +871,9 @@ class ExSiacua(ExerciseBase):
                 guess   = send_dict["guess"],
         """
 
-        #TODO: TERMINAR esta FUNcao
-
         concepts_match = re.search(
             r'SIACUAstart(.*?)SIACUAend', 
-            summary_text, 
+            self.summary(), 
             flags=re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
 
         if concepts_match is not None:
@@ -1118,4 +884,58 @@ class ExSiacua(ExerciseBase):
             print "For the siacua system %SUMMARY needs the following lines:\nSIACUAstart\nguess=2;  slip= 0.2; guess=0.25; discr=0.3;\nconcepts = [(1221, 0.5),(1222, 1)]\nSIACUAend\n"
             raise ValueError
 
-        return (dict(level=level, slip=slip, guess=guess,discr=discr), concepts)
+        self.siacua_parameters = dict(level=level, slip=slip, guess=guess,discr=discr)
+        self.siacua_concepts = concepts
+
+
+
+
+def _old_html(input_text):
+    r"""Remove tags like the example below and let
+    only the "show" part between <center>.        
+
+    EXAMPLE:: (testing this is not done with: sage -t ex.py)
+
+        sage: from megua.exsiacua import _old_html
+        sage: print _old_html(r'''
+        ....:    <center>
+        ....:    <div style="display: None">
+        ....:     closed set.
+        ....:    </div>
+        ....:    <div style="display: None">
+        ....:     closed set.
+        ....:    </div>
+        ....:    <div style="display: Show">
+        ....:    open set 1.
+        ....:    </div>
+        ....:    <div style="display: None">
+        ....:    open set 2.
+        ....:    </div>
+        ....:    </center> 
+        ....:    ''')
+        <center>            open set 1.         </center>
+
+    """
+
+    # Replace all "display: None" by empty string.
+    (newtext, nr) = re.subn(
+        ur'<div style="display: None">(.+?)</div>', '', 
+        input_text, count=0, flags=re.DOTALL|re.UNICODE|re.MULTILINE)
+
+    (newtext, nr) = re.subn(
+        '\n', '', 
+        newtext, count=0, flags=re.DOTALL|re.UNICODE|re.MULTILINE)
+
+    #print "old_html():", nr
+
+    # Replace all "display: Show" by \1.
+    (newtext, nr) = re.subn(
+        ur'<div style="display: Show">(.+?)</div>', ur'\1', 
+        newtext, count=0, flags=re.DOTALL|re.UNICODE|re.MULTILINE)
+
+    #newtext = newtext.strip()
+
+    #print "old_html():", nr
+
+    return newtext
+        

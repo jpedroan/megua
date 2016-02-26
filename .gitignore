@@ -3,6 +3,9 @@ spyder_session
 *.swp
 *.pyc
 \.testoutput/
+_images/
+_input
+_output
 \.vim
 mconfig.py
 *.aux
