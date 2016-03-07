@@ -278,10 +278,11 @@ class MegBook(MegSiacua):
 
 
     def __str__(self):
-        return "MegBook('%s','%s','%s')" % (self.local_store_filename)
+        return "MegBook('%s')" % self.local_store_filename
 
     def __repr__(self):
-        return "MegBook('%s','%s','%s')" % (self.local_store_filename)
+        print self.local_store_filename	
+        return "MegBook('%s')" % self.local_store_filename
 
     def make_index(self,where='.',debug=False):
         #warnings.warn("make_index() is deprecated. TODO: what to do ?", DeprecationWarning)
