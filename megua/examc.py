@@ -1,14 +1,13 @@
 # coding=utf-8
 
 r"""
-exlatex -- an exercise in LaTeX.
+examc -- an exercise in LaTeX for use in AMC.
 
-Implements parameterized exercises in LaTeX
 
 
 AUTHORS:
 
-- Pedro Cruz (2016-01): first modifications for use in SMC.
+- Pedro Cruz (2016-03): first modifications for use in SMC.
 
 
 EXAMPLES
@@ -73,7 +72,7 @@ from megua.jinjatemplates import templates
 from megua.mconfig import MEGUA_PLATFORM
 
 
-class ExLaTeX(ExerciseBase):
+class ExAMC(ExerciseBase):
    
 
     def _latex_string(self):

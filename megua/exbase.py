@@ -122,6 +122,8 @@ Make a static, ie, non parameterized exercise:
        sage: print adding_template.answer()
        Result is 30.
 
+
+
 """
 
 
@@ -140,7 +142,9 @@ import os
 
 
 #SAGEMATH modules
-from sage.all import SageObject  
+from sage.all import SageObject 
+from sage.misc.misc import alarm, cancel_alarm
+
 
 
 #MEGUA modules
@@ -196,11 +200,11 @@ class ExerciseBase(SageObject,UnifiedGraphics):
     def __init__(self,ekey=None, edict=None, rendermethod='base64',dimx=150,dimy=150,dpi=100):
         
         #Considered part of the class definition and not the instance.
+        #TODO: should author write each filed ? Can he leave empty fields?
         assert(self._unique_name)
         assert(self._summary_text)
         assert(self._problem_text)
         assert(self._answer_text)
-
 
         #Create if not exist: exercise working directory (images, latex,...)
         self.working_dir = os.path.join(MEGUA_OUTPUT_DIR,self._unique_name)
@@ -220,7 +224,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         self.has_instance = False
         self._current_problem = None
         self._current_answer = None   
-        self.update(ekey,edict)
+        self.update_timed(ekey,edict)
 
 
     def __str__(self):
@@ -230,6 +234,37 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
     def _repr_(self): 
         return "%s(edict=%s)" % (self._unique_name,repr(self.__dict__))
+
+
+    def update_timed(self,ekey=None,edict=None, render_method=None):
+        r"""calls ex.update() but controls execution time.
+        """
+        self.has_instance = False
+        
+        try:
+
+            #Keep author in control of max time in megbook.
+
+            #alarm is from sage.misc.misc
+            if not self._megbook:
+                alarm(5)
+            else:                
+                alarm(self._megbook.max_computation_time)
+            
+            self.update(ekey,edict,render_method)
+
+        except KeyboardInterrupt:
+
+            print 'Exercise is taking too long to make!'
+            print 'Check make_random() routine or increase meg.max_computation_time.'
+            # if the computation finished early, though, the alarm is still ticking!
+            # so let's turn it off below.
+            raise KeyboardInterrupt
+
+        #Turn off alarm because make has been done in time.
+        #cancel_alarm is from sage.misc.misc
+        cancel_alarm()             
+        
 
 
     def update(self,ekey=None,edict=None, render_method=None):
@@ -245,6 +280,11 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         - http://stackoverflow.com/questions/5268404/what-is-the-fastest-way-to-check-if-a-class-has-a-function-defined
         
         """
+
+
+
+        self.has_instance = False
+
 
         #Graphics
         if render_method:
@@ -275,7 +315,9 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         self._current_problem = self.searchreplace(self._problem_text)
         self._current_answer = self.searchreplace(self._answer_text)
 
+
         self.has_instance = True
+
 
 
     def update_dict(self,edict=None):
@@ -319,12 +361,20 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         return text
 
 
-    def check(self,max_computation_time):
-        #TODO: test several keys for maxtime.
-        #1. test code several times
-        #2. test compilations, for example
-        #Use alarm(max_computation_time)
-        pass
+    def try_random_updates(self,maxiter=None):
+        r"""This method is called by megbook.save() before
+        an exercise is saved into database.
+        """
+        print "Trying several ekeys ..."
+
+        start = 0 #TODO: choose a random start
+
+        if not maxiter:
+            maxiter = self._megbook.max_tried_instances
+            
+        for ekey in range(start,start+maxiter):
+            print "    Testing for random key: ekey=",ekey
+            self.update_timed(ekey=ekey)
 
 
     def get_ekey(self):

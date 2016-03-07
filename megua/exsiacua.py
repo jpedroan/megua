@@ -19,8 +19,7 @@ A Siacua exercise in portuguese:
 
 ::
 
-       sage: from megua.megbook import MegBook 
-       sage: from megua.exsiacua import ExSiacua
+       sage: from megua.all import *
        sage: meg = MegBook(r'_input/megbook.sqlite') 
        sage: meg.save(r'''
        ....: %SUMMARY Probabilidade; Regra de Laplace
@@ -112,14 +111,14 @@ Another example that is sent to siacua system:
        ....: Lança-se o dado e tira-se, ao acaso, uma bola da caixa.
        ....: Qual é a probabilidade de os números saídos serem ambos menores que v2?  
        ....:  
-       ....: %answer
-       ....:  
        ....: <multiplechoice>
        ....: <choice> $$vresp$$ </choice>
        ....: <choice> $$err1$$ </choice>
        ....: <choice> $$err2$$ </choice>
        ....: <choice> $$err3$$ </choice>
        ....: </multiplechoice>
+       ....:  
+       ....: %answer
        ....:  
        ....: A resposta é $vresp$.
        ....:  
@@ -187,7 +186,7 @@ Another example that is sent to siacua system:
        ....: ''')
        exsiacua module: open file _output/E97K50_Laplace_001/E97K50_Laplace_001.html in the browser and press F5.
        sage: ex = meg.new("E97K50_Laplace_001", returninstance=True)
-       sage: ex.siacua(ekeys=[9],sendpost=True,course="matsec",usernamesiacua="f1183",siacuatest=True) #long output
+       sage: #ex.siacua(ekeys=[9],sendpost=True,course="matsec",usernamesiacua="f1183",siacuatest=True) #long output
 
 
 DEVELOPER NOTES:
@@ -238,7 +237,7 @@ from megua.mconfig import *
 class ExSiacua(ExerciseBase):    
 
 
-    def update(self,ekey=None,edict=None):
+    def update(self,ekey=None,edict=None, render_method=None):
 
         #For multiplechoice
         self.all_choices = []
@@ -601,7 +600,7 @@ class ExSiacua(ExerciseBase):
         for e_number in ekeys:
 
             #Create exercise instance
-            self.update(ekey=e_number)
+            self.update_timed(ekey=e_number)
 
 
             # OLD OLD OLD OLD 

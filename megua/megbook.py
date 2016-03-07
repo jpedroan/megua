@@ -82,9 +82,11 @@ Save a new or changed exercise:
    ....:   
    ....: %Problem Long Computation Problem
    ....: What is the long primitive of ap x + bp@() ?
-   ....: 
+   ....:  
    ....: %Answer
-   ....: 
+   ....:  
+   ....: prim1
+   ....:  
    ....: class E28E28_pdirect_001(ExerciseBase):
    ....: 
    ....:     def make_random(self,edict=None):
@@ -93,27 +95,34 @@ Save a new or changed exercise:
    ....:         sleep(15)  
    ....:         #do something else.
    ....: ''')
-   Exercise is taking too long to calculate!
-   Check make_random() routine or increase max_computation_time = ... in save().
+   Exercise is taking too long to make!
+   Check make_random() routine or increase meg.max_computation_time.
    Exercise was not saved.
 
+
+::
+
+   sage: meg.max_computation_time = 30  #increase patience.
    sage: meg.save(r'''
    ....: %Summary Long Computations Section; Example 2
    ....: Changing maximum length of computation time.
-   ....:   
+   ....:    
    ....: %Problem Long Computation Problem
    ....: What is the long primitive of ap x + bp@() ?
-   ....: 
+   ....:  
    ....: %Answer
-   ....: 
+   ....:  
+   ....: prim1
+   ....:  
    ....: class E28E28_pdirect_001(ExerciseBase):
-   ....: 
+   ....:  
    ....:     def make_random(self,edict=None):
    ....:         #suppose a 15 seconds computation here
    ....:         #maximum by default is 10 (see MegBook)
    ....:         sleep(15)  
    ....:         #do something else.
-   ....: ''', max_computation_time = 30) #increase patience.
+   ....:            
+   ....: ''') 
    -------------------------------
    Instance of: E28E28_pdirect_001
    -------------------------------
@@ -122,7 +131,7 @@ Save a new or changed exercise:
    ==> Problem instance
    What is the long primitive of ap x + bp ?
    ==> Answer instance
-   <BLANKLINE>
+   prim1
 
    
 Search an exercise:
@@ -142,6 +151,25 @@ Remove an exercise:
    Exercise 'E28E28_pdirect_001' stored on text file _output/E28E28_pdirect_001.txt.
    sage: meg.remove('E28E28_nonexistant',dest=r'_output')
    Exercise E28E28_nonexistant is not on the database.
+
+
+
+DEVELOP:
+
+Execution time control
+
+- authors don't want to wait to much time for an "answer"
+- the programming part (python/sage,...)  running must be time controlled
+- the markup language (latex, html, ...) instance must be time controlled
+
+Example: The laTeX compilation could took to much time and a warning must be issued.
+
+
+Meaning of _ and __ (double underscorre):
+
+TODO: read http://stackoverflow.com/questions/1301346/the-meaning-of-a-single-and-a-double-underscore-before-an-object-name-in-python
+
+
 
 """
 
@@ -193,6 +221,7 @@ from megua.parse_ex import parse_ex
 from megua.tounicode import to_unicode
 from megua.jinjatemplates import templates
 from megua.ur import ur
+from megua.megsiacua import MegSiacua
 #from platex import pcompile
 #from xmoodle import MoodleExporter
 #from xsphinx import SphinxExporter
@@ -203,7 +232,7 @@ from megua.ur import ur
 
 
 
-class MegBook:
+class MegBook(MegSiacua):
     r"""
     A book of exercises of several markup languages.
     
@@ -240,8 +269,10 @@ class MegBook:
         #For template. See template_create function.
         self.template_row = None
 
-        #(default, in seconds) author can change this value.
+        #In seconds, author can change this value when calling save()
         self.max_computation_time = 10 
+        #In seconds, author can change this value when calling save()
+        self.max_tried_instances = 10 
 
         ExerciseBase._megbook = self
 
@@ -257,14 +288,13 @@ class MegBook:
         raise NotImplementedError
         
         
-    def save(self,uexercise,max_computation_time = None):
+    def save(self,uexercise):
         r"""
         Save an exercise defined on a `python string`_ using a specific sintax defined here_.
 
         INPUT::
 
-        - ``uexercise`` -- an exercise textual description (unicode string).
-        - ``max_computation_time`` -- max time!
+        - ``uexercise`` -- an exercise textual description (utf8 string).
         
         OUTPUT::
         
@@ -275,56 +305,50 @@ class MegBook:
         - An exercise textual description must be processed.
 
         """
-
-        if max_computation_time:
-            assert(1<max_computation_time<5*60)
-            self.max_computation_time = max_computation_time
         
-        
-        #First check: syntatic level ("megua" script)
-        row =  parse_ex(to_unicode(uexercise))
-
-        #Second check: syntatic and runtime  ("python/sagemath" script)
-        ex_instance = self.exerciseinstance(row,ekey=0)            
-        
-        if ex_instance:
-            
-            #Third check: creating several instances; create content.
-            ex_instance.check(self.max_computation_time) #3 seconds
-
-
-            #After all that, save it on database:                        
-            self.megbook_store.insertchange(row)
-        
+        try:
+            #First check: syntatic level ("megua" script)
+            row =  parse_ex(to_unicode(uexercise))
+            if not row:
+                raise
+            #Second check: syntatic and runtime  ("python/sagemath" script)
+            ex_instance = self.exerciseinstance(row,ekey=0)            
+            #Third check: create contens (latex compilation, for example)
             ex_instance.print_instance()
+        except:
+            print "Exercise was not saved."
+        
+        
+        #After all that, save it on database:                        
+        self.megbook_store.insertchange(row)
+        
 
-        else:
+
             
-            print "megbook module: the exercise was not saved."
-            
 
-    def check_all(self,dest='.'):
-        r""" 
-        Check all exercises of this megbook for errrors.
-
-        INPUT:
-
-        OUTPUT:
-
-            Printed message and True/False value.
-        """
-
-        all_ex = []
-        for row in ExIter(self.megbook_store):
-            if not self.is_exercise_ok(row,dest,silent=True):
-                print "   Exercise '%s' have python/sage or compilation errors." % row['unique_name']
-                all_ex.append(row['unique_name'])
-        if all_ex:
-            print "Review the following exercises:"
-            for r in all_ex:
-                print r
-        else:
-            print "No problem found."
+#TODO: improve or adpat this check_all method
+#    def check_all(self,dest='.'):
+#        r""" 
+#        Check all exercises of this megbook for errrors.
+#
+#        INPUT:
+#
+#        OUTPUT:
+#
+#            Printed message and True/False value.
+#        """
+#
+#        all_ex = []
+#        for row in ExIter(self.megbook_store):
+#            if not self.is_exercise_ok(row,dest,silent=True):
+#                print "   Exercise '%s' have python/sage or compilation errors." % row['unique_name']
+#                all_ex.append(row['unique_name'])
+#        if all_ex:
+#            print "Review the following exercises:"
+#            for r in all_ex:
+#                print r
+#        else:
+#            print "No problem found."
 
 
 
@@ -501,20 +525,13 @@ class MegBook:
 
         """
     
-        # TODO: control the time and the process
+        # TODO: control the time and the process. Is it of value?
 
-        try:
-            alarm(self.max_computation_time)
-            sage_class_string = preparse(row['class_text'])
-            sage_class_string = u"from megua.all import *\n" + sage_class_string
-            exec sage_class_string
-        except KeyboardInterrupt:
-            print 'Exercise is taking too long to calculate!'
-            print 'Check __init__ routine or increase max_computation_time = ... in save().'
-            # if the computation finished early, though, the alarm is still ticking!
-            # so let's turn it off below.
-            return None
-# TODO NOW: ACABAR ISTO
+        sage_class_string = preparse(row['class_text'])
+        sage_class_string = u"from megua.all import *\n" + sage_class_string
+        exec sage_class_string
+
+         # TODO NOW: ACABAR ISTO
 #        except: 
 #            tmp = "_temp" #tempfile.mkdtemp()
 #            pfilename = tmp+"/"+row["unique_name"]+".sage"
@@ -542,7 +559,7 @@ class MegBook:
         #class fields
         ex_class._summary_text = row['summary_text']
         ex_class._problem_text = row['problem_text']
-        ex_class._answer_text  = row['answer_text']
+        ex_class._answer_text  = row['answer_text'] 
         ex_class._unique_name  = row['unique_name']
     
         return ex_class
@@ -575,19 +592,13 @@ class MegBook:
         #Create the class (not yet the instance). 
         #See exerciseclass definition above.
         ex_class = self.exerciseclass(row)    
-    
-        #Create one instance of ex_class
+
+
+        #TODO: remove this and active "try" below
         ex_instance = ex_class(ekey,edict)
-# TODO NOW: ACABAR ISTO
+    
 #        try:
-#            alarm(self.max_computation_time)
 #            ex_instance = ex_class(ekey,edict)
-#        except KeyboardInterrupt:
-#            print 'Exercise is taking too long to calculate!'
-#            print 'Check make_random() routine or increase max_computation_time = ... in save().'
-#            # if the computation finished early, though, the alarm is still ticking!
-#            # so let's turn it off below.
-#            return None
 #        except: 
 #            tmp = "_temp" # tempfile.mkdtemp()
 #            pfilename = tmp+"/"+row["unique_name"]+".sage"
@@ -607,118 +618,48 @@ class MegBook:
 #            ######os.system("rm -r %s" % tmp)
 #            print err_log
 #            return None #raise #Need to specify "raise Exception"?  
-
-        #Turn off alarm.
-        cancel_alarm()             
-
-        ex_instance = ex_class(ekey,edict)        
         
         return ex_instance
     
     
-    
-    def get(self,unique_name,ekey=None,edict=None):
-        r"""
 
-        INPUT:
+#TODO: remove get method ?    
+#    def get(self,unique_name,ekey=None,edict=None):
+#        r"""
+#
+#        INPUT:
+#
+#        - ``unique_name``: problem name (name in "class E12X34_something_001(Exercise):").
+#        - ``ekey``: numbers that generate the same problem instance.
+#        - ``edict``: dictionary of values
+#
+#        OUTPUT:
+#
+#        - this command writes an html file with all instances.
+#
+#        NOTE:
+#
+#        - you can export between 3 and 6 wrong options and 1 right.
+#
+#            
+#        Algorithm:
+#            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
+#
+#        """    
+#        
+#        #Create exercise instance
+#        row = self.megbook_store.get_classrow(unique_name)
+#        if not row:
+#            print "Exercise %s not found." % unique_name
+#            return
+#
+#        if ekey or edict:
+#            return self.exerciseinstance(row,ekey,edict)
+#        else:
+#            return self.exerciseclass(row) 
 
-        - ``unique_name``: problem name (name in "class E12X34_something_001(Exercise):").
-        - ``ekey``: numbers that generate the same problem instance.
-        - ``edict``: dictionary of values
 
-        OUTPUT:
 
-        - this command writes an html file with all instances.
-
-        NOTE:
-
-        - you can export between 3 and 6 wrong options and 1 right.
-
-            
-        Algorithm:
-            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
-
-        """    
-        
-        #Create exercise instance
-        row = self.megbook_store.get_classrow(unique_name)
-        if not row:
-            print "Exercise %s not found." % unique_name
-            return
-
-        if ekey or edict:
-            return self.exerciseinstance(row,ekey,edict)
-        else:
-            return self.exerciseclass(row) 
-
-    def check_sagepythoncode(row,start=0,many=5, edict=None,silent=False):
-        r"""
-        Test an exercise with random keys.
-    
-        INPUT:
-    
-         - ``row`` -- dictionary with class textual definitions.
-         - ``start`` -- the parameteres will be generated for this random seed for start.
-         - ``many`` -- how many keys to generate. 
-         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-    
-        OUTPUT:
-    
-            Printed message and True/False value.
-    
-        TODO: change this function name to exercise_test.
-        """
-    
-        success = True
-    
-        
-    
-        #Testing for SyntaxErrors
-        if not silent:
-            print "Check '%s' for syntatical errors on Python code." % row['unique_name'] #TODO: add here a link to common syntatical error 
-    
-        try:
-            #compiles and produces a class in memory (but no instance)
-            exerciseclass(row)
-            if not silent:
-                print "    No syntatical errors found on Python code."
-        except:
-            success = False
-        
-    
-        if success:
-    
-            #Testing for semantical errors
-            if not silent:
-                #print "Execute python class '%s' with %d different keys searching for semantical errors in the algorithm." % (row['unique_name'],many)
-                print "Execute python class '%s' with %d different keys" % (row['unique_name'],many)
-    
-            try:
-    
-                for ekey in range(start,start+many):
-                    if not silent:
-                        print "    Testing for random key: ekey=",ekey
-                    exerciseinstance(row,ekey=ekey,edict=edict)
-    
-            except: # Exception will be in memory.
-                print "    Error on exercise '{0}' with parameters edict={1} and ekey={2}".format(row['unique_name'],edict,ekey)
-                success = False #puxar para a frente
-                #NOTES:
-                #TODO: check http://docs.python.org/2/tutorial/errors.html 
-                # ("One may also instantiate an exception first" ...)
-                #TODO: remove this
-    
-            
-        #Conclusion
-        if not silent:
-            if success:
-                print "    No problems found in Python."
-            else:
-                print "    Please review the code '%s' based on the reported cases." % row['unique_name']
-    
-        return success
-    
-    
 
 
     def thesis(self,problem_list):
@@ -933,52 +874,6 @@ class MegBook:
         ofile.write(html_string)
         ofile.close()
 
-    #TODO: rever isto tudo
-    def siacua(self,exname,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
-        r"""
-
-        INPUT:
-
-        - ``exname``: problem name (name in "class E12X34_something_001(Exercise):").
-
-        - ``ekeys``: list of numbers that generate the same problem instance.
-
-        - ``sendpost``: if True send information to siacua.
-
-        - ``course``: Right now could be "calculo3", "calculo2". Ask siacua administrator for more.
-
-        - ``usernamesiacua``: username used by the author in the siacua system.
-
-        - ``grid2x2``: write user options in multiplechoice in a 2x2 grid (useful for graphics) values in {0,1}.
-
-        OUTPUT:
-
-        - this command prints the list of sended exercises for the siacua system.
-
-        NOTE:
-
-        - you can export between 3 and 6 wrong options and 1 right.
-
-        EXAMPLE:
-
-            ssssage: meg.siacua(exname="E12X34",ekeys=[1,2,5],sendpost=True,course="calculo2",usernamesiacua="jeremias")
-
-        TODO:
-
-        - securitykey: implemenent in a megua-server configuration file.
-
-        LINKS:
-            http://docs.python.org/2/library/json.html
-            http://stackoverflow.com/questions/7122015/sending-post-request-to-a-webservice-from-python
-
-        Algorithm:
-            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
-
-        TESTS:
-            ~/Dropbox/all/megua/archive$ sage jsontest.sage
-
-        """
-        raise
 
 
 def m_get_sections(sectionstxt):
