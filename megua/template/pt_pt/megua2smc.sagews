@@ -6,7 +6,7 @@
 
 {{marker_cell}}{{uuid2}}a{{marker_cell}}
 from megua.all import *
-meg = MegBook('{{filename}}')
+meg = MegBook('{{megbookfilename}}')
 {{marker_cell}}{{uuid3}}{{marker_cell}}
 meg.save(r'''
 %SUMMARY  {{sections}}
@@ -29,10 +29,5 @@ meg.save(r'''
 
 {{marker_cell}}{{uuid4}}{{marker_cell}}
 
-     if html:
-            out += MARKERS['cell'] + uuid() + 'i' + MARKERS['cell'] + u'\n'
-            out += '%html\n'
-            out += html + u'\n'
-            out += (u'\n' + MARKERS['output'] + uuid() + MARKERS['output'] +
-                    json.dumps({'html':html}) + MARKERS['output']) + u'\n'
+meg.new("{{unique_name}}",ekey=10)
 

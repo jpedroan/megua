@@ -17,4 +17,4 @@ from megua.megbook import MegBook
 #Exercise Types
 from megua.exbase import ExerciseBase
 from megua.exsiacua import ExSiacua
-from megua.exlatex import ExLaTeX
+from megua.exlatex import ExLatex

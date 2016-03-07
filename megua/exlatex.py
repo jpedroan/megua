@@ -37,7 +37,7 @@ Creation a LaTeX exercise:
        ....: %Answer
        ....: The answer is $prim1+C$, with C a real number.
        ....:  
-       ....: class E28E28_pdirect_001(ExLaTeX):
+       ....: class E28E28_pdirect_001(ExLatex):
        ....:  
        ....:     def make_random(self):
        ....:         # make a problem instance
@@ -73,7 +73,7 @@ from megua.jinjatemplates import templates
 from megua.mconfig import MEGUA_PLATFORM
 
 
-class ExLaTeX(ExerciseBase):
+class ExLatex(ExerciseBase):
    
 
     def _latex_string(self):

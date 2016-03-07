@@ -36,7 +36,7 @@ Creation a LaTeX exercise:
        ....: %Answer
        ....: The answer is $prim1+C$, with C a real number.
        ....:  
-       ....: class E28E28_pdirect_001(ExLaTeX):
+       ....: class E28E28_pdirect_001(ExAMC):
        ....:  
        ....:     def make_random(self):
        ....:         # make a problem instance
