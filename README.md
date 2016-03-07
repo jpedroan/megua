@@ -19,4 +19,10 @@ There are two branches in this repository:
 - **old_megua**: running in a non public server from november 2010 to 2015 (well 5 years...!!).
 - **master**: version to be adopted for SageMathCloud use, command-line, etc. 
 
+DEVELOP
+-------
+
+* aalib: download, gunzip, untar
+* aalib: sage -python setup.py install 
+* etoolbox.sty: sudo apt-get install texlive-latex-extra
 

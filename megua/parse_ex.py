@@ -59,7 +59,7 @@ re_answer = re.compile(ur'[ \t]*%[ \t]*answer[ \t]*(.*)\n',re.IGNORECASE|re.U)
 #Includes grammar for class name in form: E dd letter dd
 #re_class = re.compile(ur'^class[ \t]+(E(\d\d(\b|[\-a-zA-Z])(\b|\d\d))_\w+_\d+)\(Exercise\):\s*',re.U)
 #In this re_class the prefix is less rigorous.
-re_class = re.compile(ur'^class[ \t]+(E([a-zA-Z0-9]+)_\w+_\d+)\(\w+\):\s*',re.U)
+re_class = re.compile(ur'^class[ \t]+(E([a-zA-Z0-9]+)_\w+_.+)\(\w+\):\s*',re.U)
 
 re_wrongclass = re.compile(ur'[ \t]*class[ \t]+(.+):\s*',re.U)
 

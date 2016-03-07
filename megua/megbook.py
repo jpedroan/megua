@@ -73,6 +73,8 @@ Save a new or changed exercise:
    What is the primitive of -1 x + (-5/4) ?
    ==> Answer instance
    prim1
+   sage: meg
+    MegBook('_output/megbasedb.sqlite')
 
    Long computation? Two examples follow:
    
@@ -281,7 +283,6 @@ class MegBook(MegSiacua):
         return "MegBook('%s')" % self.local_store_filename
 
     def __repr__(self):
-        print self.local_store_filename	
         return "MegBook('%s')" % self.local_store_filename
 
     def make_index(self,where='.',debug=False):
