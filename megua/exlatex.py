@@ -121,7 +121,6 @@ class ExLatex(ExerciseBase):
         if MEGUA_PLATFORM=='sagews':
             from smc_sagews.sage_salvus import salvus
             fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
-            salvus.pdf(fullpath)
             salvus.file(fullpath,show=True,raw=True)
             print ""
             fullpath = os.path.join(self.working_dir, 'utf8-'+self.unique_name()+'.tex')
@@ -129,6 +128,8 @@ class ExLatex(ExerciseBase):
             print ""
             fullpath = os.path.join(self.working_dir, self.unique_name()+'.tex')
             salvus.file(fullpath,show=True,raw=True)
+            print ""
+            salvus.pdf(fullpath)
         else: #MEGUA_PLATFORM=='commandline'
             fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
             print "exlatex module: open pdf file",fullpath

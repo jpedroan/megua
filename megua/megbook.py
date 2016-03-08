@@ -288,8 +288,7 @@ class MegBook(MegSiacua):
     def make_index(self,where='.',debug=False):
         #warnings.warn("make_index() is deprecated. TODO: what to do ?", DeprecationWarning)
         raise NotImplementedError
-        
-        
+
     def save(self,uexercise):
         r"""
         Save an exercise defined on a `python string`_ using a specific sintax defined here_.
@@ -308,17 +307,19 @@ class MegBook(MegSiacua):
 
         """
         
-        try:
+#TODO: improve this try because it's hidding programmer coding errors and not only  author coding errors.
+#        try:
             #First check: syntatic level ("megua" script)
-            row =  parse_ex(to_unicode(uexercise))
-            if not row:
-                raise
-            #Second check: syntatic and runtime  ("python/sagemath" script)
-            ex_instance = self.exerciseinstance(row,ekey=0)            
-            #Third check: create contens (latex compilation, for example)
-            ex_instance.print_instance()
-        except:
-            print "Exercise was not saved."
+        row =  parse_ex(to_unicode(uexercise))
+        if not row:
+            raise
+        #Second check: syntatic and runtime  ("python/sagemath" script)
+        ex_instance = self.exerciseinstance(row,ekey=0)            
+        #Third check: create contens (latex compilation, for example)
+        ex_instance.print_instance()
+
+#       except:
+#           print "Exercise was not saved."
         
         
         #After all that, save it on database:                        

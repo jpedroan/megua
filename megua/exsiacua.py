@@ -332,8 +332,9 @@ class ExSiacua(ExerciseBase):
         
             
         if MEGUA_PLATFORM=='sagews':
-            import salvus
-            salvus.file(html_filename)
+            from smc_sagews.sage_salvus import salvus
+            salvus.file(html_filename,show=True,raw=True)
+            print ""
             salvus.html(html_string)
         else: #MEGUA_PLATFORM=='commandline'
             print "exsiacua module: open file",html_filename,"in the browser and press F5."        
