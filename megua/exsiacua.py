@@ -21,6 +21,7 @@ A Siacua exercise in portuguese:
 
        sage: from megua.all import *
        sage: meg = MegBook(r'_input/megbook.sqlite') 
+       MegBook('_input/megbook.sqlite')
        sage: meg.save(r'''
        ....: %SUMMARY Probabilidade; Regra de Laplace
        ....:  
@@ -93,6 +94,7 @@ Another example that is sent to siacua system:
        sage: from megua.megbook import MegBook 
        sage: #from megua.exsiacua import ExSiacua
        sage: meg = MegBook(r'_input/megbook.sqlite') 
+       MegBook('_input/megbook.sqlite')
        sage: meg.save(r'''
        ....: %summary Regra de Laplace
        ....:  

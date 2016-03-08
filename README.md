@@ -25,4 +25,9 @@ DEVELOP
 * aalib: download, gunzip, untar
 * aalib: sage -python setup.py install 
 * etoolbox.sty: sudo apt-get install texlive-latex-extra
+* salvus: /projects/sage/sage-6.10/local/lib/python2.7/site-packages/smc_sagews
+* from smc_sagews.sage_salvus import salvus #Functions: salvus.file(), salvus.html()
+* sage_server.py: contains definitions of "def file()" and "def html()", see useful arguments
+
+
 
