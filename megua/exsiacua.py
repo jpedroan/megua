@@ -330,6 +330,7 @@ class ExSiacua(ExerciseBase):
         
             
         if MEGUA_PLATFORM=='sagews':
+            import salvus
             salvus.file(html_filename)
             salvus.html(html_string)
         else: #MEGUA_PLATFORM=='commandline'
@@ -530,6 +531,7 @@ class ExSiacua(ExerciseBase):
         f.close()
          
         if MEGUA_PLATFORM=='sagews':
+            import salvus
             salvus.file(html_filename)
             #salvus.html(html_string)
         else: #MEGUA_PLATFORM=='commandline'
@@ -679,6 +681,7 @@ class ExSiacua(ExerciseBase):
             #TODO: remove extra newlines that the user sees on notebook.
             data = response.read()
             if MEGUA_PLATFORM=='sagews':
+                import salvus
                 salvus.html(data.strip())
             else: #MEGUA_PLATFORM=='commandline'
                 print data.strip()

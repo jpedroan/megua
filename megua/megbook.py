@@ -277,7 +277,7 @@ class MegBook(MegSiacua):
         self.max_tried_instances = 10 
 
         ExerciseBase._megbook = self
-
+        print self.__repr__()
 
     def __str__(self):
         return "MegBook('%s')" % self.local_store_filename

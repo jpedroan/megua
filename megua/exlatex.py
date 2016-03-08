@@ -14,7 +14,7 @@ AUTHORS:
 EXAMPLES
 
 ::
-  
+
     sage -t exlatex.py
 
 Creation a LaTeX exercise:
@@ -119,12 +119,16 @@ class ExLatex(ExerciseBase):
             raise
 
         if MEGUA_PLATFORM=='sagews':
-            fullpath = os.path.join(self.working_dir, 'utf8-'+self.unique_name()+'.tex')
-            salvus.file(fullpath)
-            fullpath = os.path.join(self.working_dir, self.unique_name()+'.tex')
-            salvus.file(fullpath)
+            from smc_sagews.sage_salvus import salvus
             fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
-            salvus.file(fullpath)
+            salvus.pdf(fullpath)
+            salvus.file(fullpath,show=True,raw=True)
+            print ""
+            fullpath = os.path.join(self.working_dir, 'utf8-'+self.unique_name()+'.tex')
+            salvus.file(fullpath,show=True,raw=True)
+            print ""
+            fullpath = os.path.join(self.working_dir, self.unique_name()+'.tex')
+            salvus.file(fullpath,show=True,raw=True)
         else: #MEGUA_PLATFORM=='commandline'
             fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
             print "exlatex module: open pdf file",fullpath
