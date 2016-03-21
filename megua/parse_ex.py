@@ -16,6 +16,8 @@ IMPLEMENTATION NOTES:
 
 * Test with ``sage -t paramparse.py``.
 * This is a pure Python module that can be adapted to a windows ``meg`` system using Sympy for example.
+* TODO: warn if summary, problem, answer or class are empty strings.
+
 
 """
 
@@ -262,7 +264,8 @@ def parse_ex(inputtext):
     state = ExState.STARTING_BLANKS
 
     error_found = False
-
+    warn_found = False
+    
     while current<numlines and not error_found:
 
         tag = classlines[current].linetag
@@ -283,6 +286,7 @@ def parse_ex(inputtext):
                     if txtinfo == '':
                         print "Each exercise can belong to a section/subsection/subsubsection. \n"\
                               "Write sections using ';' in the '%summary' line. For ex., '%summary Section; Subsection; Subsubsection'.\n"
+                        warn_found = True      
                     txt_sections = txtinfo
                 #TODO review: txt_summary = '\n%summary ' + txtinfo + '\n'
                 txt_summary = '\n'
@@ -306,7 +310,8 @@ def parse_ex(inputtext):
                     if txtinfo == '':
                         print "Each problem can have a suggestive name. \n"\
                               "Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.\n"
-                    txt_problemname = txtinfo
+                        warn_found = True     
+                    txt_problemname = '(...)' #txtinfo
                 #TODO Review this txt_problem = '\n%problem ' + txtinfo + '\n'
                 txt_problem = '\n'
                 current+=1
@@ -328,6 +333,7 @@ def parse_ex(inputtext):
                     txtinfo = classlines[current].lineinfo.strip()
                     if  txtinfo != '':
                         print "Ignoring text '" + txtinfo + "' in %answer tag at line {0}.\n".format(current+1)
+                        warn_found = True
                 current+=1
             else:
                 error_found = True
@@ -371,6 +377,13 @@ def parse_ex(inputtext):
         error_found = True
         print "Expected python/sage class definition on line %d or class identifier is wrong." % (current+1)
         print "Class identifier must follow a name like: E12A34_somename_number."
+
+    if warn_found:
+        if "unique_name" in locals() and unique_name:
+            print "Check exercise %s for the above warnings." % unique_name.strip()
+        else:
+            print "Check the exercise for the above warnings."
+
 
     if error_found:
         return None

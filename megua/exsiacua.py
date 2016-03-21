@@ -219,7 +219,6 @@ import codecs
 # http://www.doughellmann.com/PyMOTW/warnings/
 #import warnings
 #import tempfile
-#import tikzmod
 #import subprocess
 
 
@@ -234,6 +233,7 @@ from megua.ug import UnifiedGraphics
 from megua.ur import ur
 from megua.jinjatemplates import templates
 from megua.mconfig import *
+from megua.platex import html2latex
 
 
 class ExSiacua(ExerciseBase):    
@@ -254,18 +254,21 @@ class ExSiacua(ExerciseBase):
         #If exist information about MC
         #extracts it to local variables.
         #All after all replacements
+
         if "multiplechoice" in self.problem():
             self._multiplechoice_parser(self.problem(),where="problem")
             self.detailed_answer = self.answer()
         else:
+            print self.unique_name()," has multiplechoice in answer part "
             self._multiplechoice_parser(self.answer(),where="answer")
 
+
          
-    def searchreplace(self,input_text):
+    def search_replace(self,input_text):
         """Called after parameter_change call. See above."""
 
         #Base tranformation
-        text = ExerciseBase.searchreplace(self,input_text)
+        text = ExerciseBase.search_replace(self,input_text)
 
         #Other transformations
         text = self.latex_render(text) #ver UnifiedGraphics
@@ -356,7 +359,9 @@ class ExSiacua(ExerciseBase):
         """
 
         if "CDATA" in input_text:
-            print "#TODO: should issue warning when CDATA and multiplechoice are both present."
+            print "TODO: in %s, should issue warning when CDATA and multiplechoice are both present." % self.unique_name()
+            self.detailed_answer = "Contains [CDATA]\n"
+            self.all_choices = []
             return 
 
 
@@ -892,6 +897,53 @@ class ExSiacua(ExerciseBase):
         self.siacua_parameters = dict(level=level, slip=slip, guess=guess,discr=discr)
         self.siacua_concepts = concepts
 
+
+
+    #ExSiacua specific conversion
+    TO_LATEX = [
+        (u'<multiplechoice>', '\n\n'+r'\\begin{enumerate}'+'\n\n'),
+        (u'</multiplechoice>', r'\\end{enumerate}'+'\n\n'),
+        (u'<choice>', r'\\singleoption '),    #quadra is \item[\quadra\hspace*{0.5cm}]
+        (u'</choice>', '\n\n'),    
+    ]
+
+
+    @staticmethod
+    def to_latex(txt):
+        r"""Convert this siacua exercise into latex:
+        - <multiplechoice> tag is converted to \begin{itemize}
+        - html tags and mathjax is converted using pandoc tool.
+        
+        
+        EXAMPLE::
+        
+        sage: from megua.exsiacua import ExSiacua
+        sage: txt = ur'''
+        ....: <center>CENTERED</center>
+        ....: <multiplechoice>
+        ....: <choice> 
+        ....: $$f1=\sum_{n=0}^{+\infty}{ser1}, \quad x \in intc1$$
+        ....: </choice>
+        ....: <choice>  
+        ....: $$f1=\sum_{n=0}^{+\infty}{ser1}, \quad x \in intw1$$
+        ....: </choice>
+        ....: <choice>  
+        ....: $$\ln{\left(f11\right)}=\sum_{n=0}^{+\infty}{intser11}
+        ....: card1 +lb1 , \quad x \in intw1$$
+        ....: </choice>
+        ....: </multiplechoice> '''
+        sage: ExSiacua.to_latex(txt)
+ 
+        """
+        
+        #Basic conversion
+        #txt = txt.encode('utf8')
+        newtext = html2latex(txt)
+        
+        for pr in ExSiacua.TO_LATEX: #see above, outside function
+            (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
+        
+        return newtext
 
 
 

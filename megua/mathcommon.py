@@ -39,6 +39,7 @@ does not work.
 """
 
 #PYTHON modules
+from string import join
 import jinja2
 import os
 
@@ -79,6 +80,71 @@ x,y=var('x,y')
 #For 4 digit numbers.
 R15=RealField(15)
 
+#For more digit numbers
+R20 = RealField(20)
+
+
+##############
+#TikZmod -- Routines to convert sage plots into latex TikZ markup.
+##############
+
+
+def getpoints_str(pointlist):
+    return join( [ str( ( R20(p[0]), R20(p[1]) ) ) for p in pointlist ], ' ' )
+
+
+def tikz_axis(vmin,vmax,axis='x', points=None, ticksize=2, originlabels=True):
+    r"""
+    Draw the vertical or horizontal 2d axis.
+
+    INPUT:
+
+    - ``vmin``: first point of the axis.
+
+    - ``vmax``: last point of the axis (where the arrow ends).
+
+    - ``axis``: 'x' or 'y'.
+
+    - ``points``: if None, points are guessed. Otherwise they are used to place marks.
+
+    - ``originlabels'': (dafault True) If false (0,0) won't have labels.
+
+
+    Specials thanks to Paula Oliveira for the first version.
+
+    Other resource: http://matplotlib.org/users/pgf.html#pgf-tutorial
+
+    """
+    
+    if points is None:
+        #integer tick marks only (for now)
+        first_int = floor(vmin)
+        last_int  = ceil(vmax)
+        #last_int - first_int + 1 gives all integers,
+        #but the last point is the arrow vertice: no label and no tick mark so "+1" is not added.
+        points = [ i+first_int for i in range(last_int - first_int) ] 
+        if not originlabels and 0 in points:
+            pos = points.index(0)
+            del points[pos]
+    else:
+        first_int = min(points)
+        last_int  = max(points) + 1 #added +1 for the reason above.
+
+    if axis=='x':
+        #integer tick marks
+        tmarks = r'\foreach \x in %s' % Set(points)
+        tmarks += r'\draw[color=black] (\x,-%d pt) node[below] {\scriptsize $\x$} -- (\x,%d pt) ;' % (ticksize,ticksize)
+        #main line and arrow at end
+        tmain = r'\draw[->,color=black] (%f,0) -- (%f,0);' % (first_int,last_int)
+    else:
+        #integer tick marks
+        tmarks = r'\foreach \y in %s' % Set(points)
+        tmarks += r'\draw[color=black] (-%d pt,\y) node[left] {\scriptsize $\y$} -- (%d pt,\y);' % (ticksize,ticksize)
+        #main line and arrow at end
+        tmain = r'\draw[->,color=black] (0,%f) -- (0,%f);' % (first_int,last_int)
+
+    return tmain + tmarks
+    
 
 # =====================
 # Google charts
@@ -366,63 +432,6 @@ def factb(xv):
     return FORMALFACT(xv)
 
 
-# =========
-# TikZ Graphics
-#================
-
-
-def tikz_axis(vmin,vmax,axis='x', points=None, ticksize=2, originlabels=True):
-    r"""
-    Draw the vertical or horizontal 2d axis.
-
-    INPUT:
-
-    - ``vmin``: first point of the axis.
-
-    - ``vmax``: last point of the axis (where the arrow ends).
-
-    - ``axis``: 'x' or 'y'.
-
-    - ``points``: if None, points are guessed. Otherwise they are used to place marks.
-
-    - ``originlabels'': (dafault True) If false (0,0) won't have labels.
-
-
-    Specials thanks to Paula Oliveira for the first version.
-
-    Other resource: http://matplotlib.org/users/pgf.html#pgf-tutorial
-
-    """
-    
-    if points is None:
-        #integer tick marks only (for now)
-        first_int = floor(vmin)
-        last_int  = ceil(vmax)
-        #last_int - first_int + 1 gives all integers,
-        #but the last point is the arrow vertice: no label and no tick mark so "+1" is not added.
-        points = [ i+first_int for i in range(last_int - first_int) ] 
-        if not originlabels and 0 in points:
-            pos = points.index(0)
-            del points[pos]
-    else:
-        first_int = min(points)
-        last_int  = max(points) + 1 #added +1 for the reason above.
-
-    if axis=='x':
-        #integer tick marks
-        tmarks = r'\foreach \x in %s' % Set(points)
-        tmarks += r'\draw[color=black] (\x,-%d pt) node[below] {\scriptsize $\x$} -- (\x,%d pt) ;' % (ticksize,ticksize)
-        #main line and arrow at end
-        tmain = r'\draw[->,color=black] (%f,0) -- (%f,0);' % (first_int,last_int)
-    else:
-        #integer tick marks
-        tmarks = r'\foreach \y in %s' % Set(points)
-        tmarks += r'\draw[color=black] (-%d pt,\y) node[left] {\scriptsize $\y$} -- (%d pt,\y);' % (ticksize,ticksize)
-        #main line and arrow at end
-        tmain = r'\draw[->,color=black] (0,%f) -- (0,%f);' % (first_int,last_int)
-
-    return tmain + tmarks
-    
 
 
 

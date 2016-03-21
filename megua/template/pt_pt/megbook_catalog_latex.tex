@@ -1,0 +1,89 @@
+{# see MegBookWeb.py catalog() function #}
+
+\documentclass[a4paper]{book}
+
+{% include 'common.tex' %}
+
+\usepackage{alltt}
+
+
+\usepackage{spverbatim}
+
+\usepackage[linktoc=page]{hyperref}
+
+
+\usepackage[
+    layoutwidth=210mm,
+    layoutheight=295mm,
+    nomarginpar,
+    nofoot,
+    textwidth=170mm,
+    textheight=240mm,
+    inner=25mm,
+    verbose,
+    outer=20mm,
+    top=25mm,
+    centering,
+    footskip=22pt]{geometry}
+
+
+
+%Usado na escolha múltipla para desenhar um quadradinho
+\newcommand{\quadra}{$\sqcup \!\!\!\!\sqcap$}
+\def\singleoption{\item[\quadra\hspace*{0.5cm}]}
+
+
+{# NOTE:  {{ '{#' }} means '{#' in the output #}
+
+
+\newcommand{\reffonte}[2]{
+\vfill\noindent Concretização do exercício~\textbf{{ '{#1}' }}~(ver código fonte na pág. \pageref{{ '{#2}' }}): \par
+}
+
+
+\newcommand{\cfonte}[2]{
+\noindent \hrulefill~\textbf{{ '{#1}' }}~\hrulefill\label{{ '{#2}' }}
+}
+
+%================
+% Listings
+%================
+\usepackage{listings}
+
+\renewcommand{\lstlistingname}{Listagem}
+\renewcommand{\lstlistlistingname}{Listagens}
+
+\lstset{
+    frame=single,
+    breaklines=true,
+    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}},
+    extendedchars=true
+}
+
+%Remove indentation
+\setlength\parindent{0pt}
+
+
+
+\begin{document}
+
+
+\frontmatter
+
+\tableofcontents
+
+
+\mainmatter
+
+
+\chapter{Questões concretizadas}
+
+
+{{exerciseinstanceslatex}}
+
+
+
+\end{document}
+
+
+

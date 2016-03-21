@@ -9,7 +9,7 @@ AUTHORS:
 
 - Pedro Cruz (2010-06): initial version
 - Pedro Cruz (2011-08): documentation strings
-
+- Pedro Cruz (2016-03): adpatation to SMC
 
 Types of variables are:
 
@@ -50,69 +50,7 @@ IMPLEMENTATION NOTES:
    b. In Python the example could return "Examples: 1) -12.123456  2) (-34.32) 3) -12.1 4) R15(-34.32)"
 
 
-LINKS:
-
-1. See Python MatchObject
-2. http://docs.python.org/library/string.html#formatexamples(
-
-FUTURE. Evaluate if any of this forms is really useful::
-
-    name
-    @R15(name)
-    @round(name,2)
-    @(name)
-    @["2.3g".format(name)]
-    @[t=name1+name2;round(name,2)] ->
-    @integrate(f,x) -> (1/2)x^2
-    @(name[0],name[1])-> (10.2,23.3)
-    @(integrate(f,x),f.diff(x)) -> ((1/2)x^2,1)
-
-
-"""
-
-#Python package
-import re
-
-
-#Meg module
-#Named placeholders need functions in mathcommon: latex, R15, ...
-from mathcommon import *
-
-
-
-# Why is this here?
-#from sage.symbolic.expression import is_Expression
-
-
-#See expression1() below
-#TODO: improve for cases without space: $n@$ ($), $n@+40$ (operators +-*/), etc 
-#old prog = re.compile(r'(\w+)@(\s|\(\)|\[(.*)\]|{(.*)})',re.MULTILINE|re.DOTALL|re.IGNORECASE)
-
-
-def parameter_change(inputtext,datadict, latex_filter = True):
-    """
-    Substitution on a given input text with names acting as placeholders by their values on a provided dict.
-
-    INPUT:
-    - ``inputtext``-- text containing an exercise template with named placeholders.
-    - ``datadict`` -- a dictionary with the names that will be changed by values.
-
-    OUTPUT:
-        Text where names where replaced by values.
-
-    See examples at top of the file.
-    Implementation details below.
-    """
-
-    #Create regex using datadict names
-    keys_no_keyword = [ v for v in datadict.keys() if v[0]!='_' and v!='self'] 
-      #this revered sort guarantees that 'onb1' is first changed and only then 'onb'.
-      #Otherwise, if key onb1 appear,  "onb" will be first replaced leaving '1' in the text.
-    keys_no_keyword.sort(reverse=True) 
-    c_dict_keys = "|".join( keys_no_keyword ) #see use below.
-
-    """
-    RegEX definition:
+REGEX DEFINITIONS:
 
     Consider this examples:   ``"1) name  2) name2@() 3) name@f{2.3g} 4) name2@s{R15} 5) name3@["text0","text1"] "``. 
     Fields in the regex are for the example are separed in this way:
@@ -139,23 +77,115 @@ def parameter_change(inputtext,datadict, latex_filter = True):
     \W: If UNICODE is set, this will match anything other than [0-9_] and characters marked as alphanumeric in the Unicode character properties database.
     \w: If UNICODE is set, this will match the characters [0-9_] plus whatever is classified as alphanumeric in the Unicode character properties database.
 
-    """
-    #ReEX definition:
-    re_str = r'\W(\w+)@\(\)|'\
+
+
+LINKS:
+
+1. See Python MatchObject
+2. http://docs.python.org/library/string.html#formatexamples(
+
+FUTURE. Evaluate if any of this forms is really useful::
+
+    name
+    @R15(name)
+    @round(name,2)
+    @(name)
+    @["2.3g".format(name)]
+    @[t=name1+name2;round(name,2)] ->
+    @integrate(f,x) -> (1/2)x^2
+    @(name[0],name[1])-> (10.2,23.3)
+    @(integrate(f,x),f.diff(x)) -> ((1/2)x^2,1)
+
+
+"""
+
+
+# PYTHON modules
+import re
+
+
+
+# MEGUA modules
+# Named placeholders need functions in mathcommon: latex, R15, ...
+from mathcommon import *
+
+
+#TODO: answer this
+# Why is this here?
+#from sage.symbolic.expression import is_Expression
+
+
+#See expression1() below
+#TODO: improve for cases without space: $n@$ ($), $n@+40$ (operators +-*/), etc 
+#old prog = re.compile(r'(\w+)@(\s|\(\)|\[(.*)\]|{(.*)})',re.MULTILINE|re.DOTALL|re.IGNORECASE)
+
+
+
+
+#ReEX definition:
+BASE_REGEX = r'\W(\w+)@\(\)|'\
              r'\W(\w+)@f\{([\.#bcdeEfFgGnosxX<>=\^+\- 0-9\%]+)\}|'\
              r'\W(\w+)@s\{(\w+)\}|'\
-             r'\W(\w+)@c\{([\s",\-\w\.]+)\}|' + \
-             r'\W(' + c_dict_keys + ')'
+             r'\W(\w+)@c\{([\s",\-\w\.]+)\}|'
+
+#Original REGEX definition:
+#re_str = r'\W(\w+)@\(\)|'\
+#         r'\W(\w+)@f\{([\.#bcdeEfFgGnosxX<>=\^+\- 0-9\%]+)\}|'\
+#         r'\W(\w+)@s\{(\w+)\}|'\
+#         r'\W(\w+)@c\{([\s",\-\w\.]+)\}|' + \
+#         r'\W(' + c_dict_keys + ')'
+
+
+"""
+When ExBase.search_replace is called
+it will output values using some "global" method
+Decorators, inside txtual sources, can change this
+default behaviour.
+"""
+EXPR2LATEX = 0x1 #sage.symbolic.expression.Expression to latex
+DEFAULT_OUTPUT_METHOD = EXPR2LATEX
+
+
+#Avoid this members in exercise
+AVOID = ['self', 'imagedirectory', 'image_pathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir']
 
 
 
-    #re.MULTILINE|re.DOTALL|re.IGNORECASE|re.|
-    match_iter = re.finditer(re_str,inputtext,re.UNICODE)
+def parameter_change(inputtext,datadict):
+    """
+    Substitution on a given input text with names acting as placeholders by their values on a provided dict.
+
+    INPUT:
+    - ``inputtext``-- text containing an exercise template with named placeholders.
+    - ``datadict`` -- a dictionary with the names that will be changed by values.
+
+    OUTPUT:
+        Text where names where replaced by values.
+
+    See examples at top of the file.
+    Implementation details below.
+
+    """
+
+    #Create regex using datadict names
+    keys_no_keyword = [ v for v in datadict.keys() if v[0]!='_' and v not in AVOID] 
+
+    #Reverse: why is important.
+    #This reversed sort guarantees that 'onb1' is first changed and only then 'onb'.
+    #Otherwise, if key onb1 appear,  "onb" will be first replaced leaving '1' in the text.
+    keys_no_keyword.sort(reverse=True) 
+    c_dict_keys = "|".join( keys_no_keyword ) #see use below.
+    re_str = BASE_REGEX + r'\W({0})'.format(c_dict_keys)
 
 
     #TODO: maybe this should be above.
     if type(inputtext) == str:
         inputtext = unicode(inputtext,'utf-8')
+
+
+    #re.MULTILINE|re.DOTALL|re.IGNORECASE|re.|
+    match_iter = re.finditer(re_str,inputtext,re.UNICODE)
+
 
     #Debug
     #import unicodedata
@@ -183,7 +213,7 @@ def parameter_change(inputtext,datadict, latex_filter = True):
                 data_value = datadict[keyname]
                 outputtext += \
                     inputtext[text_last:match.start()+1] + \
-                    ulatex(data_value,latex_filter,parentesis=True)
+                    output_value(data_value,DEFAULT_OUTPUT_METHOD,parentesis=True)
             elif match.group(2) is not None and match.group(3) is not None:
                 #case name@f{0.2g}
                 keyname = match.group(2)
@@ -240,7 +270,7 @@ def parameter_change(inputtext,datadict, latex_filter = True):
                 elif type(data_value) is unicode:
                     outputtext += inputtext[text_last:match.start()+1] + data_value
                 else:
-                    outputtext += inputtext[text_last:match.start()+1] + ulatex(data_value,latex_filter)
+                    outputtext += inputtext[text_last:match.start()+1] + output_value(data_value,DEFAULT_OUTPUT_METHOD)
         except KeyError:
                 #outputtext += inputtext[text_last:match.start()+1] + unicode(keyname,'utf-8')
                 outputtext += inputtext[text_last:match.start()+1] + keyname
@@ -252,17 +282,26 @@ def parameter_change(inputtext,datadict, latex_filter = True):
     return outputtext
 
 
-def ulatex(s,latex_filter=True,parentesis=False):
-    if latex_filter:
+def output_value(s,output_method=None,parentesis=False):
+    r"""Return a unicode string with the value ``s`` 
+    or some transformation of it.
+    """
+    #old def ulatex(...)
+    #TODO: var@l => force latex(var)
+    #TODO: improve this function
+    #print type(s)
+    if output_method & EXPR2LATEX and type(s)==sage.symbolic.expression.Expression:
+        s = unicode(latex(s),'utf-8')
         if parentesis and bool(s<0):
-            return ur'\left(' + unicode(latex(s),'utf-8') + ur'\right)'
+            return u'\\left(' + unicode(s,'utf-8') + ur'\\right)'
         else:
-            return unicode(latex(s),'utf-8')
+            return s
     else:
+        s = unicode(s)
         if parentesis and bool(s<0):
-            return r'(' + unicode(s) + r')'
+            return r'(' + s + r')'
         else:
-            return unicode(s)  #unicode(s,'utf-8')
+            return s  #unicode(s,'utf-8')
 
 
 """

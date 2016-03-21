@@ -10,11 +10,17 @@ platex -- routines to compile MegUA generated tex files with pdflatex.
 #  Distributed under the terms of the GNU General Public License (GPL)
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
-  
+
+
+# PYTHON modules  
+import re
 import os
 import subprocess
 
+
+# SAGE modules
 from sage.misc.latex import have_pdflatex
+
 
 
 def pcompile(latexstr, workdir, filename, runs=1, hideoutput=True,silent=True):
@@ -273,4 +279,88 @@ Command line
 
 
  
+    #No groups, direct replacements
+HTML2LATEX = [  (ur'(\d)%', ur'\1\%'),  # 3% --> 3\%
+            (ur'(\d) %', ur'\1\%'),  # 3 % --> 3\%
+#            (ur"'",ur"\prime"),
+            (ur'<br>', u'\n\n'),
+            (ur'<br/>', u'\n\n'),
+            (ur'</br>', u'\n\n'),
+            (ur'<b>', r'{\\bf '),
+            (ur'</b>', u'}'),
+            (ur'<p>', u'\n\n'),
+            (ur'</p>', u'\n'),
+            (ur'<ul>', u'\\begin{itemize}'),
+            (ur'</ul>', u'\\end{itemize}'),
+            (ur'<ol>', u'\\begin{enumerate}'),
+            (ur'</ol>', u'\\end{enumerate}'),
+            (ur'<li>', u'\\item '),    
+            (ur'</li>', u'\n\n'),    
+            (ur'<center>', '\n'+r'\\begin{center}'+'\n'),
+            (ur'</center>', u'\\end{center}\n'),
+            (ur'<style>(.*?)</style>', u'\n'),
+            (ur'<pre>(.*?)</pre>',ur'\n%Falta colocar linhas vazias em baixo\n\\begin{alltt}\n\1\n\\end{alltt}\n\n'), 
+        ]
 
+
+
+def html2latex(htmltext):
+    r"""
+    Replace:
+
+    * \n\n\n by \n\n (reduce to much blank lines);
+    * <p> by \n\n; </p> by empty string;
+    * not any more ==> * <center> by \n\n; </center> by empty string;
+    """
+
+    newtext = htmltext
+    for pr in HTML2LATEX:
+        (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
+
+    #Convert from <table> to \begin{tabular}
+    newtext = table2tabular(newtext)
+    
+
+    #Removing spaces and lots of blank lines.
+    nr = 1
+    while nr >= 1:
+        (newtext, nr) = re.subn('\n\n\n', '\n\n', newtext, count=0, flags=re.UNICODE)
+        #print "html2latex():", nr
+
+    return newtext
+
+HTML2TABULAR = [
+            (u'<table(.*?)>', u'\n\n\\begin{tabular}{...}\n'),
+            (u'</table>', u'\n\end{tabular}\n'),
+            (u'<tr(.*?)>', u'\n'),
+            (u'</tr>', u' \\\\ \hline\n'), 
+            (u'<td(.*?)>', ' '),
+            (u'</td>', ' & '),
+        ]
+
+
+def table2tabular(text):
+    r"""Convert <table>...</table> to \begin{tabular} ... \end{tabular}"""
+
+    newtext = text
+    for pr in HTML2TABULAR:
+        (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
+    
+    return newtext
+
+def latexcommentthis(txt):
+    """Put % signs in each line"""
+    txt += '\n' #assure last line has "\n"
+    tlist = re.findall('(.*?)\n', txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
+    return '\n'.join( [ '%'+t for t in tlist] ) + '\n'
+        
+
+
+def latexunderscore(txt):
+    """Put \_  in each underscore"""
+    return re.subn("_","\_",txt)[0]
+
+def equation2display(txt):
+    """Put \displaystyle\$  in each $$"""
+    return re.subn(r"\$\$(.*?)\$\$",r"$\displaystyle \1$",txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
+        

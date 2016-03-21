@@ -94,7 +94,7 @@ Save a new or changed exercise:
    ....:     def make_random(self,edict=None):
    ....:         #suppose a 15 seconds computation here
    ....:         #maximum by default is 10 (see MegBook)
-   ....:         sleep(15)  
+   ....:         #sleep(15)  #remove # for tests
    ....:         #do something else.
    ....: ''')
    Exercise is taking too long to make!
@@ -121,7 +121,7 @@ Save a new or changed exercise:
    ....:     def make_random(self,edict=None):
    ....:         #suppose a 15 seconds computation here
    ....:         #maximum by default is 10 (see MegBook)
-   ....:         sleep(15)  
+   ....:         #sleep(5)  #remove # for tests
    ....:         #do something else.
    ....:            
    ....: ''') 
@@ -135,6 +135,13 @@ Save a new or changed exercise:
    ==> Answer instance
    prim1
 
+
+Make a catalog:
+
+::
+
+   sage: meg.catalog()
+   
    
 Search an exercise:
 
@@ -153,7 +160,6 @@ Remove an exercise:
    Exercise 'E28E28_pdirect_001' stored on text file _output/E28E28_pdirect_001.txt.
    sage: meg.remove('E28E28_nonexistant',dest=r'_output')
    Exercise E28E28_nonexistant is not on the database.
-
 
 
 DEVELOP:
@@ -217,13 +223,17 @@ from megua.mconfig import *
 
 
 #MEGUA modules:
+from megua.mathcommon import *
 from megua.exbase import ExerciseBase
+from megua.exlatex import ExLatex
+from megua.exsiacua import ExSiacua
 from megua.localstore import LocalStore,ExIter
 from megua.parse_ex import parse_ex
 from megua.tounicode import to_unicode
 from megua.jinjatemplates import templates
 from megua.ur import ur
 from megua.megsiacua import MegSiacua
+from megua.csection import SectionClassifier
 #from platex import pcompile
 #from xmoodle import MoodleExporter
 #from xsphinx import SphinxExporter
@@ -277,7 +287,7 @@ class MegBook(MegSiacua):
         self.max_tried_instances = 10 
 
         ExerciseBase._megbook = self
-        print self.__repr__()
+        #print self.__repr__()
 
     def __str__(self):
         return "MegBook('%s')" % self.local_store_filename
@@ -313,6 +323,8 @@ class MegBook(MegSiacua):
         row =  parse_ex(to_unicode(uexercise))
         if not row:
             raise
+            
+            
         #Second check: syntatic and runtime  ("python/sagemath" script)
         ex_instance = self.exerciseinstance(row,ekey=0)            
         #Third check: create contens (latex compilation, for example)
@@ -564,6 +576,7 @@ class MegBook(MegSiacua):
         ex_class._problem_text = row['problem_text']
         ex_class._answer_text  = row['answer_text'] 
         ex_class._unique_name  = row['unique_name']
+        ex_class._suggestive_name = row['suggestive_name']
     
         return ex_class
     
@@ -598,6 +611,7 @@ class MegBook(MegSiacua):
 
 
         #TODO: remove this and active "try" below
+        #TODO: use "load" (check sandbox/python_modules)
         ex_instance = ex_class(ekey,edict)
     
 #        try:
@@ -846,41 +860,93 @@ class MegBook(MegSiacua):
 
 
 
-    def to_latex(self,problem_name):
-        r"""
-        Generates a tex file ready in standard LaTeX to put in a thesis.
 
-        INPUT:
-        
-        - `problem_name`: problem name.
-
-        #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
+    def catalog(self,what='all',export='latex'):
+        r"""Writes exercises in an ordered fashion 
+        Only: all and latex formats, now.        
         """
+        
+        self.sc = SectionClassifier(self.megbook_store)
+        section_iterator = self.sc.section_iterator()
 
-        ofile = codecs.open(exercise_latex.html, mode='w', encoding='utf-8')
+        #ver templates: megbook_catalog_latex
+        lts = u'' #exerciseinstanceslatex
+        
+        #Instance creation        
+        for s in section_iterator:
 
-        #amc template without groups for each question
-        exercise_text = u'<html>\n<body>\n\n'
-        exercise_text += u'meg.save(r"""\n'
+            #Section creation
+            if s.level==0: # {{ => }
+                lts += u'\n\n\section{{{0} ({1})}}\n\n'.format(s.sec_name,len(s.exercises))
+            elif s.level==1:
+                lts += u'\n\n\subsection{{{0} ({1})}}\n\n'.format(s.sec_name,len(s.exercises))
+            elif s.level==2:
+                lts += u'\n\n\subsubsection{{{0} ({1})}}\n\n'.format(s.sec_name,len(s.exercises))
+            else:
+                lts += u'\n\n\textbf{{{0} ({1})}}\n\n'.format(s.sec_name,len(s.exercises))
 
-        #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(problem_name)
-        if not row:
-            print "meg.to_latex(): %s cannot be accessed on database" % problem_name
-            return
+            #Get the instances, if they exist on this section, subsection or subsubsection
+            #TODO: image render mode to "filenameimage"
+            lts += u'\n\nThis section has {0} exercises.\n\n'.format(len(s.exercises)) # {{ => }
+            for unique_name in s.exercises:
+                ex = self.new(unique_name,ekey=0,returninstance=True)     
+                if ExLatex in ex.__class__.__bases__:
+                    #TODO: incluir tipo no template e na section acima
+                    ex_str = templates.render("megbook_catalog_instance.tex",
+                                exformat="latex",              
+                                unique_name_noslash = unique_name.replace("_","\_"),
+                                summary = ex.summary(),
+                                suggestive_name = ex.suggestive_name(),
+                                problem = ex.problem(),
+                                answer = ex.answer()
+                    )
+                elif ExSiacua in ex.__class__.__bases__:
+                    #TODO: incluir tipo no template e na section acima
+                    ex_str = templates.render("megbook_catalog_instance.tex",
+                                exformat="siacua",              
+                                unique_name_noslash = unique_name.replace("_","\_"),
+                                summary = ex.summary(),
+                                suggestive_name = ex.suggestive_name(),
+                                problem = ExSiacua.to_latex(ex.problem()), #u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
+                                answer = ExSiacua.to_latex(ex.answer()) #u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
+                    )
+                else:
+                    #TODO: incluir tipo no template e na section acima
+                    ex_str = templates.render("megbook_catalog_instance.tex",
+                                exformat="textual (exbase)",              
+                                unique_name_noslash = unique_name.replace("_","\_"),
+                                summary = ex.summary(),
+                                suggestive_name = ex.suggestive_name(),
+                                problem = u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
+                                answer = u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
+                    )
+                    
+                lts += ex_str
+                
+                #Only for latex (was first version)
+                #lts += u'\\bigskip\n\\textbf{{Unique Name {0}}} with ekey=0\n'.format(unique_name.replace("_","\_"))
+                #lts += u'%{0}\n\n'.format(unique_name)
+                #lts += u'\\textbf{{Summary}}\n\n\\begin{{verbatim}}\n{0}\n\\end{{verbatim}}\n\n'.format(ex.summary())
+                #lts += u'\\textbf{{Problem {0}}}\n\n{1}\n\n'.format(
+                #    ex.suggestive_name(),
+                #    ex.problem())
+                #lts += u'\\textbf{{Answer}}\n\n{0}\n\n'.format(ex.answer())
 
 
 
-        exercise_text += u'""")\n'
-        exercise_text += u'</body>\n</html>\n'
 
-        ofile.write(html_string)
-        ofile.close()
+              
+        latex_string =  templates.render("megbook_catalog_latex.tex",
+                         exerciseinstanceslatex=lts)
+        open(os.path.join(MEGUA_OUTPUT_DIR,"catalog.tex"),"w").write(latex_string.encode("latin1"))   #"utf8"
+
+        print os.path.join(MEGUA_OUTPUT_DIR,"catalog.tex")
+        #TODO: smc or command line ?
 
 
 
 def m_get_sections(sectionstxt):
-    """
+    r"""
 
     LINKS::
 

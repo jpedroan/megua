@@ -195,6 +195,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
     _summary_text = None
     _problem_text = None
     _answer_text  = None
+    _suggestive_name = None
 
 
     def __init__(self,ekey=None, edict=None, rendermethod='base64',dimx=150,dimy=150,dpi=100):
@@ -219,7 +220,6 @@ class ExerciseBase(SageObject,UnifiedGraphics):
             dimy=dimy,
             dpi=dpi
         )        
-
 
         self.has_instance = False
         self._current_problem = None
@@ -312,8 +312,8 @@ class ExerciseBase(SageObject,UnifiedGraphics):
             solve()
 
         #create current problem and answer
-        self._current_problem = self.searchreplace(self._problem_text)
-        self._current_answer = self.searchreplace(self._answer_text)
+        self._current_problem = self.search_replace(self._problem_text)
+        self._current_answer = self.search_replace(self._answer_text)
 
 
         self.has_instance = True
@@ -392,17 +392,27 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
     def problem(self):
         assert(self.has_instance)
+        assert(self._current_problem)
         return self._current_problem
 
 
     def answer(self):
         assert(self.has_instance)
+        assert(self._current_answer)
         return self._current_answer
 
 
-    def searchreplace(self,text_source):
+    def suggestive_name(self):
+        assert(self.has_instance)
+        if self._suggestive_name:
+            return self._suggestive_name #could be none or ""
+        else:
+            return u""
+ 
+
+    def search_replace(self,text_source):
         """Change this routine in derivations"""
-        text1 = parameter_change(text_source,self.__dict__,latex_filter=False)
+        text1 = parameter_change(text_source,self.__dict__)
         text2 = self.rewrite(text1)
         if text2 is None: 
             raise NameError('rewrite(s,text) function is not working.')

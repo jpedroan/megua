@@ -1,24 +1,16 @@
+# coding=utf8
+
 r"""
-Classify by sections.
+csection.py -- Create a tree of contents, organized by sections and inside 
+sections the exercises unique_name.
+
 
 AUTHOR:
 
 - Pedro Cruz (2012-01): initial version
+- Pedro Cruz (2016-03): improvment for smc
 
-"""
 
-#*****************************************************************************
-#       Copyright (C) 2011 Pedro Cruz <PedroCruz@ua.pt>
-#
-#  Distributed under the terms of the GNU General Public License (GPL)
-#                  http://www.gnu.org/licenses/
-#*****************************************************************************
-  
-#MEGUA modules
-from megua.localstore import ExIter
-
-class SectionClassifier:
-    """
     An exercise could contain um its %summary tag line a description of section
     in form::
 
@@ -41,24 +33,32 @@ class SectionClassifier:
                 * a dictionary of subsections (again Section objects)
             * Section = (sec_name, level, [list of exercises names], dict( subsections ) )
 
-    EXAMPLES::
+    EXAMPLES:
 
-    .. OLD test with: sage -python -m doctest csection.py 
+
+    Test with:
+    
+::
 
     sage -t csection.py
 
-    Create or edit a database::
+
+    Create or edit a database:
+
+::
 
        sage: from megua.megbook import MegBook
-       sage: meg = MegBook(r'./.testoutput/csection.sqlite')
-       MegBook opened. Execute `MegBook?` for examples of usage.
-       Templates for 'pt_pt' language.
+       sage: meg = MegBook(r'_input/csection.sqlite')
 
 
-    Save a new or changed exercise::
+    Save a new or changed exercise
+
+::
 
        sage: txt=r'''
        ....: %Summary Primitives; Imediate primitives; Trigonometric 
+       ....:   
+       ....:  Here, is a summary. 
        ....:   
        ....: %Problem Some Name
        ....: What is the primitive of $a x + b@()$ ?
@@ -66,18 +66,24 @@ class SectionClassifier:
        ....: %Answer
        ....: The answer is $prim+C$, for $C in \mathbb{R}$.
        ....: 
-       ....: class E28E28_pimtrig_001(Exercise):
+       ....: class E28E28_pimtrig_001(ExerciseBase):
        ....:     pass
        ....: '''
-       sage: meg.save(txt,dest='.testoutput')
-       Testing python/sage class 'E28E28_pimtrig_001' with 100 different keys.
-           No problems found in this test.
-          Compiling 'E28E28_pimtrig_001' with pdflatex.
-          No errors found during pdflatex compilation. Check E28E28_pimtrig_001.log for details.
-       Exercise name E28E28_pimtrig_001 inserted or changed.
+       sage: meg.save(txt)
+       -------------------------------
+       Instance of: E28E28_pimtrig_001
+       -------------------------------
+       ==> Summary:
+       Here, is a summary.
+       ==> Problem instance
+       What is the primitive of $a x + b$ ?
+       ==> Answer instance
+       The answer is $prim+C$, for $C in \mathbb{R}$.
 
        sage: txt=r'''
        ....: %Summary Primitives; Imediate primitives; Trigonometric 
+       ....:   
+       ....:  Here, is a summary. 
        ....:   
        ....: %Problem Some Name2
        ....: What is the primitive of $a x + b@()$ ?
@@ -85,18 +91,24 @@ class SectionClassifier:
        ....: %Answer
        ....: The answer is $prim+C$, for $C in \mathbb{R}$.
        ....: 
-       ....: class E28E28_pimtrig_002(Exercise):
+       ....: class E28E28_pimtrig_002(ExerciseBase):
        ....:     pass
        ....: '''
-       sage: meg.save(txt,dest='.testoutput')
-       Testing python/sage class 'E28E28_pimtrig_002' with 100 different keys.
-           No problems found in this test.
-          Compiling 'E28E28_pimtrig_002' with pdflatex.
-          No errors found during pdflatex compilation. Check E28E28_pimtrig_002.log for details.
-       Exercise name E28E28_pimtrig_002 inserted or changed.
+       sage: meg.save(txt)
+       -------------------------------
+       Instance of: E28E28_pimtrig_002
+       -------------------------------
+       ==> Summary:
+       Here, is a summary.
+       ==> Problem instance
+       What is the primitive of $a x + b$ ?
+       ==> Answer instance
+       The answer is $prim+C$, for $C in \mathbb{R}$.
 
        sage: txt=r'''
        ....: %Summary Primitives; Imediate primitives; Polynomial 
+       ....:   
+       ....:  Here, is a summary. 
        ....:   
        ....: %Problem Some Problem 1
        ....: What is the primitive of $a x + b@()$ ?
@@ -104,42 +116,54 @@ class SectionClassifier:
        ....: %Answer
        ....: The answer is $prim+C$, for $C in \mathbb{R}$.
        ....: 
-       ....: class E28E28_pdirect_001(Exercise):
+       ....: class E28E28_pdirect_001(ExerciseBase):
        ....:     pass
        ....: '''
 
-       sage: meg.save(txt,dest='.testoutput')
-       Testing python/sage class 'E28E28_pdirect_001' with 100 different keys.
-           No problems found in this test.
-          Compiling 'E28E28_pdirect_001' with pdflatex.
-          No errors found during pdflatex compilation. Check E28E28_pdirect_001.log for details.
-       Exercise name E28E28_pdirect_001 inserted or changed.
+       sage: meg.save(txt)
+       -------------------------------
+       Instance of: E28E28_pdirect_001
+       -------------------------------
+       ==> Summary:
+       Here, is a summary.
+       ==> Problem instance
+       What is the primitive of $a x + b$ ?
+       ==> Answer instance
+       The answer is $prim+C$, for $C in \mathbb{R}$.
        sage: txt=r'''
        ....: %Summary  
        ....:   
-       ....: No summary problem.
-       ....:
+       ....:  Here, is a summary. 
+       ....:   
        ....: %Problem 
        ....: What is the primitive of $a x + b@()$ ?
        ....: 
        ....: %Answer
        ....: The answer is $prim+C$, for $C in \mathbb{R}$.
        ....: 
-       ....: class E28E28_pdirect_003(Exercise):
+       ....: class E28E28_pdirect_003(ExerciseBase):
        ....:     pass
        ....: '''
-       sage: meg.save(txt,dest='.testoutput')
+       sage: meg.save(txt)
        Each exercise can belong to a section/subsection/subsubsection. 
        Write sections using ';' in the '%summary' line. For ex., '%summary Section; Subsection; Subsubsection'.
        <BLANKLINE>
        Each problem can have a suggestive name. 
-       Write in the '\%problem' line a name, for ex., '\%problem The Fish Problem'.
+       Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
        <BLANKLINE>
-       Testing python/sage class 'E28E28_pdirect_003' with 100 different keys.
-           No problems found in this test.
-          Compiling 'E28E28_pdirect_003' with pdflatex.
-          No errors found during pdflatex compilation. Check E28E28_pdirect_003.log for details.
-       Exercise name E28E28_pdirect_003 inserted or changed.
+       -------------------------------
+       Instance of: E28E28_pdirect_003
+       -------------------------------
+       ==> Summary:
+       Here, is a summary.
+       ==> Problem instance
+       What is the primitive of $a x + b$ ?
+       ==> Answer instance
+       The answer is $prim+C$, for $C in \mathbb{R}$.
+
+    Travel down the tree sections:
+
+::
 
        sage: s = SectionClassifier(meg.megbook_store)
        sage: s.textprint()
@@ -152,6 +176,38 @@ class SectionClassifier:
          > E28E28_pimtrig_002
        E28E28_pdirect
        > E28E28_pdirect_003
+
+
+    Testing a recursive iterator:
+
+::
+
+       sage: meg = MegBook("_input/paula.sqlite") 
+       sage: s = SectionClassifier(meg.megbook_store)
+       sage: for section in section_iterator(s):
+       ....:     print section
+       
+
+"""
+
+#*****************************************************************************
+#       Copyright (C) 2011,2016 Pedro Cruz <PedroCruz@ua.pt>
+#
+#  Distributed under the terms of the GNU General Public License (GPL)
+#                  http://www.gnu.org/licenses/
+#*****************************************************************************
+
+
+#PYHTON modules
+import collections
+  
+#MEGUA modules
+from megua.localstore import ExIter
+
+
+
+class SectionClassifier:
+    """
 
     """
 
@@ -195,6 +251,26 @@ class SectionClassifier:
 
     
 
+    def section_iterator(self):
+        r"""
+        OUTPUT:
+        
+        - an iterator yielding (secname, sorted exercises)
+        """
+        # A stack-based alternative to the traverse_tree method above.
+        od_top = collections.OrderedDict(sorted(self.contents.items()))
+        stack = []
+        for secname,section in od_top.iteritems():
+            stack.append(section)
+        while stack:
+            section_top = stack.pop(0) #remove left element
+            yield section_top
+            od_sub = collections.OrderedDict(sorted(section_top.subsections.items()))
+            desc = []
+            for secname,section in od_sub.iteritems():
+                desc.append(section)
+            stack[:0] = desc #add elemnts from desc list at left (":0")
+    
 
 class Section:
     r"""
@@ -205,14 +281,24 @@ class Section:
     def __init__(self,sec_name,level=0):
         self.sec_name = sec_name
         self.level = level
+        #Exercises of this section (self).
         self.exercises = []
+        #This section (self) can have subsections.
         self.subsections = dict()
 
+    def __str__(self):
+        return self.level*" " + self.sec_name.encode("utf8") + " has " + str(len(self.exercises))
+
+    def __repr__(self):
+        return self.level*" " + self.sec_name.encode("utf8") + " has " + str(len(self.exercises))
   
     def add(self,exname,sections):
+        r"""
+        Recursive function to add an exercise to """
 
         if sections == []:
             self.exercises.append(exname)
+            self.exercises.sort()
             return
         
         if not sections[0] in self.subsections:
@@ -231,7 +317,9 @@ class Section:
         for sub in self.subsections:
             self.subsections[sub].textprint()
 
-        
+
+
+
 
 def str_to_list(s):
     """

@@ -208,85 +208,6 @@ def lang_set(s):
 
 
 
-def html2latex(htmltext):
-    r"""
-    Replace:
-
-    * \n\n\n by \n\n (reduce to much blank lines);
-    * <p> by \n\n; </p> by empty string;
-    * <center> by \n\n; </center> by empty string;
-    """
-
-    #No groups, direct replacements
-    lr = [  (ur'(\d)%', ur'\1\%'),  # 3% --> 3\%
-            (ur'(\d) %', ur'\1\%'),  # 3 % --> 3\%
-            (ur'<br>', '\n\n'),
-            (ur'<p>', '\n\n'),
-            (ur'</p>', '\n'),
-            (ur'<ul>', ur'\\begin{itemize}'),
-            (ur'</ul>', ur'\\end{itemize}'),
-            (ur'<ol>', ur'\\begin{enumerate}'),
-            (ur'</ol>', ur'\\end{enumerate}'),
-            (ur'<li>', ur'\\item '),    
-            (ur'</li>', '\n\n'),    
-            (ur'<center>', '\n\n'),
-            (ur'</center>', '\n'),
-            (ur'<style>(.*?)</style>', '\n'),
-            (ur'<pre>(.*?)</pre>',ur'\n%Falta colocar linhas vazias em baixo\n\\begin{alltt}\n\1\n\\end{alltt}\n\n'), 
-        ]
-
-    newtext = htmltext
-    for pr in lr:
-        (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
-
-    #Convert from <table> to \begin{tabular}
-    newtext = table2tabular(newtext)
-    
-
-    #Removing spaces and lots of blank lines.
-    nr = 1
-    while nr >= 1:
-        (newtext, nr) = re.subn('\n\n\n', '\n\n', newtext, count=0, flags=re.UNICODE)
-        #print "html2latex():", nr
-
-    return newtext
-
-
-def table2tabular(text):
-    r"""Convert <table>...</table> to \begin{tabular} ... \end{tabular}"""
-
-    lista = [
-            (ur'<table(.*?)>', ur'\n\n\\begin{tabular}{...}\n'),
-            (ur'</table>', ur'\n\end{tabular}\n'),
-            (ur'<tr(.*?)>', ur'\n'),
-            (ur'</tr>', ur' \\\\ \hline\n'), 
-            (ur'<td(.*?)>', ' '),
-            (ur'</td>', ' & '),
-        ]
-
-    newtext = text
-    for pr in lista:
-        (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
-    
-    return newtext
-
-def latexcommentthis(txt):
-    """Put % signs in each line"""
-    txt += '\n' #assure last line has "\n"
-    tlist = re.findall('(.*?)\n', txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
-    return '\n'.join( [ '%'+t for t in tlist] ) + '\n'
-        
-
-
-def latexunderscore(txt):
-    """Put \_  in each underscore"""
-    return re.subn("_","\_",txt)[0]
-
-def equation2display(txt):
-    """Put \displaystyle\$  in each $$"""
-    return re.subn(r"\$\$(.*?)\$\$",r"$\displaystyle \1$",txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
-        
-
 
 
     def put_here(self,unique_namestring, ekey=None, edict=None, elabel="NoLabel", em=True):
@@ -802,40 +723,40 @@ def equation2display(txt):
     
 
 
-
-
-    def to_latex(self,problem_name):
-        r"""
-        Generates a tex file ready in standard LaTeX to put in a thesis.
-
-        INPUT:
-        
-        - `problem_name`: problem name.
-
-        #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
-        """
-
-        ofile = codecs.open(exercise_latex.html, mode='w', encoding='utf-8')
-
-        #amc template without groups for each question
-        exercise_text = u'<html>\n<body>\n\n'
-        exercise_text += u'meg.save(r"""\n'
-
-        #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(problem_name)
-        if not row:
-            print "meg.to_latex(): %s cannot be accessed on database" % problem_name
-            return
-
-
-
-        exercise_text += u'""")\n'
-        exercise_text += u'</body>\n</html>\n'
-
-        ofile.write(html_string)
-        ofile.close()
-
-
+# REMOVE
+#
+#    def to_latex(self,problem_name):
+#        r"""
+#        Generates a tex file ready in standard LaTeX to put in a thesis.
+#
+#        INPUT:
+#        
+#        - `problem_name`: problem name.
+#
+#        #TODO: os CDATA tem que ser recuperados neste ficheiro e os <choice> ja estao no campo ex.all_choices.
+#        """
+#
+#        ofile = codecs.open(exercise_latex.html, mode='w', encoding='utf-8')
+#
+#        #amc template without groups for each question
+#        exercise_text = u'<html>\n<body>\n\n'
+#        exercise_text += u'meg.save(r"""\n'
+#
+#        #Get summary, problem and answer and class_text
+#        row = self.megbook_store.get_classrow(problem_name)
+#        if not row:
+#            print "meg.to_latex(): %s cannot be accessed on database" % problem_name
+#            return
+#
+#
+#
+#        exercise_text += u'""")\n'
+#        exercise_text += u'</body>\n</html>\n'
+#
+#        ofile.write(html_string)
+#        ofile.close()
+#
+#
 
 
 def m_get_sections(sectionstxt):

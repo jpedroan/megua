@@ -251,6 +251,7 @@ class LocalStore:
 
             """
             #Check metameg
+            #TODO: improve this meta tag
             c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='metameg'")
             row = c.fetchone()            
             if row == None:
@@ -260,8 +261,8 @@ class LocalStore:
                 c2.execute("SELECT version,natural_language,markup_language from metameg")
                 row = c2.fetchone()
                 version = row['version']
-                assert(self.natural_language == row['natural_language']) #TODO: check this
-                assert(self.markup_language == row['markup_language'])
+                #assert(self.natural_language == row['natural_language']) #TODO: check this
+                #assert(self.markup_language == row['markup_language'])
                 c2.close()
 
         else:
@@ -337,6 +338,10 @@ class LocalStore:
         
 
         NOTES: it is implicit in each instance the columns.
+
+        TODO: if exercise is not changed it need not be compiled again. Maybe 
+        this function could return "new", "changed", "not changed" for helping
+        decision in pdf file.
 
         """
 

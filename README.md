@@ -28,6 +28,7 @@ DEVELOP
 * salvus: /projects/sage/sage-6.10/local/lib/python2.7/site-packages/smc_sagews
 * from smc_sagews.sage_salvus import salvus #Functions: salvus.file(), salvus.html()
 * sage_server.py: contains definitions of "def file()" and "def html()", see useful arguments
-
+* decorators dynamically alter the functionality of a function, method or class without having to directly use subclasses, http://thecodeship.com/patterns/guide-to-python-function-decorators/
+* ascii art http://doc.sagemath.org/html/en/reference/misc/sage/typeset/character_art.html
 
 

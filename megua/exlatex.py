@@ -74,7 +74,8 @@ from megua.mconfig import MEGUA_PLATFORM
 
 
 class ExLatex(ExerciseBase):
-   
+
+
 
     def _latex_string(self):
 
