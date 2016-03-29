@@ -175,7 +175,6 @@ from sage.all import * #All Sage Graphics
 
 
 #MEGUA modules
-from megua.mconfig import MEGUA_OUTPUT_DIR
 from megua.jinjatemplates import templates
 from megua.platex import pcompile
 

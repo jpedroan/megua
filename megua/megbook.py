@@ -938,10 +938,19 @@ class MegBook(MegSiacua):
               
         latex_string =  templates.render("megbook_catalog_latex.tex",
                          exerciseinstanceslatex=lts)
-        open(os.path.join(MEGUA_OUTPUT_DIR,"catalog.tex"),"w").write(latex_string.encode("latin1"))   #"utf8"
+                         
+        open(os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex"),"w").write(latex_string.encode("latin1"))   #"utf8"
 
-        print os.path.join(MEGUA_OUTPUT_DIR,"catalog.tex")
-        #TODO: smc or command line ?
+        #fname = os.path.join(MEGUA_EXERCISES_CATALOG+"/catalog.tex")
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
+
+        if MEGUA_PLATFORM=='commandline':
+            print "Check",os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf")
+        elif MEGUA_PLATFORM=='sagews':
+            salvus.open_tab(os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf"))
+        else:    
+            print os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex")
 
 
 

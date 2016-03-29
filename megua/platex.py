@@ -244,7 +244,8 @@ Command line
                 _run_latex_(texfname,debug=False,engine='pdflatex')
                 print texfname
 
-                #NOTE: misterio: a directoria corrente e /tmp/tal e tal mas shutil.move(...,'.') move para a celula correcta.
+                #NOTE: misterio: a directoria corrente e /tmp/tal e tal 
+                mas shutil.move(...,'.') move para a celula correcta.
                 print os.getcwd() 
 
         5. It maybe necessary for Internet Explorer::

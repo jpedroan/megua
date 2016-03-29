@@ -18,3 +18,11 @@ from megua.megbook import MegBook
 from megua.exbase import ExerciseBase
 from megua.exsiacua import ExSiacua
 from megua.exlatex import ExLatex
+
+from megua.mconfig import *
+
+
+meg = MegBook(projectname)
+
+
+

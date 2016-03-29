@@ -57,6 +57,20 @@ Old way:
     except jinja2.exceptions.TemplateNotFound:
         return "MegBook: missing template %s"%filename
 
+
+Solution using environment variables:
+
+::
+
+    #Templating (with Jinja2)
+    if os.environ.has_key('MEGUA_TEMPLATE_PATH'):
+        TEMPLATE_PATH = os.environ['MEGUA_TEMPLATE_PATH']
+    else:
+        from pkg_resources import resource_filename
+        TEMPLATE_PATH = os.path.join(resource_filename(__name__,''),'template',natlang)
+
+
+
 """
 
 
@@ -70,14 +84,15 @@ Old way:
 
 
 
-#PYTHON modules:
-import os
+#PYTHON modules
 import jinja2  #see notes on Jinj2 above.
 
 
-
 #SAGE modules
-from megua.mconfig import MEGUA_SYSTEM_NATLANG
+#OLD? from megua.mconfpackage import MEGUA_TEMPLATE_DIR
+
+from megua.mconfig import MEGUA_TEMPLATE_DIR
+
 
 
 
@@ -85,25 +100,7 @@ class JinjaTemplate:
     
     def __init__(self):
   
-
-        #================
-        #Solution using environment variables
-        #================
-        ##Templating (with Jinja2)
-        #if os.environ.has_key('MEGUA_TEMPLATE_PATH'):
-        #    TEMPLATE_PATH = os.environ['MEGUA_TEMPLATE_PATH']
-        #else:
-        #    from pkg_resources import resource_filename
-        #    TEMPLATE_PATH = os.path.join(resource_filename(__name__,''),'template',natlang)
-
-
-
-        from pkg_resources import resource_filename
-        TEMPLATE_PATH = os.path.join(resource_filename(__name__,''),'template',MEGUA_SYSTEM_NATLANG)
-
-        #print "Templates in: " + TEMPLATE_PATH
-        
-        self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_PATH))
+        self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(MEGUA_TEMPLATE_DIR))
         
 
     def get_template(self,templatefilename):

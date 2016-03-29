@@ -18,13 +18,15 @@ each file for each exercise, is to be created in SMC.
 
 EXAMPLES:
 
-Extract from latex or web/html/siacua old style databases to 
+Extract from latex or web (html for siacua) old style databases to 
 individual *.sagews files and one *.sage file containing all exercises.
+Also, mix options, extracts ExLatex or ExSiacua exercises.
 
 ::
 
    sage -python meg2smc.py latex megua_latex.sqlite .newfile.sqlite 
    sage -python meg2smc.py web megua_siacua.sqlite .newfile.sqlite
+   sage -python meg2smc.py mix .newfile.sqlite .newfile.sqlite
 
 
 will create several *.sagews files in the same directory.
@@ -273,8 +275,17 @@ if __name__=='__main__':
     """
 
     import sys
-    assert(sys.argv[1] in ["latex","web", "mix"])
-    print "Producing *.sagews files from '%s' for %s" % (sys.argv[2],sys.argv[1])
+    assert(sys.argv[1] in ["latex","web", "mix","help"])
+    if sys.argv[1]=="help":
+        ##### "1.......................26..................................................78
+        #####  |.....................--.|...................................................|
+        print "Usage examples:"
+        print "[1] sage -python meg2smc.py latex megua_latex.sqlite .newfile.sqlite" 
+        print "[2] sage -python meg2smc.py web megua_siacua.sqlite .newfile.sqlite"
+        print "[3] sage -python meg2smc.py mix .newfile.sqlite .newfile.sqlite"
+        exit()
+        
+    print "Producing *.sagews files from '%s' for %s...." % (sys.argv[2],sys.argv[1])
     #print 'Number of arguments:', len(sys.argv), 'arguments.'
     #print 'Argument List:', str(sys.argv)
     import os.path
