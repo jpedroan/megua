@@ -920,9 +920,9 @@ class MegBook(MegSiacua):
                                 problem = u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
                                 answer = u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
                     )
-                    
+
                 lts += ex_str
-                
+
                 #Only for latex (was first version)
                 #lts += u'\\bigskip\n\\textbf{{Unique Name {0}}} with ekey=0\n'.format(unique_name.replace("_","\_"))
                 #lts += u'%{0}\n\n'.format(unique_name)
@@ -935,21 +935,22 @@ class MegBook(MegSiacua):
 
 
 
-              
+
         latex_string =  templates.render("megbook_catalog_latex.tex",
                          exerciseinstanceslatex=lts)
-                         
-        open(os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex"),"w").write(latex_string.encode("latin1"))   #"utf8"
 
-        #fname = os.path.join(MEGUA_EXERCISES_CATALOG+"/catalog.tex")
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
+        f = codecs.open(os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex"), mode='w', encoding='utf-8')
+        f.write(latex_string)
+        f.close()
+
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s &> /dev/null" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s &> /dev/null" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
 
         if MEGUA_PLATFORM=='commandline':
             print "Check",os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf")
         elif MEGUA_PLATFORM=='sagews':
             salvus.open_tab(os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf"))
-        else:    
+        else:
             print os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex")
 
 
@@ -960,13 +961,13 @@ def m_get_sections(sectionstxt):
     LINKS::
 
        http://stackoverflow.com/questions/2054746/how-to-search-and-replace-utf-8-special-characters-in-python?rq=1
-    """   
+    """
     s = "megua/"+sectionstxt.replace("; ","/") #case "; " by "/"
     return s.replace(";","/") #possible case without space: ";" by "/"
 
 
 
-        
+
 #end class MegBook
-        
-        
+
+
