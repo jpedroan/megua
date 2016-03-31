@@ -21,8 +21,7 @@ from megua.exlatex import ExLatex
 
 from megua.mconfig import *
 
-
-meg = MegBook(projectname)
+meg = MegBook(PROJECT_DATABASE)
 
 
 
