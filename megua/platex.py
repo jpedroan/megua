@@ -16,6 +16,7 @@ platex -- routines to compile MegUA generated tex files with pdflatex.
 import re
 import os
 import subprocess
+import codecs
 
 
 # SAGE modules
@@ -69,22 +70,29 @@ def pcompile(latexstr, workdir, filename, runs=1, hideoutput=True,silent=True):
 
     #Unicode or latin1
     if type(latexstr)==unicode:
-        import codecs
-        #Store latexstr in filename
-        fullpath = os.path.join(workdir, 'utf8-'+filename+'.tex')
-        f = codecs.open(fullpath,encoding='utf-8', mode='w+')
-        f.write(latexstr)
-        f.close()
-        
         #Conversion for ISO-8859-1 http://pt.wikipedia.org/wiki/ISO_8859-1
         latexstr = latexstr.encode('latin1')
+        latexstr.replace("utf8","latin1")
+        
+        #Store latexstr in filename
+        fullpath = os.path.join(workdir, 'windows-'+filename+'.tex')
+        f = open(fullpath,'w')
+        f.write(latexstr)
+        f.close()
 
+
+
+    if type(latexstr)==str:
+        print type(latexstr)
+        latexstr = latexstr.decode('utf-8','ignore')
+        
 
     #Store latexstr in filename
     fullpath = os.path.join(workdir, filename+'.tex')
-    f = open(fullpath,'w')
+    f = codecs.open(fullpath,encoding='utf-8', mode='w+')
     f.write(latexstr)
     f.close()
+        
 
     #compile
     lt = r'cd ' + workdir + '; /usr/bin/pdflatex -interaction=nonstopmode ' + filename

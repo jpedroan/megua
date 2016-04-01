@@ -104,19 +104,22 @@ class ExLatex(ExerciseBase):
         try:
             pcompile(latex_string,self.working_dir,self.unique_name(),hideoutput=True)
         except subprocess.CalledProcessError as err:
+            print "Start ExLatex.print_instance() error message:"
             #Try to show the message to user
             #print "Error:",err
             #print "returncode:",err.returncode
             #print "output:",err.output
-            print "================"
+            #print "================"
             latex_error_pattern = re.compile(r"!.*?l\.\d+(.*?)$",re.DOTALL|re.M)
             match = latex_error_pattern.search(err.output) #create an iterator
             if match:
                 print match.group(0)
             else:
                 print "There was a problem with an latex file."
-            print "You can download %s.tex and use your windows LaTeX editor to help find the error." % self.unique_name() 
-            print "================"
+            print "You can download %s and use your windows LaTeX "\
+                    "editor to help find the error." % \
+                    os.path.join(self.working_dir,self.unique_name()+".tex" )
+            print "End ExLatex.print_instance()."
             raise
 
         if MEGUA_PLATFORM=='sagews':

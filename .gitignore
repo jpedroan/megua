@@ -7,7 +7,6 @@ _images/
 _input
 _output
 \.vim
-mconfig.py
 *.aux
 *.log
 build

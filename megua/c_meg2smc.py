@@ -156,7 +156,6 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename):
             htmlstr = u'<h4>%s (Siacua)</h4>' % new_unique_name
         else: #mix style
             if '_latex' in row['unique_name']:
-                continue
                 new_unique_name = row['unique_name'] #keep for compatibility
                 new_codetext = u'class {0}(ExLatex):\n'.format(new_unique_name)
                 htmlstr = u'<h4>%s (Latex)</h4>' % new_unique_name

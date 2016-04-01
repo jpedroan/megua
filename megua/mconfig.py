@@ -40,6 +40,9 @@ execfile(MCONFIG_PATH)
 ##Sample Config File
 ##===================
 #
+#MEGUA_TEMPLATE_DIR = '/home/jpedro/megua/megua/template/pt_pt'
+#
+#===========#
 ##===========
 ##
 #projectname = 'calculo2'
