@@ -20,7 +20,7 @@ EXAMPLES
 Creation a LaTeX exercise:
 
 ::
-        
+
        sage: from megua.all import *
        sage: meg = MegBook(r'_input/megbook.sqlite') 
        sage: meg.save(r'''
@@ -127,13 +127,15 @@ class ExLatex(ExerciseBase):
             fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
             salvus.file(fullpath,show=True,raw=True)
             print ""
-            fullpath = os.path.join(self.working_dir, 'utf8-'+self.unique_name()+'.tex')
+            fullpath = os.path.join(self.working_dir, 'windows-'+self.unique_name()+'.tex')
             salvus.file(fullpath,show=True,raw=True)
             print ""
             fullpath = os.path.join(self.working_dir, self.unique_name()+'.tex')
             salvus.file(fullpath,show=True,raw=True)
             print ""
-            salvus.pdf(fullpath)
+            fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
+            #salvus.pdf(fullpath)
+            salvus.open_tab(fullpath)
         else: #MEGUA_PLATFORM=='commandline'
             fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
             print "exlatex module: open pdf file",fullpath
