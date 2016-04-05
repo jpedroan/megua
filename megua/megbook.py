@@ -192,7 +192,6 @@ TODO: read http://stackoverflow.com/questions/1301346/the-meaning-of-a-single-an
 #  Distributed under the terms of the GNU General Public License (GPL)
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
-  
 
 
 
@@ -201,6 +200,8 @@ import tempfile
 import sqlite3 #for row objects as result from localstore.py
 import shutil
 import os
+from os import environ
+import subprocess
 import random
 #import codecs
 import re
@@ -218,7 +219,7 @@ from sage.all import * #needed in exec (see exerciseinstance)
 
   
 #MEGUA configuration file: server side settings.
-from megua.mconfig import * 
+#tirar? from megua.mconfig import *
 
 
 
@@ -939,19 +940,36 @@ class MegBook(MegSiacua):
         latex_string =  templates.render("megbook_catalog_latex.tex",
                          exerciseinstanceslatex=lts)
 
-        f = codecs.open(os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex"), mode='w', encoding='utf-8')
+
+        MEGUA_EXERCISES_CATALOG = environ["MEGUA_EXERCISES_CATALOG"]
+        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex")
+        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf")
+
+
+        f = codecs.open(CATALOG_TEX_PATHNAME, mode='w', encoding='utf-8')
         f.write(latex_string)
         f.close()
 
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s &> /dev/null" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s &> /dev/null" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
+        #TODO: convert all os.system to subprocess.call or subprocess.Popen
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
 
-        if MEGUA_PLATFORM=='commandline':
-            print "Check",os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf")
-        elif MEGUA_PLATFORM=='sagews':
-            salvus.open_tab(os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf"))
+
+        if environ["MEGUA_PLATFORM"]=='SMC':
+            if environ["MEGUA_BASH_CALL"]:
+                print "MegBook module say:  open ", CATALOG_PDF_PATHNAME
+            else: #sagews SALVUS
+                from smc_sagews.sage_salvus import salvus
+                salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
+                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"                
+                salvus.open_tab(CATALOG_PDF_PATHNAME)
+        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+            print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
+            subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:
-            print os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex")
+            print """MegBook module say: environ["MEGUA_EXERCISES_CATALOG"] must be properly configured at $HOME/.megua/mconfig.sh"""
+
+
 
 
 

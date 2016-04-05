@@ -6,6 +6,9 @@
 #*****************************************************************************
 
 
+#tirar? from megua.mconfig import *
+
+
 
 #Common libaries
 from megua.ur import ur
@@ -19,9 +22,25 @@ from megua.exbase import ExerciseBase
 from megua.exsiacua import ExSiacua
 from megua.exlatex import ExLatex
 
-from megua.mconfig import *
-
-meg = MegBook(PROJECT_DATABASE)
-
+from os import environ
+meg = MegBook(environ["PROJECT_DATABASE"])
 
 
+
+#
+#export MATHJAX_HEADER = "<script type='text/x-mathjax-config'> 
+#  MathJax.Hub.Config({ 
+#    extensions: ['tex2jax.js'], 
+#    jax: ['input/TeX', 'output/HTML-CSS'], 
+#    tex2jax: { 
+#      inlineMath: [ ['$','$'], ['\\(','\\)'] ], 
+#      displayMath: [ ['$$','$$'], ['\\[','\\]'] ], 
+#      processEscapes: true 
+#    }, 
+#    'HTML-CSS': { availableFonts: ['TeX'] } 
+#  }); 
+#</script> 
+#<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'> 
+#</script> 
+#"
+#

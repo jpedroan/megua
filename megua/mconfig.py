@@ -1,9 +1,7 @@
 # coding=utf-8
 
 """
-
 Could be useful:
-
 - .bashrc:export PATH=$HOME/bin:$HOME/.local/bin:$PATH:$HOME/megua/megua
 
 """
@@ -14,10 +12,80 @@ import os
 
 
 
+# Why this file:
+# 1. megua project could benefit from a command line "megua <some command>"
+# 2. megua python/sage project needs local variable setup
+# 3. The solution is to put configure variables in $HOME/.megua/mconfig.sh
+# 4. How to read this variable into python ?
 
-MCONFIG_PATH = os.path.join( os.getenv("HOME"), ".megua/mconfig.py")
+
+# ======================
+# SYSTEM CONFIGURATION
+# ======================
+
+SAGECMD = os.getenv("SAGECMD")
+
+export MEGUA_MODULES_DIR="$HOME/megua/megua"
+
+export MEGUA_TEMPLATE_DIR = '$HOME/megua/megua/template/pt_pt'
+
+#Options: desktop, smc
+export MEGUA_BASH_ENVIRONMENT = "desktop"
+
+#Options: commandline, sagews, and in the "future": jupyter, sagenb, ...
+export MEGUA_PLATFORM = "commandline"
+
+#siacua key
+export SIACUA_WEBKEY = "oblady"
 
 
+
+# =================
+# PROJECT CONFIGURATION
+# =================
+
+export PROJECT_DATABASE = "$HOME/all/calculo2/.calculo2.sqlite"
+
+# Directory where exercises are stored
+export MEGUA_EXERCISE_INPUT = "$HOME/all/calculo2"
+
+# Directory where graphics and results are stored
+export MEGUA_EXERCISES_OUTPUT = "$HOME/Downloads/calculo2"
+
+
+# Directory for CATALOGS
+export MEGUA_EXERCISES_CATALOG = "$HOME/Downloads/calculo2-catalogo"
+
+
+export MATHJAX_HEADER = "<script type='text/x-mathjax-config'>
+  MathJax.Hub.Config({
+    extensions: ['tex2jax.js'],
+    jax: ['input/TeX', 'output/HTML-CSS'],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
+      processEscapes: true
+    },
+    'HTML-CSS': { availableFonts: ['TeX'] }
+  });
+</script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'>
+</script>
+"
+
+
+
+
+
+
+
+
+
+
+
+
+
+#MCONFIG_PATH = os.path.join( os.getenv("HOME"), ".megua/mconfig.sh")
 ###TODO: improve
 ##MEGUA modules
 #import codecs
@@ -30,80 +98,6 @@ MCONFIG_PATH = os.path.join( os.getenv("HOME"), ".megua/mconfig.py")
 #    print "Change the new '%s' configuration file and restart again." % \
 #            MCONFIG_PATH
 #    exit()
-
-
-
-execfile(MCONFIG_PATH)
-
-#
-##===================
-##Sample Config File
-##===================
-#
-#MEGUA_TEMPLATE_DIR = '/home/jpedro/megua/megua/template/pt_pt'
-#
-#===========#
-##===========
-##
-#projectname = 'calculo2'
-#
-## =====================
-## SIACUA CONFIGURATION
-## =====================
-#SIACUA_WEBKEY = "oblady"
-#
-#
-## =============
-##
-## commandline, sagews, jupyter, sagenb, ...
-#MEGUA_PLATFORM = "commandline"
-##MEGUA_MODULES_DIR = "/home/jpedro/all/megua/megua"
-#
-#
-## ===
-## Directory where exercises are stored
-## ===
-#MEGUA_EXERCISE_INPUT = os.path.join(os.getenv("HOME"),"all/calculo2")
-#if not os.path.exists(MEGUA_EXERCISE_INPUT):
-#    os.makedirs(MEGUA_EXERCISE_INPUT)
-#
-#
-## ===
-## Directory where graphics and results are stored
-## ===
-#MEGUA_EXERCISES_OUTPUT = os.path.join(os.getenv("HOME"),"Downloads/calculo2")
-#if not os.path.exists(MEGUA_EXERCISES_OUTPUT):
-#    os.makedirs(MEGUA_EXERCISES_OUTPUT)
-#
-#
-## ===
-## Directory for CATALOGS
-## ===
-#MEGUA_EXERCISES_CATALOG = os.path.join(os.getenv("HOME"),"Downloads/Calculo2Catalogo")
-#if not os.path.exists(MEGUA_EXERCISES_CATALOG):
-#    os.makedirs(MEGUA_EXERCISES_CATALOG)
-#
-#
-#
-#MATHJAX_HEADER = r'''
-#<script type="text/x-mathjax-config">
-#  MathJax.Hub.Config({
-#    extensions: ["tex2jax.js"],
-#    jax: ["input/TeX", "output/HTML-CSS"],
-#    tex2jax: {
-#      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-#      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-#      processEscapes: true
-#    },
-#    "HTML-CSS": { availableFonts: ["TeX"] }
-#  });
-#</script>
-#<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'>
-#</script>
-#'''
-#
-#
-#
 
 
 

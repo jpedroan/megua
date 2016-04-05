@@ -63,6 +63,7 @@ Creation a LaTeX exercise:
 #PYTHON modules
 import re
 import os
+from os import environ
 import subprocess
 
 
@@ -70,7 +71,7 @@ import subprocess
 from megua.platex import pcompile
 from megua.exbase import ExerciseBase
 from megua.jinjatemplates import templates
-from megua.mconfig import MEGUA_PLATFORM
+#tirar? from megua.mconfig import MEGUA_PLATFORM
 
 
 class ExLatex(ExerciseBase):
@@ -100,6 +101,9 @@ class ExLatex(ExerciseBase):
 
         #Use jinja2 template to generate LaTeX.
         latex_string = self._latex_string()
+
+        EXERCISE_TEX_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.tex')
+        EXERCISE_PDF_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.pdf')
         
         try:
             pcompile(latex_string,self.working_dir,self.unique_name(),hideoutput=True)
@@ -116,26 +120,33 @@ class ExLatex(ExerciseBase):
                 print match.group(0)
             else:
                 print "There was a problem with an latex file."
+
             print "You can download %s and use your windows LaTeX "\
-                    "editor to help find the error." % \
-                    os.path.join(self.working_dir,self.unique_name()+".tex" )
+                  "editor to help find the error." % EXERCISE_TEX_PATHNAME )
             print "End ExLatex.print_instance()."
             raise
 
-        if MEGUA_PLATFORM=='sagews':
-            from smc_sagews.sage_salvus import salvus
-            fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
-            salvus.file(fullpath,show=True,raw=True)
-            print ""
-            fullpath = os.path.join(self.working_dir, 'utf8-'+self.unique_name()+'.tex')
-            salvus.file(fullpath,show=True,raw=True)
-            print ""
-            fullpath = os.path.join(self.working_dir, self.unique_name()+'.tex')
-            salvus.file(fullpath,show=True,raw=True)
-            print ""
-            salvus.pdf(fullpath)
-        else: #MEGUA_PLATFORM=='commandline'
-            fullpath = os.path.join(self.working_dir, self.unique_name()+'.pdf')
-            print "exlatex module: open pdf file",fullpath
+
+        if environ["MEGUA_PLATFORM"]=='SMC':
+            if environ["MEGUA_BASH_CALL"]:
+                print "Exlatex module say:  open ", CATALOG_PDF_PATHNAME
+                subprocess.Popen(["open",CATALOG_PDF_PATHNAME])
+            else: #sagews SALVUS
+                from smc_sagews.sage_salvus import salvus
+                #Windows latin1 tex
+                fullpath = os.path.join(self.working_dir, 'windows-'+self.unique_name()+'.tex')
+                salvus.file(fullpath,show=True,raw=True); print ""
+                #utf-8 tex
+                salvus.file(EXERCISE_TEX_PATHNAME,show=True,raw=True); print ""
+                #pdf file
+                salvus.file(EXERCISE_PDF_PATHNAME,show=True,raw=True); print ""
+                #salvus.pdf(fullpath)
+                salvus.open_tab(pdffullpath)
+        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+            print "Exlatex module say: evince ",pdffullpath
+            subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
+        else:
+            print """Exlatex module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            
 
 

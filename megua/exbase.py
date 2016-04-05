@@ -139,7 +139,7 @@ Make a static, ie, non parameterized exercise:
 import warnings
 import re
 import os
-
+from os import environ
 
 #SAGEMATH modules
 from sage.all import SageObject 
@@ -151,7 +151,7 @@ from sage.misc.misc import alarm, cancel_alarm
 from megua.parse_param import parameter_change
 from megua.ur import ur
 from megua.ug import UnifiedGraphics
-from megua.mconfig import MEGUA_EXERCISES_OUTPUT
+#tirar from megua.mconfig import MEGUA_EXERCISES_OUTPUT
 
        
         
@@ -208,7 +208,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         assert(self._answer_text)
 
         #Create if not exist: exercise working directory (images, latex,...)
-        self.working_dir = os.path.join(MEGUA_EXERCISES_OUTPUT,self._unique_name)
+        self.working_dir = os.path.join(environ["MEGUA_EXERCISES_OUTPUT"],self._unique_name)
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
 

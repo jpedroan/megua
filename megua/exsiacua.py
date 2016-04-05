@@ -229,11 +229,11 @@ import codecs
 
 #MEGUA modules  
 from megua.exbase import ExerciseBase
-from megua.ug import UnifiedGraphics  
-from megua.ur import ur
+#from megua.ug import UnifiedGraphics  
+#from megua.ur import ur
 from megua.jinjatemplates import templates
-from megua.mconfig import *
 from megua.platex import html2latex
+#tirar? from megua.mconfig import *
 
 
 class ExSiacua(ExerciseBase):    

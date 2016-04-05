@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
 
-SAGECMD="/home/jpedro/SageMath/sage"
-MEGUAROOT="/home/jpedro/megua/megua"
+source $HOME/.megua/mconfig.sh
 
-$SAGECMD -python $MEGUAROOT/c_megua.py "$@"
+# NOTE:
+#
+# The following variable must be set here and not in "mconfig.sh"
+# because it should be turned off below, and this,
+# because megua code must know it was called 
+# from "megua bash commandline".
+
+export MEGUA_BASH_CALL='on'
+
+$SAGECMD -python $MEGUA_MODULES_DIR/c_megua.py "$@"
+
+unset MEGUA_BASH_CALL
 
 exit
 
@@ -11,6 +21,7 @@ exit
 
 ######################################################
 #### THIS, below, IS DONE IN PYTHON IN c_megua.py ####
+####      (kept here for reference only)          #### 
 ######################################################
 
 
