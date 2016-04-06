@@ -55,7 +55,7 @@ if __name__=="__main__":
     if len(sys.argv)==1 or not sys.argv[1] in ['help','catalog','dup','new','meg2smc']:
         usage()
         exit()
-        
+
     if sys.argv[1] == 'help':
         usage()
     elif sys.argv[1] == 'catalog':
@@ -69,6 +69,6 @@ if __name__=="__main__":
     else:
         print "Command not known."
         usage()
-        
+
 
 

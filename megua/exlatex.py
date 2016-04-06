@@ -88,7 +88,7 @@ class ExLatex(ExerciseBase):
             ekey = self.ekey,
          )
 
-        return latex_string         
+        return latex_string
 
 
 
@@ -104,7 +104,7 @@ class ExLatex(ExerciseBase):
 
         EXERCISE_TEX_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.tex')
         EXERCISE_PDF_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.pdf')
-        
+
         try:
             pcompile(latex_string,self.working_dir,self.unique_name(),hideoutput=True)
         except subprocess.CalledProcessError as err:
@@ -127,9 +127,12 @@ class ExLatex(ExerciseBase):
             raise
 
         if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]:
+            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
                 print "Exlatex module say:  open ", EXERCISE_PDF_PATHNAME
-                subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
+                #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([EXERCISE_PDF_PATHNAME])
             else: #sagews SALVUS
                 from smc_sagews.sage_salvus import salvus
                 #Windows latin1 tex
@@ -146,6 +149,8 @@ class ExLatex(ExerciseBase):
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:
             print """Exlatex module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
-            
+
+
+
 
 

@@ -83,7 +83,7 @@ def pcompile(latexstr, workdir, filename, runs=1, hideoutput=True,silent=True):
 
 
     if type(latexstr)==str:
-        print type(latexstr)
+        #print type(latexstr)
         latexstr = latexstr.decode('utf-8','ignore')
         
 

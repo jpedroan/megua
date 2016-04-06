@@ -211,6 +211,7 @@ Some ideas:
 #PYTHON modules
 import httplib, urllib
 import os
+from os import environ
 import re
 import codecs
 
@@ -263,7 +264,7 @@ class ExSiacua(ExerciseBase):
             self._multiplechoice_parser(self.answer(),where="answer")
 
 
-         
+
     def search_replace(self,input_text):
         """Called after parameter_change call. See above."""
 
@@ -274,7 +275,7 @@ class ExSiacua(ExerciseBase):
         text = self.latex_render(text) #ver UnifiedGraphics
         text = self.show_one(text)
         text = _old_html(text)
-        
+
         return text
 
 
@@ -283,7 +284,7 @@ class ExSiacua(ExerciseBase):
         After producing an exercise template or requesting a new instance of some exercise
         this routine will print it on notebook notebook or command line mode. It also should
         give a file were the user can find text markup (latex or html, etc).
-        
+
         TODO: this view should be almost equal to view the exercise in siacua
         """
 
@@ -314,7 +315,7 @@ class ExSiacua(ExerciseBase):
                 probtxt=probtxt,
                 answtxt=answtxt_woCDATA,
                 ekey=self.ekey,
-                mathjax_header=MATHJAX_HEADER)
+                mathjax_header=environ["MATHJAX_HEADER"])
 
         #print html_string
 
@@ -328,19 +329,32 @@ class ExSiacua(ExerciseBase):
         #f.write(html_string.encode('latin1'))
         #f.close()
 
-        html_filename = os.path.join(self.working_dir,uname+'.html')
-        f = codecs.open(html_filename, mode='w', encoding='utf-8')
+        
+        EXERCISE_HTML_PATHNAME = os.path.join(self.working_dir,uname+'.html')
+        f = codecs.open(EXERCISE_HTML_PATHNAME, mode='w', encoding='utf-8')
         f.write(html_string)
         f.close()
-        
-            
-        if MEGUA_PLATFORM=='sagews':
-            from smc_sagews.sage_salvus import salvus
-            salvus.file(html_filename,show=True,raw=True)
-            print ""
-            salvus.html(html_string)
-        else: #MEGUA_PLATFORM=='commandline'
-            print "exsiacua module: open file",html_filename,"in the browser and press F5."        
+
+
+        if environ["MEGUA_PLATFORM"]=='SMC':
+            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+                print "Exsiacua module say:  open ", EXERCISE_HTML_PATHNAME
+                #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([EXERCISE_HTML_PATHNAME])
+            else: #sagews SALVUS
+                from smc_sagews.sage_salvus import salvus
+                salvus.file(EXERCISE_HTML_PATHNAME,show=True,raw=True)
+                print ""
+                salvus.html(html_string)
+        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+            print "Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME
+            subprocess.Popen(["firefox",EXERCISE_HTML_PATHNAME])
+        else:
+            print """Exsiacua module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
+
+
 
 
 

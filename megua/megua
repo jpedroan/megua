@@ -13,7 +13,7 @@ export MEGUA_BASH_CALL='on'
 
 $SAGECMD -python $MEGUA_MODULES_DIR/c_megua.py "$@"
 
-unset MEGUA_BASH_CALL
+export MEGUA_BASH_CALL='off'
 
 exit
 

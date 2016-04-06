@@ -208,7 +208,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         assert(self._answer_text)
 
         #Create if not exist: exercise working directory (images, latex,...)
-        self.working_dir = os.path.join(environ["MEGUA_EXERCISES_OUTPUT"],self._unique_name)
+        self.working_dir = os.path.join(environ["MEGUA_EXERCISE_OUTPUT"],self._unique_name)
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
 

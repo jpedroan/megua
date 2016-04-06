@@ -945,7 +945,6 @@ class MegBook(MegSiacua):
         CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex")
         CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf")
 
-
         f = codecs.open(CATALOG_TEX_PATHNAME, mode='w', encoding='utf-8')
         f.write(latex_string)
         f.close()
@@ -956,8 +955,17 @@ class MegBook(MegSiacua):
 
 
         if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]:
+            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
                 print "MegBook module say:  open ", CATALOG_PDF_PATHNAME
+                #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
+                #Does not work using "sage -python": from smc_pyutil import smc_open
+                #Works using: "python": from smc_pyutil import smc_open
+                #                        smc_open.process([CATALOG_PDF_PATHNAME])
+                #WORKS:subprocess.call(["openpdf.py",CATALOG_PDF_PATHNAME])
+                #ANOTHER SOLUTION (http://stackoverflow.com/questions/3402168/permanently-add-a-directory-to-pythonpath)
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([CATALOG_PDF_PATHNAME])
             else: #sagews SALVUS
                 from smc_sagews.sage_salvus import salvus
                 salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
