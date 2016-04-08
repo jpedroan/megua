@@ -864,16 +864,17 @@ class MegBook(MegSiacua):
 
     def catalog(self,what='all',export='latex'):
         r"""Writes exercises in an ordered fashion 
-        Only: all and latex formats, now.        
+        Only: all and latex formats, now.
         """
-        
+
         self.sc = SectionClassifier(self.megbook_store)
         section_iterator = self.sc.section_iterator()
 
         #ver templates: megbook_catalog_latex
         lts = u'' #exerciseinstanceslatex
-        
-        #Instance creation        
+
+        #Instance creation
+        print "MegBook.py say: making instances of the exercises."
         for s in section_iterator:
 
             #Section creation
@@ -890,11 +891,11 @@ class MegBook(MegSiacua):
             #TODO: image render mode to "filenameimage"
             lts += u'\n\nThis section has {0} exercises.\n\n'.format(len(s.exercises)) # {{ => }
             for unique_name in s.exercises:
-                ex = self.new(unique_name,ekey=0,returninstance=True)     
+                ex = self.new(unique_name,ekey=0,returninstance=True)
                 if ExLatex in ex.__class__.__bases__:
                     #TODO: incluir tipo no template e na section acima
                     ex_str = templates.render("megbook_catalog_instance.tex",
-                                exformat="latex",              
+                                exformat="latex",
                                 unique_name_noslash = unique_name.replace("_","\_"),
                                 summary = ex.summary(),
                                 suggestive_name = ex.suggestive_name(),
@@ -904,7 +905,7 @@ class MegBook(MegSiacua):
                 elif ExSiacua in ex.__class__.__bases__:
                     #TODO: incluir tipo no template e na section acima
                     ex_str = templates.render("megbook_catalog_instance.tex",
-                                exformat="siacua",              
+                                exformat="siacua",
                                 unique_name_noslash = unique_name.replace("_","\_"),
                                 summary = ex.summary(),
                                 suggestive_name = ex.suggestive_name(),
@@ -914,7 +915,7 @@ class MegBook(MegSiacua):
                 else:
                     #TODO: incluir tipo no template e na section acima
                     ex_str = templates.render("megbook_catalog_instance.tex",
-                                exformat="textual (exbase)",              
+                                exformat="textual (exbase)",
                                 unique_name_noslash = unique_name.replace("_","\_"),
                                 summary = ex.summary(),
                                 suggestive_name = ex.suggestive_name(),
@@ -936,22 +937,23 @@ class MegBook(MegSiacua):
 
 
 
+        print "MegBook.py say: compiling latex file containing the instances of the exercises."
 
         latex_string =  templates.render("megbook_catalog_latex.tex",
                          exerciseinstanceslatex=lts)
 
 
-        MEGUA_EXERCISES_CATALOG = environ["MEGUA_EXERCISES_CATALOG"]
-        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.tex")
-        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISES_CATALOG,"catalog.pdf")
+        MEGUA_EXERCISE_CATALOG = environ["MEGUA_EXERCISE_CATALOG"]
+        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"catalog.tex")
+        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"catalog.pdf")
 
         f = codecs.open(CATALOG_TEX_PATHNAME, mode='w', encoding='utf-8')
         f.write(latex_string)
         f.close()
 
         #TODO: convert all os.system to subprocess.call or subprocess.Popen
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISES_CATALOG,"catalog.tex") )
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"catalog.tex") )
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"catalog.tex") )
 
 
         if environ["MEGUA_PLATFORM"]=='SMC':
@@ -969,13 +971,13 @@ class MegBook(MegSiacua):
             else: #sagews SALVUS
                 from smc_sagews.sage_salvus import salvus
                 salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
-                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"                
+                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
                 salvus.open_tab(CATALOG_PDF_PATHNAME)
         elif environ["MEGUA_PLATFORM"]=='DESKTOP':
             print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:
-            print """MegBook module say: environ["MEGUA_EXERCISES_CATALOG"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            print """MegBook module say: environ["MEGUA_EXERCISE_CATALOG"] must be properly configured at $HOME/.megua/mconfig.sh"""
 
 
 
