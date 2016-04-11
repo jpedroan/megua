@@ -137,6 +137,7 @@ Make a static, ie, non parameterized exercise:
 
 #PYTHON modules
 import warnings
+#warnings.filterwarnings("error")
 import re
 import os
 from os import environ
@@ -153,7 +154,8 @@ from megua.ur import ur
 from megua.ug import UnifiedGraphics
 #tirar from megua.mconfig import MEGUA_EXERCISES_OUTPUT
 
-       
+
+
         
 class ExerciseBase(SageObject,UnifiedGraphics):
     """Class ``ExerciseBase`` is the base class for an exercise.
@@ -254,8 +256,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
             self.update(ekey,edict,render_method)
 
         except KeyboardInterrupt:
-
-            print 'Exercise is taking too long to make!'
+            print 'Exercise "%s" is taking too long to make!' % self.unique_name()
             print 'Check make_random() routine or increase meg.max_computation_time.'
             # if the computation finished early, though, the alarm is still ticking!
             # so let's turn it off below.

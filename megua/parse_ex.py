@@ -204,12 +204,12 @@ def parse_ex(inputtext):
     ....:  My answer.
     ....: class E12A34_name_001(ExerciseBase):
     ....:   more lines here''')
-    {'answer_text': '\n My answer.\n',
+    {'answer_text': 'My answer.',
      'class_text': 'class E12A34_name_001(ExerciseBase):\n  more lines here',
-     'problem_text': '\n My Problem.\n',
+     'problem_text': 'My Problem.',
      'sections_text': 'Section',
      'suggestive_name': 'Suggestive Textual Name',
-     'summary_text': '\n My summary.\n',
+     'summary_text': 'My summary.',
      'unique_name': 'E12A34_name_001'}
      
 
@@ -226,13 +226,15 @@ def parse_ex(inputtext):
     ....:       more lines ''')
     Ignoring text 'Answer Comment' in %answer tag at line 6.
     <BLANKLINE>
-    {'answer_text': '\n    My answer.\n',
-     'class_text': 'class E12A34_name_001(ExerciseBase):\n      more lines ',
-     'problem_text': '\n     My Problem.\n',
+    Check exercise E12A34_name_001 for the above warnings.
+    {'answer_text': 'My answer.',
+     'class_text': 'class E12A34_name_001(ExerciseBase):\n      more lines',
+     'problem_text': 'My Problem.',
      'sections_text': 'Section',
      'suggestive_name': 'Suggestive Textual Name',
-     'summary_text': '\n     My summary.\n',
+     'summary_text': 'My summary.',
      'unique_name': 'E12A34_name_001'}
+
 
     Example when class name is malformed::
 
@@ -253,6 +255,7 @@ def parse_ex(inputtext):
     <BLANKLINE>
     Expected python/sage class definition on line 8 or class identifier is wrong.
     Class identifier must follow a name like: E12A34_somename_number.
+    Check the exercise for the above warnings.
     """
 
     #Parse each line to LineToken "lines"
@@ -311,9 +314,11 @@ def parse_ex(inputtext):
                         print "Each problem can have a suggestive name. \n"\
                               "Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.\n"
                         warn_found = True     
-                    txt_problemname = '(...)' #txtinfo
+                        txt_problemname = '(...)' #txtinfo
+                    else:
+                        txt_problemname = txtinfo
                 #TODO Review this txt_problem = '\n%problem ' + txtinfo + '\n'
-                txt_problem = '\n'
+                txt_problem = '\n' #starts class code with \n
                 current+=1
             else:
                 error_found = True
@@ -526,7 +531,7 @@ class E26A36_antiderivativeparts_005(Exercise):
             print 'line '+str(line+1)+': "' + txtlines[line] +'"'
             print r
 
-    res = exerc_parse(txt)
+    res = parse_ex(txt)
     if res is not None:    
         (s,p,a,c) = res
         print s

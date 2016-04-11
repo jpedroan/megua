@@ -373,3 +373,10 @@ def equation2display(txt):
     """Put \displaystyle\$  in each $$"""
     return re.subn(r"\$\$(.*?)\$\$",r"$\displaystyle \1$",txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
         
+r"""
+
+
+
+
+
+"""

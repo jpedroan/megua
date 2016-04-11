@@ -63,6 +63,7 @@ Save a new or changed exercise:
    Each problem can have a suggestive name. 
    Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
    <BLANKLINE>
+   Check exercise E28E28_pdirect_001 for the above warnings.
    -------------------------------
    Instance of: E28E28_pdirect_001
    -------------------------------
@@ -70,15 +71,65 @@ Save a new or changed exercise:
    Here one can write few words, keywords about the exercise.
    For example, the subject, MSC code, and so on.
    ==> Problem instance
-   What is the primitive of -1 x + (-5/4) ?
+   What is the primitive of -1 x + -5/4 ?
    ==> Answer instance
    prim1
    sage: meg
-    MegBook('_output/megbasedb.sqlite')
+   MegBook('_output/megbasedb.sqlite')
 
-   Long computation? Two examples follow:
-   
+
+Testing a warning error:
+
+::
+
    sage: meg.save(r'''
+   ....: %Summary Primitives
+   ....: Here one can write few words, keywords about the exercise.
+   ....: For example, the subject, MSC code, and so on.
+   ....:   
+   ....: %Problem A Primitive
+   ....: What is the primitive of ap x + bp@() ?
+   ....: 
+   ....: %Answer
+   ....: prim1
+   ....: 
+   ....: class E28E28_pdirect_001(ExerciseBase):
+   ....: 
+   ....:     def make_random(self,edict=None):
+   ....:         x = SR.var("x")
+   ....:         yy = (exp(x)*exp(5*x)).simplify_exp() #deprecated
+   ....:         self.ap = ZZ.random_element(-4,4) + yy
+   ....:         self.bp = self.ap + QQ.random_element(1,4)
+   ....:         x=SR.var('x')
+   ....:         self.prim1 = integrate(self.ap * x + self.bp,x)
+   ....: ''')
+    MegBook.py say: exercise "E28E28_pdirect_001" needs review! See below:
+    simplify_exp is deprecated. Please use canonicalize_radical instead.
+    See http://trac.sagemath.org/11912 for details.
+            x = SR.var("x")
+            yy = (exp(x)*exp(5*x)).simplify_exp() #deprecated
+            self.ap = ZZ.random_element(-4,4) + yy
+            self.bp = self.ap + QQ.random_element(1,4)
+    ======= end of warning list ==========
+    -------------------------------
+    Instance of: E28E28_pdirect_001
+    -------------------------------
+    ==> Summary:
+    Here one can write few words, keywords about the exercise.
+    For example, the subject, MSC code, and so on.
+    ==> Problem instance
+    What is the primitive of e^{\left(6 \, x\right)} - 1 x + e^{\left(6 \, x\right)} - \frac{5}{4} ?
+    ==> Answer instance
+    prim1
+
+
+
+Long computation? Two examples follow:
+
+::
+   
+   sage: try:    
+   ....:     meg.save(r'''
    ....: %Summary Long Computations Section; Example 1
    ....: Testing the production of exercises with long computations.
    ....:   
@@ -94,13 +145,13 @@ Save a new or changed exercise:
    ....:     def make_random(self,edict=None):
    ....:         #suppose a 15 seconds computation here
    ....:         #maximum by default is 10 (see MegBook)
-   ....:         #sleep(15)  #remove # for tests
-   ....:         #do something else.
+   ....:         sleep(15)  #remove comment for tests
+   ....:         pass
    ....: ''')
-   Exercise is taking too long to make!
+   ....: except KeyboardInterrupt:
+   ....:     pass
+   Exercise "E28E28_pdirect_001" is taking too long to make!
    Check make_random() routine or increase meg.max_computation_time.
-   Exercise was not saved.
-
 
 ::
 
@@ -122,8 +173,8 @@ Save a new or changed exercise:
    ....:         #suppose a 15 seconds computation here
    ....:         #maximum by default is 10 (see MegBook)
    ....:         #sleep(5)  #remove # for tests
-   ....:         #do something else.
-   ....:            
+   ....:         #do something else.   
+   ....:         pass   
    ....: ''') 
    -------------------------------
    Instance of: E28E28_pdirect_001
@@ -135,12 +186,11 @@ Save a new or changed exercise:
    ==> Answer instance
    prim1
 
-
 Make a catalog:
 
 ::
 
-   sage: meg.catalog()
+   sage: #meg.catalog() #opens evince
    
    
 Search an exercise:
@@ -177,8 +227,6 @@ Meaning of _ and __ (double underscorre):
 
 TODO: read http://stackoverflow.com/questions/1301346/the-meaning-of-a-single-and-a-double-underscore-before-an-object-name-in-python
 
-
-
 """
 
 
@@ -207,7 +255,7 @@ import random
 import re
 import codecs
 import random as randomlib #random is imported as a funtion somewhere
-
+import warnings
 
 
 #SAGE modules
@@ -318,16 +366,20 @@ class MegBook(MegSiacua):
 
         """
         
-#TODO: improve this try because it's hidding programmer coding errors and not only  author coding errors.
-#        try:
-            #First check: syntatic level ("megua" script)
+        #TODO: improve this try because it's hidding programmer coding errors and not only  author coding errors.
+        #try:
+        #First check: syntatic level ("megua" script)
+        
         row =  parse_ex(to_unicode(uexercise))
+        
         if not row:
             raise
             
+        ex_instance = self.exerciseinstance(row,ekey=0)
+
             
         #Second check: syntatic and runtime  ("python/sagemath" script)
-        ex_instance = self.exerciseinstance(row,ekey=0)            
+        ######
         #Third check: create contens (latex compilation, for example)
         ex_instance.print_instance()
 
@@ -340,31 +392,104 @@ class MegBook(MegSiacua):
         
 
 
-            
+    def new(self, unique_name, ekey=None, edict=None, returninstance=False):
+        r"""Prints an exercise instance of a given type
 
-#TODO: improve or adpat this check_all method
-#    def check_all(self,dest='.'):
-#        r""" 
-#        Check all exercises of this megbook for errrors.
-#
-#        INPUT:
-#
-#        OUTPUT:
-#
-#            Printed message and True/False value.
-#        """
-#
-#        all_ex = []
-#        for row in ExIter(self.megbook_store):
-#            if not self.is_exercise_ok(row,dest,silent=True):
-#                print "   Exercise '%s' have python/sage or compilation errors." % row['unique_name']
-#                all_ex.append(row['unique_name'])
-#        if all_ex:
-#            print "Review the following exercises:"
-#            for r in all_ex:
-#                print r
-#        else:
-#            print "No problem found."
+        INPUT:
+
+         - ``unique_name`` -- the class name.
+         - ``ekey`` -- the parameteres will be generated for this random seed.
+         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
+         - ``returninstance`` -- if True, this function return a python object.
+
+        OUTPUT:
+            An instance of class named ``unique_name``.
+
+        """
+        #Get summary, problem and answer and class_text
+        row = self.megbook_store.get_classrow(unique_name)
+        if not row:
+            print "%s cannot be accessed on database" % unique_name
+            return
+        
+        #Create and print the instance
+        ex_instance = self.exerciseinstance(row, ekey, edict)
+        
+        if returninstance:
+            return ex_instance
+        else:
+            ex_instance.print_instance()
+            return
+
+    
+
+    
+    def exerciseinstance(self, row, ekey=None, edict=None):
+        r"""
+        This function creates an instance of a class named in parameter row["unique_name"]. 
+    
+        INPUT:
+    
+         - ``row``-- a dictionary containing fields: 'summary_text', 'problem_text',  'answer_text'.
+         - ``ekey`` -- the parameteres will be generated for this random seed.
+         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
+    
+        OUTPUT:
+            An instance of class named ``unique_namestring``.
+    
+        FIELDS in row:
+    
+        - row['unique_name']
+        - row['sections_text']
+        - row['suggestive_name']
+        - row['summary_text']
+        - row['problem_text']
+        - row['answer_text']
+        - row['class_text']
+
+        DEVELOP:
+    
+        - http://docs.python.org/library/exceptions.html#exceptions.Exception
+        - Note on python warnings: SageMath calls reset.... so use of warnings.filterwarnings('error') does not work with try...except.
+
+        """
+        
+        code_string = templates.render("megbook_instance_new.sage",
+            unique_name=row["unique_name"],
+            class_text=row["class_text"],
+            sumtxt=row['summary_text'],
+            probtxt=row['problem_text'],
+            anstxt=row['answer_text'],
+            suggestivename=row['suggestive_name'],
+            ekey = ekey,
+            edict = edict
+         )
+
+        #Create if not exist: exercise working directory (images, latex,...)
+        working_dir = os.path.join(environ["MEGUA_EXERCISE_OUTPUT"],row["unique_name"])
+        if not os.path.exists(working_dir):
+            os.makedirs(working_dir)
+
+        cfilename = os.path.join(working_dir,row["unique_name"]+'.sage')
+
+        with codecs.open(cfilename, encoding='utf-8', mode='w') as f:
+            f.write(code_string)
+
+        with warnings.catch_warnings(record=True) as wlist:
+            load(cfilename) #sagemath load command
+            if len(wlist)>0:
+                print 'MegBook.py say: exercise "%s" needs review! See below:' % row['unique_name']
+            for w in wlist:
+                #print warnings.showwarning(w)
+                #Simple way of showing an warning: 
+                #print w
+                display_warning(w,code_string) #find in this file
+            if len(wlist)>0:
+                print '======= end of warning list =========='
+        
+        return ex_instance #the value of ex_instance is created in load()
+    
+    
 
 
 
@@ -479,203 +604,6 @@ class MegBook(MegSiacua):
             self.megbook_store.remove_exercise(unique_namestring)
         else:
             print "Exercise %s is not on the database." % unique_namestring
-
-
-
-    def new(self, unique_name, ekey=None, edict=None, returninstance=False):
-        r"""Prints an exercise instance of a given type
-
-        INPUT:
-
-         - ``unique_name`` -- the class name.
-         - ``ekey`` -- the parameteres will be generated for this random seed.
-         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-         - ``returninstance`` -- if True, this function return a python object.
-
-        OUTPUT:
-            An instance of class named ``unique_name``.
-
-        """
-        #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(unique_name)
-        if not row:
-            print "%s cannot be accessed on database" % unique_name
-            return
-        
-        #Create and print the instance
-        ex_instance = self.exerciseinstance(row, ekey, edict)
-        
-        if returninstance:
-            return ex_instance
-        else:
-            ex_instance.print_instance()
-            return
-
-    
-
-
-    def exerciseclass(self, row):
-        r"""
-        Interpret the `exercise class` (not an object) from text fields:
-
-        - Put the class designed by an author in the global namespace 
-        - (not yet the instance)
-        
-        DEVELOPMENT:
-
-        Check:
-        
-        - global namespace has the class name.
-        
-        Instructions that did not work but don't know why::
-
-            #sage_class_string = preparse_file(row['class_text'],globals=globals())
-            #sage_class_string = u"# -*- coding: utf-8 -*\nfrom sage.all import *\nfrom megua.all import *\n" + sage_class_string
-            #sage_class_string = u"from sage.all import *\nfrom megua.all import *\n" + sage_class_string
-            #exec(...), only exec statment works.
-
-            #exec compile(sage_class,row["unique_name"],'eval')
-            #sage_eval did not work. Why ?
-            #http://www.sagemath.org/doc/reference/misc/sage/misc/sage_eval.html
-            #and spread this for more points in code.
-
-        """
-    
-        # TODO: control the time and the process. Is it of value?
-
-        sage_class_string = preparse(row['class_text'])
-        sage_class_string = u"from megua.all import *\n" + sage_class_string
-        exec sage_class_string
-
-         # TODO NOW: ACABAR ISTO
-#        except: 
-#            tmp = "_temp" #tempfile.mkdtemp()
-#            pfilename = tmp+"/"+row["unique_name"]+".sage"
-#            pcode = open(pfilename,"w")
-#            pcode.write("# -*- coding: utf-8 -*\nfrom megua.all import *\n" + row['class_text'].encode("utf-8") )
-#            pcode.close()
-#            errfilename = "%s/err.log" % tmp
-#            os.system("sage %s 2> %s" % (pfilename,errfilename) ) # sage -python ???
-#            errfile = open(errfilename,"r")
-#            err_log = errfile.read()
-#            errfile.close()
-#            #TODO: adjust error line number by -2 lines HERE.
-#            #....
-#            #remove temp directory
-#            #print "=====> tmp = ",tmp
-#            #os.system("rm -r %s" % tmp)
-#            print "Error log:", err_log #user will see errors on syntax.
-#            raise SyntaxError  #to warn user #TODO: not always SyntaxError
-    
-        #Get class name
-        #The string contents row['unique_name'] is now a valid identifier.
-        ex_class = eval(row['unique_name']) 
-
-    
-        #class fields
-        ex_class._summary_text = row['summary_text']
-        ex_class._problem_text = row['problem_text']
-        ex_class._answer_text  = row['answer_text'] 
-        ex_class._unique_name  = row['unique_name']
-        ex_class._suggestive_name = row['suggestive_name']
-    
-        return ex_class
-    
-        
-    
-    def exerciseinstance(self, row, ekey=None, edict=None):
-        r"""
-        Instantiates the `exercise class` (not an object) from text fields.
-        Then, creates an instance using  `exercise_instance` routine.
-    
-        This function creates an instance of a class named in parameter unique_namestring. That class must be already defined in memory.
-    
-        INPUT:
-    
-         - ``row``-- the sqlite row containing fields: 'summary_text', 'problem_text',  'answer_text'.
-         - ``ekey`` -- the parameteres will be generated for this random seed.
-         - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-    
-        OUTPUT:
-            An instance of class named ``unique_namestring``.
-    
-        DEVELOP:
-    
-        - http://docs.python.org/library/exceptions.html#exceptions.Exception
-        - TODO: control the time and the process
-
-        """
-
-        #Create the class (not yet the instance). 
-        #See exerciseclass definition above.
-        ex_class = self.exerciseclass(row)    
-
-
-        #TODO: remove this and active "try" below
-        #TODO: use "load" (check sandbox/python_modules)
-        ex_instance = ex_class(ekey,edict)
-    
-#        try:
-#            ex_instance = ex_class(ekey,edict)
-#        except: 
-#            tmp = "_temp" # tempfile.mkdtemp()
-#            pfilename = tmp+"/"+row["unique_name"]+".sage"
-#            pcode = open(pfilename,"w")
-#            pcode.write("# coding=utf-8\nfrom megua.all import *\n" + row['class_text'].encode("utf-8")+"\n")
-#            pcode.write(row['unique_name'] + "(ekey=" + str(ekey) + ", edict=" + str(edict) + ")\n")
-#            pcode.close()
-#            errfilename = "%s/err.log" % tmp
-#            os.system("sage %s 2> %s" % (pfilename,errfilename) )
-#            errfile = open(errfilename,"r")
-#            err_log = errfile.read()
-#            errfile.close()
-#            #TODO: adjust error line number by -2 lines HERE.
-#            #....
-#            #remove temp directory
-#            #print "=====> tmp = ",tmp
-#            ######os.system("rm -r %s" % tmp)
-#            print err_log
-#            return None #raise #Need to specify "raise Exception"?  
-        
-        return ex_instance
-    
-    
-
-#TODO: remove get method ?    
-#    def get(self,unique_name,ekey=None,edict=None):
-#        r"""
-#
-#        INPUT:
-#
-#        - ``unique_name``: problem name (name in "class E12X34_something_001(Exercise):").
-#        - ``ekey``: numbers that generate the same problem instance.
-#        - ``edict``: dictionary of values
-#
-#        OUTPUT:
-#
-#        - this command writes an html file with all instances.
-#
-#        NOTE:
-#
-#        - you can export between 3 and 6 wrong options and 1 right.
-#
-#            
-#        Algorithm:
-#            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
-#
-#        """    
-#        
-#        #Create exercise instance
-#        row = self.megbook_store.get_classrow(unique_name)
-#        if not row:
-#            print "Exercise %s not found." % unique_name
-#            return
-#
-#        if ekey or edict:
-#            return self.exerciseinstance(row,ekey,edict)
-#        else:
-#            return self.exerciseclass(row) 
-
 
 
 
@@ -994,7 +922,17 @@ def m_get_sections(sectionstxt):
     return s.replace(";","/") #possible case without space: ";" by "/"
 
 
-
+def display_warning(w,code_string):
+    print w.message
+    code_list = code_string.split("\n")
+    line = w.lineno
+    if line>1:
+        code_debug_str = '\n'.join(code_list[line-2:line+2])
+    else:
+        code_debug_str = '\n'.join(code_list[0:line+1])
+    print code_debug_str 
+        
+    
 
 #end class MegBook
 
