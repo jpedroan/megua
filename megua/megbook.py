@@ -452,6 +452,10 @@ class MegBook(MegSiacua):
         - http://docs.python.org/library/exceptions.html#exceptions.Exception
         - Note on python warnings: SageMath calls reset.... so use of warnings.filterwarnings('error') does not work with try...except.
 
+        - To locate unicode problems in byte position 1508 use:
+            - $ python -c "print hex(1508)"
+            - $ hd E97H30_Equacaoliteral2_002_latex.sage
+
         """
         
         code_string = templates.render("megbook_instance_new.sage",
@@ -475,17 +479,25 @@ class MegBook(MegSiacua):
         with codecs.open(cfilename, encoding='utf-8', mode='w') as f:
             f.write(code_string)
 
-        with warnings.catch_warnings(record=True) as wlist:
-            load(cfilename) #sagemath load command
-            if len(wlist)>0:
-                print 'MegBook.py say: exercise "%s" needs review! See below:' % row['unique_name']
-            for w in wlist:
-                #print warnings.showwarning(w)
-                #Simple way of showing an warning: 
-                #print w
-                display_warning(w,code_string) #find in this file
-            if len(wlist)>0:
-                print '======= end of warning list =========='
+        try:
+            with warnings.catch_warnings(record=True) as wlist:
+                load(cfilename) #sagemath load command
+                if len(wlist)>0:
+                    print 'MegBook.py say: exercise "%s" needs review! See below:' % row['unique_name']
+                for w in wlist:
+                    #print warnings.showwarning(w)
+                    #Simple way of showing an warning: 
+                    #print w
+                    display_warning(w,code_string) #find in this file
+                if len(wlist)>0:
+                    print '======= end of warning list =========='
+        except SyntaxError as s:
+            print 'MegBook.py say: exercise "%s" causes a syntatical error and needs review! See below.' % row['unique_name']
+            print 'See line %d in file "%s".' % (s.lineno,cfilename)
+            display_syntaxerror(s,code_string)
+            raise s
+        
+        
         
         return ex_instance #the value of ex_instance is created in load()
     
@@ -924,6 +936,8 @@ def m_get_sections(sectionstxt):
 
 def display_warning(w,code_string):
     print w.message
+    #print "Around line:",w.lineno #<-could be on runtime without line
+    #print "Filename:",w.filename #<- always megbase.py ?
     code_list = code_string.split("\n")
     line = w.lineno
     if line>1:
@@ -932,7 +946,24 @@ def display_warning(w,code_string):
         code_debug_str = '\n'.join(code_list[0:line+1])
     print code_debug_str 
         
-    
+
+def display_syntaxerror(s,code_string):
+    print s.msg #specific error description
+    print s.message #code where error is
+
+    if '(unicode error)' in s.msg:
+        print "Localte with" 
+        print "   $ python -c \"print hex(<position of the byte>)\" "
+        print "   $ hd <file.sage>"
+        print "   and rewrite the full paragraph, maybe!"
+
+    # strcuture of "s":    
+    #'__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', 
+    #'__getitem__', '__getslice__', '__hash__', '__init__', '__new__', '__reduce__', 
+    #'__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__', '__str__', 
+    #'__subclasshook__', '__unicode__', 'args', 'filename', 'lineno', 'message', 'msg', 
+    #'offset', 'print_file_and_line', 'text']
+
 
 #end class MegBook
 

@@ -83,10 +83,10 @@ R15=RealField(15)
 #For more digit numbers
 R20 = RealField(20)
 
-
 ##############
 #TikZmod -- Routines to convert sage plots into latex TikZ markup.
 ##############
+
 
 
 def getpoints_str(pointlist):

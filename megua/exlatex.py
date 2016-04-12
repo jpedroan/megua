@@ -146,7 +146,7 @@ class ExLatex(ExerciseBase):
                 salvus.open_tab(EXERCISE_PDF_PATHNAME)
         elif environ["MEGUA_PLATFORM"]=='DESKTOP':
             print "Exlatex module say: evince ",EXERCISE_PDF_PATHNAME
-            subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
+            subprocess.Popen(["evince",EXERCISE_PDF_PATHNAME])
         else:
             print """Exlatex module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
 
