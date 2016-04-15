@@ -130,7 +130,7 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename):
     newsagefile = codecs.open(sqlitefilename+'.sage', 'w', 'utf-8')
     newsagefile.write(u'# coding=utf8\n\n')
     newsagefile.write(u'from megua.all import *\n')
-    newsagefile.write(u'meg = MegBook("%s")\n\n' % newmegbookfilename)
+    newsagefile.write(u'#meg = MegBook("%s")\n\n' % newmegbookfilename)
     newsagefile.write(u'''print "Open file %s and replace all 'Exercise.' by 'ExLatex.' or 'ExSiacua.';"\n\n''')
 
 

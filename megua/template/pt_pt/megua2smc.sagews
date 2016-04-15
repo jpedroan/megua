@@ -5,9 +5,8 @@
 {{marker_output}}{{uuid4}}{{marker_output}}{{json_html}}{{marker_output}}
 
 {{marker_cell}}{{uuid2}}a{{marker_cell}}
-%auto
 from megua.all import *
-meg = MegBook('{{megbookfilename}}')
+#meg = MegBook('{{megbookfilename}}')
 {{marker_cell}}{{uuid3}}{{marker_cell}}
 meg.save(r'''
 %SUMMARY  {{sections}}

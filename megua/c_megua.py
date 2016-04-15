@@ -41,7 +41,7 @@ def usage():
     print "  help <cmd>          -- calls help on command <cmd>"  
     print "  catalog             -- produce a catalog based on exercises database"  
     print "  dup                 -- duplicate name, inc. counter, make new exercise file"  
-    print "  new                 -- make new exercise file"  
+    print "  new <filename>      -- make new exercise file"  
     print "  meg2smc             -- convert megua5.2 database to megua for smc"  
 
 
@@ -63,12 +63,18 @@ if __name__=="__main__":
     elif sys.argv[1] == 'dup':
         raise NotImplementedError
     elif sys.argv[1] == 'new':
-        raise NotImplementedError
+        if len(sys.argv)<3:
+            usage()
+            exit()
+        if len(sys.argv)>3:
+            print "megua new <filename>, only; other arguments were ignored."
+        meg.new_exercise(sys.argv[2])
     elif sys.argv[1] == 'meg2smc':
         print "At bash, call 'sage -python meg2smc.py'"
     else:
         print "Command not known."
         usage()
+        exit()
 
 
 

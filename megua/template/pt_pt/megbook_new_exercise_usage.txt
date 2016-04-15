@@ -1,0 +1,4 @@
+
+Megbook.py say: filename must be a name in form E12X34_SomeName_001_latex ou _siacua or _moodle and related extension *.sagews or *.sage.
+
+

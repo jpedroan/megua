@@ -244,9 +244,9 @@ TODO: read http://stackoverflow.com/questions/1301346/the-meaning-of-a-single-an
 
 
 #PYTHON modules:
-import tempfile
+#import tempfile
+#import shutil
 import sqlite3 #for row objects as result from localstore.py
-import shutil
 import os
 from os import environ
 import subprocess
@@ -257,6 +257,13 @@ import codecs
 import random as randomlib #random is imported as a funtion somewhere
 import warnings
 
+#For sagews files:
+import json
+from uuid import uuid4
+def uuid():
+    return unicode(uuid4())
+MARKERS = {'cell':u"\uFE20", 'output':u"\uFE21"}
+#end.
 
 #SAGE modules
 from sage.all import * #needed in exec (see exerciseinstance)
@@ -344,10 +351,145 @@ class MegBook(MegSiacua):
     def __repr__(self):
         return "MegBook('%s')" % self.local_store_filename
 
-    def make_index(self,where='.',debug=False):
-        #warnings.warn("make_index() is deprecated. TODO: what to do ?", DeprecationWarning)
-        raise NotImplementedError
+    def new_exercise(self,filename):
+        r"""
+        Create a new file.
+        
+        INPUT:
+        - `filename`: a name in form E12X34_SomeName_001_latex ou _siacua or _moodle and related extension *.sagews or *.sage.
 
+
+        FUTURE IDEAS:
+        
+        Argument has two possibilities:
+        
+        - a "basename" of an existent file: in this case, an existent \
+        filename is searched and a new filename with increased counter is created. 
+        - a full filename, including extension and type.
+        
+        Type is:
+        
+           - fullname (com MSC, com número inicial, com _latex, _siacua): 
+           procura existentes, adiciona a contagem, vai buscar um modelo baseado no anterior
+
+           - args[0]: basename  (sem MSC e sem número final)
+           - args[1]: sagews, sage, ...  #extraído do .megua/mconfig.sh MEGUA_EXERCISE_DEFAULTEXT
+           - args[2]: latex, siacua, moodle #extraído do .megua/mconfig.sh MEGUA_EXERCISE_DESTINY
+        
+        Automatic Process:
+        
+            - megua check all | <some exercise> 
+            - command meg.save() could try to adjust filename?
+        
+        """
+
+        # Directory where exercises are stored
+
+        fullpath = os.path.join(
+            environ["MEGUA_EXERCISE_INPUT"],
+            filename)
+        
+        if os.path.isfile(fullpath) :
+            print "Megbook.py say: '%s' already exists. Choose another name" % filename
+            return
+
+        # =====
+        # decision by file type
+        # =====
+
+        if filename[-7:] == '.sagews':
+
+            # =====
+            # decision by exercise type
+            # =====
+
+            if '_latex' in filename:
+                
+                htmlstr = u'<h4>%s (Latex)</h4>' % filename[0:-7]
+                
+                e_string = templates.render("megbook_exlatex.sagews",
+                    unique_name=filename[0:-7],
+                    megbookfilename=self.local_store_filename,
+                    uuid1=uuid(),
+                    uuid2=uuid(),
+                    uuid3=uuid(),
+                    uuid4=uuid(),
+                    marker_cell=MARKERS["cell"],
+                    marker_output=MARKERS["output"],
+                    html=htmlstr,
+                    json_html=json.dumps({'html':htmlstr})
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            elif '_siacua' in filename:
+                
+                htmlstr = u'<h4>%s (Siacua)</h4>' % filename[0:-7]
+                
+                e_string = templates.render("megbook_exsiacua.sagews",
+                    unique_name=filename[0:-7],
+                    megbookfilename=self.local_store_filename,
+                    uuid1=uuid(),
+                    uuid2=uuid(),
+                    uuid3=uuid(),
+                    uuid4=uuid(),
+                    marker_cell=MARKERS["cell"],
+                    marker_output=MARKERS["output"],
+                    html=htmlstr,
+                    json_html=json.dumps({'html':htmlstr})
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            else:
+                
+                print templates.render("megbook_new_exercise_usage.txt")
+            
+        elif filename[-5:] == '.sage':
+
+            # =====
+            # decision by exercise type
+            # =====
+
+            if '_latex' in filename:
+                
+                e_string = templates.render("megbook_exlatex.sage",
+                    unique_name=filename[0:-5],
+                    megbookfilename=self.local_store_filename,
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            elif '_siacua' in filename:
+                
+                e_string = templates.render("megbook_exsiacua.sage",
+                    unique_name=filename[0:-5],
+                    megbookfilename=self.local_store_filename,
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            else:
+                
+                print templates.render("megbook_new_exercise_usage.txt")
+            
+            
+        else:
+
+            print templates.render("megbook_new_exercise_usage.txt")
+            #print "Megbook.py say: filename must be " 
+            #    "a name in form E12X34_SomeName_001_latex ou "
+            #    "_siacua or _moodle and related extension *.sagews or *.sage."
+
+
+
+
+        
+        
     def save(self,uexercise):
         r"""
         Save an exercise defined on a `python string`_ using a specific sintax defined here_.
