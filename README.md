@@ -32,3 +32,60 @@ DEVELOP
 * ascii art http://doc.sagemath.org/html/en/reference/misc/sage/typeset/character_art.html
 
 
+
+* http://doc.sagemath.org/html/en/reference/calculus/sage/symbolic/function_factory.html
+
+
+Answered questions
+------------------
+
+- startup file for sagews 
+
+https://groups.google.com/forum/#!topic/sage-cloud/L-9QwvlfnvY
+
+que se converteu num ticket:
+
+https://github.com/sagemathinc/smc/issues/369
+
+
+## Sobre o salvus
+
+HTML e Links
+
+https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/dg4mhp99cOg/9LiiIdEonlYJ
+
+Imagens
+
+https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/-nChfU76j7Q/D-y8rIPfUngJ
+
+
+
+## Packages
+
+**Instalar packages**
+
+**user-installed packages in sage worksheets vs. sage command line**
+
+https://groups.google.com/forum/#!searchin/sage-cloud/package/sage-cloud/ps_6eV1ljjE/uHQEiMzIfwMJ
+
+**Own Module**
+
+https://github.com/sagemathinc/smc/wiki/FAQ#own-module
+
+**Método preferido**
+
+Seguir o comando aqui:
+
+- https://docs.python.org/2/install/#alternate-installation-the-user-scheme
+
+Depois apagar o modulo instalado e fazer:
+
+- $ cd /projects/69b82f4f-dc00-498d-817e-f3575041e14e/.local/lib/python2.7/site-packages
+- $ ln -s /project-folder/megua/megua
+
+e o pacote ficará disponível tanto para command line como para worksheet.
+
+
+
+**FIM**
+
