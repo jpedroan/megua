@@ -256,6 +256,8 @@ import re
 import codecs
 import random as randomlib #random is imported as a funtion somewhere
 import warnings
+import httplib, urllib
+
 
 #For sagews files:
 import json
@@ -294,7 +296,6 @@ from megua.csection import SectionClassifier
 #from xmoodle import MoodleExporter
 #from xsphinx import SphinxExporter
 #from xlatex import * #including PDFLaTeXExporter
-
 
 
 
@@ -618,7 +619,7 @@ class MegBook(MegSiacua):
 
         cfilename = os.path.join(working_dir,row["unique_name"]+'.sage')
 
-        with codecs.open(cfilename, encoding='utf-8', mode='w') as f:
+        with codecs.open(cfilename, encoding='utf-8', mode='w', errors="ignore") as f:
             f.write(code_string)
 
         try:
@@ -1062,6 +1063,76 @@ class MegBook(MegSiacua):
             print """MegBook module say: environ["MEGUA_EXERCISE_CATALOG"] must be properly configured at $HOME/.megua/mconfig.sh"""
 
 
+
+        
+    def fast_exam_siacua(self, course, concept_id, num_questions):
+        r"""
+        The command requests the Siacua system an exam with the following requirements:
+        
+        INPUT:
+        
+        - ``course'' : string  ("calculo2", "calculo3", "matbas", ...)
+        - ``concept_id'': in the context of the course <3 digits>
+        - ``num_questions'': number of questions
+        
+        OUTPUT:
+        
+        - Output a LaTeX file with an exam.
+        - VERIFICAR SE O NUMERO DE EXCERCICIO É O PEDIDO OU ENTÃO AVISAR O PROFESSOR.
+            
+            
+        DEVELOPMENT:    
+
+        - o siacua.web.ua.pt devolve uma lista de: nome_ekey (VER EMAIL)
+         
+        EXEMPLO: e12x34_NOME_001        
+        [ [ "E12X34_primitiva_001", 10], [ "E12X34_derivada_002", 13], "E12X34_intdefinido_033", 8 ] ]
+
+
+        TEM QUE SEGUIR ESTE FORMATO
+        send_dict = { "course": "calculo2", "concept_id": 234, "num_questions": 10, "siacua_key": SIACUA_WEBKEY  }
+           
+        NO SIACUA:
+        - de momento só vai buscar exercícios marcados como disponíveis para os alunos no siacua;  
+        - Futuro: melhorar a catalogação para disponível/por rever/escondido para avaliação/ .....
+        
+
+        sage: from megua.all import *
+        sage: meg.fast_exam_siacua(course="calculo2", concept_id=100, num_questions=10)
+        
+        
+        """
+        #environ["SIACUA_WEBKEY"]
+        send_dict = { "course": "calculo2", "concept_id": 100, "num_questions": 10, "siacua_key": "oblady"  }
+        
+        params = urllib.urlencode(send_dict)
+        headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+        conn = httplib.HTTPConnection("siacuatest.web.ua.pt")
+#        if send_dict["siacuatest"]:
+#            conn = httplib.HTTPConnection("siacuatest.web.ua.pt")
+#        else:  
+#            conn = httplib.HTTPConnection("siacua.web.ua.pt")
+        conn.request("POST", "/FastExam.aspx", params, headers)
+        response = conn.getresponse()
+        #TODO: improve message to user.
+
+        print response.read()    
+        
+#        if response.status==200:
+#            #print 'Sent to server:  "', send_dict["exname"], '" with ekey=', send_dict["ekey"] 
+#            #print response.status, response.reason
+#            #TODO: remove extra newlines that the user sees on notebook.
+#            data = response.read()
+#            if MEGUA_PLATFORM=='sagews':
+#                import salvus
+#                salvus.html(data.strip())
+#            else: #MEGUA_PLATFORM=='commandline'
+#                print data.strip()
+#        else:
+#            print "Could not send %s exercise to the server." % send_dict["exname"]
+#            print response.status, response.reason
+
+        conn.close()
 
 
 

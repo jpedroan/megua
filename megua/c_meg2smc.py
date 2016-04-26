@@ -16,20 +16,59 @@ Those databases are to be re-used in SMC but a new version of each exercise,
 each file for each exercise, is to be created in SMC.
 
 
-EXAMPLES:
+HOW TO CONVERT:
 
-Extract from latex or web (html for siacua) old style databases to 
-individual *.sagews files and one *.sage file containing all exercises.
-Also, mix options, extracts ExLatex or ExSiacua exercises.
+In the following, consider variations of this names:
+
+- .newfile.sqlite : is the new sqlite file that will go to SMC
+- megua_latex.sqlite: is an old format database with latex exercises
+- megua_siacua.sqlite: is an old format database with siacua exercises
+- megua_latex.sqlite.sage: contains all text from exercises from old database.
+- megua_siacua.sqlite.sage: contains all text from exercises from old database.
+
+
+The, follow the steps:
+
+1. Extract exercises from the latex sqlite database, megua 5.2, to 
+individual *.sagews files, individual *.sage files, and 
+one large *.sage file containing all exercises. This file will be used to recreate the new database.
+
 
 ::
 
-   sage -python meg2smc.py latex megua_latex.sqlite .newfile.sqlite 
-   sage -python meg2smc.py web megua_siacua.sqlite .newfile.sqlite
-   sage -python meg2smc.py mix .newfile.sqlite .newfile.sqlite
+   sage -python $HOME/megua/megua/c_meg2smc.py latex megua_latex.sqlite .newfile.sqlite 
+
+2. Do the same but for the web sqlite old database format with:
+
+::
+
+   sage -python $HOME/megua/megua/c_meg2smc.py web megua_siacua.sqlite .newfile.sqlite
+
+3. After using the first two forms, it is necessary to run a large file using
+
+::
+
+   sage <megua.sqlite.sage>
+   
+for the appropriate database name, to recreate the new database with 
+all exercises in the new format. Errors will appear so:
+
+- correct <exercise>.sage file and after corretion, delete the 
+exercise from megua_xxxx.sqlite.sage.
+- keep doing sage ``<megua.sqlite.sage>`` until no more errors.
 
 
-will create several *.sagews files in the same directory.
+4. Do this for both latex and siacua web exercises, in order them to be 
+saved to the same database .newfile.sqlite.
+
+5. All individual *.sage files are now correct and have been stores to .newfile.sqlite. 
+Now, run the follwoing to create individual *.sagews files.
+
+   sage -python $HOME/megua/megua/c_meg2smc.py mix .newfile.sqlite .newfile.sqlite
+
+
+6. Then, export all *.sagews and .newfile.sqlite to SMC.
+       
 
        
 DEVELOPMENT:
@@ -128,7 +167,7 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename):
     lstore = LocalStore(sqlitefilename,natlang='pt_pt',markuplang=instyle)
 
     newsagefile = codecs.open(sqlitefilename+'.sage', 'w', 'utf-8')
-    newsagefile.write(u'# coding=utf8\n\n')
+    newsagefile.write(u'# -*- coding: utf-8 -*-\n\n')
     newsagefile.write(u'from megua.all import *\n')
     newsagefile.write(u'#meg = MegBook("%s")\n\n' % newmegbookfilename)
     newsagefile.write(u'''print "Open file %s and replace all 'Exercise.' by 'ExLatex.' or 'ExSiacua.';"\n\n''')
@@ -151,16 +190,16 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename):
             htmlstr = u'<h4>%s</h4>' % new_unique_name
         elif instyle == "web":    
             #siacua system does not have "_siacua" in their names
-            new_unique_name = row['unique_name'] #keep for compatibility
+            new_unique_name = row['unique_name'] + '_siacua' 
             new_codetext = u'class {0}(ExSiacua):\n'.format(new_unique_name)
             htmlstr = u'<h4>%s (Siacua)</h4>' % new_unique_name
         else: #mix style
             if '_latex' in row['unique_name']:
-                new_unique_name = row['unique_name'] #keep for compatibility
+                new_unique_name = row['unique_name'] 
                 new_codetext = u'class {0}(ExLatex):\n'.format(new_unique_name)
                 htmlstr = u'<h4>%s (Latex)</h4>' % new_unique_name
             else:
-                new_unique_name = row['unique_name'] #keep for compatibility
+                new_unique_name = row['unique_name'] 
                 new_codetext = u'class {0}(ExSiacua):\n'.format(new_unique_name)
                 htmlstr = u'<h4>%s (Siacua)</h4>' % new_unique_name
 
@@ -278,10 +317,12 @@ if __name__=='__main__':
     if sys.argv[1]=="help":
         ##### "1.......................26..................................................78
         #####  |.....................--.|...................................................|
+        print "Open old sqlite db and change owner_key to unique_name."
+        print "See more details in c_meg2smc.py file."
         print "Usage examples:"
-        print "[1] sage -python meg2smc.py latex megua_latex.sqlite .newfile.sqlite" 
-        print "[2] sage -python meg2smc.py web megua_siacua.sqlite .newfile.sqlite"
-        print "[3] sage -python meg2smc.py mix .newfile.sqlite .newfile.sqlite"
+        print "[1] sage -python $HOME/megua/megua/c_meg2smc.py latex megua_latex.sqlite .newfile.sqlite" 
+        print "[2] sage -python $HOME/megua/megua/c_meg2smc.py web megua_siacua.sqlite .newfile.sqlite"
+        print "[3] sage -python $HOME/megua/megua/c_meg2smc.py mix .newfile.sqlite .newfile.sqlite"
         exit()
         
     print "Producing *.sagews files from '%s' for %s...." % (sys.argv[2],sys.argv[1])

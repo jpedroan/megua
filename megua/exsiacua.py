@@ -960,7 +960,6 @@ class ExSiacua(ExerciseBase):
         return newtext
 
 
-
 def _old_html(input_text):
     r"""Remove tags like the example below and let
     only the "show" part between <center>.        
@@ -1009,4 +1008,4 @@ def _old_html(input_text):
     #print "old_html():", nr
 
     return newtext
-        
+

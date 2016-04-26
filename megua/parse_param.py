@@ -17,12 +17,12 @@ Types of variables are:
 2. ``name@()``: substitution for ``\left( latex(value) \right)`` if value for name is negative (w.o. () otherwise).
 3. ``name@f{2.3g}``: formatted substitution. In the example: substitution for ``"%2.3g" % value`` (this is a python expression).
 4. ``name2@s{R15}``: function call substitution. In the example: substitution for ``R15(value)`` (R15 is a user function).
-5. ``name3@{"text0","text1",...}``: In the example, if name3 is 0 then "text0" will appear, if name3 is 1 then text1" will appear, and so on.
+5. ``name3@c{"text0","text1",...}``: In the example, if name3 is 0 then "text0" will appear, if name3 is 1 then text1" will appear, and so on.
 
 
 EXAMPLES:
 
-.. test as a python module with:    sage -python -m doctest paramparse.py
+.. test as a python module with:    sage -python -m doctest parse_param.py
 
 An example of each kind::
 
@@ -32,11 +32,19 @@ The text "1) name  2) name2@() 3) name@f{2.3g} 4) name2@s{sin}" has 4 placeholde
    >>> txt = r'''Examples: 1) name  2) name2@() 3) name@f{2.3g} 4) name@s{sin} 5) name3@c{"text0", "tex-t1"}'''
    >>> newdict = {'name': -12.123456, 'name2': -34.32, 'name3': 1, '__init__': 'the init', 'self': 'the self' }
    >>> parameter_change(txt,newdict)
-   u'Examples: 1) -12.123456  2) \\left(-34.32\\right) 3) -12.1 4) 0.42857465435 5) tex-t1'
+   u'Examples: 1) -12.123456  2) (-34.32) 3) -12.1 4) 0.42857465435 5) tex-t1'
    >>> newdict = {'name3': 1 }
    >>> txt = u'''1) name3@c{"text0", "c\xc3o"} 2) name3@c{"n\xc3o", "name1"} 3) name3@c{"nop", "text2"} '''
    >>> parameter_change(txt,newdict)
    u'1) c\xc3o 2) name1 3) text2 '
+   >>> txt = u''' name3@c{"m\xe1ximo", "m\xednimo"} '''
+   >>> parameter_change(txt,newdict)
+   u' m\xednimo '
+
+#TODO: parse_parm: example that not work because it needs spaces before and after the string
+#   >>> txt = u'''name3@c{"maximo", "minimo"}'''
+#   >>> parameter_change(txt,newdict)
+
 
 .. sage output   Examples: 1) -12.1234560000000  2) \left(-34.3200000000000\right) 3) -12.1 4) -34.32
 .. python output Examples: 1) -12.123456  2) \left(-34.32\right) 3) -12.1 4) -34.32
@@ -123,10 +131,10 @@ from mathcommon import *
 
 
 #ReEX definition:
-BASE_REGEX = r'\W(\w+)@\(\)|'\
-             r'\W(\w+)@f\{([\.#bcdeEfFgGnosxX<>=\^+\- 0-9\%]+)\}|'\
-             r'\W(\w+)@s\{(\w+)\}|'\
-             r'\W(\w+)@c\{([\s",\-\w\.]+)\}|'
+BASE_REGEX = ur'\W(\w+)@\(\)|'\
+             ur'\W(\w+)@f\{([\.#bcdeEfFgGnosxX<>=\^+\- 0-9\%]+)\}|'\
+             ur'\W(\w+)@s\{(\w+)\}|'\
+             ur'\W(\w+)@c\{([\\~\'\s",\-\w\.]+)\}|'  #"|" means this expression will continue below
 
 #Original REGEX definition:
 #re_str = r'\W(\w+)@\(\)|'\
@@ -147,7 +155,7 @@ DEFAULT_OUTPUT_METHOD = EXPR2LATEX
 
 
 #Avoid this members in exercise
-AVOID = ['self', 'imagedirectory', 'image_pathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir']
+AVOID_KEYWORDS = ['self', 'imagedirectory', 'image_pathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir']
 
 
 
@@ -156,11 +164,13 @@ def parameter_change(inputtext,datadict):
     Substitution on a given input text with names acting as placeholders by their values on a provided dict.
 
     INPUT:
+    
     - ``inputtext``-- text containing an exercise template with named placeholders.
     - ``datadict`` -- a dictionary with the names that will be changed by values.
 
     OUTPUT:
-        Text where names where replaced by values.
+    
+    - text where names where replaced by values.
 
     See examples at top of the file.
     Implementation details below.
@@ -168,23 +178,24 @@ def parameter_change(inputtext,datadict):
     """
 
     #Create regex using datadict names
-    keys_no_keyword = [ v for v in datadict.keys() if v[0]!='_' and v not in AVOID] 
+    keys_no_keyword = [ v for v in datadict.keys() if v[0]!='_' and v not in AVOID_KEYWORDS] 
 
     #Reverse: why is important.
     #This reversed sort guarantees that 'onb1' is first changed and only then 'onb'.
     #Otherwise, if key onb1 appear,  "onb" will be first replaced leaving '1' in the text.
     keys_no_keyword.sort(reverse=True) 
     c_dict_keys = "|".join( keys_no_keyword ) #see use below.
-    re_str = BASE_REGEX + r'\W({0})'.format(c_dict_keys)
+    re_str = BASE_REGEX + ur'\W({0})'.format(c_dict_keys)
 
 
     #TODO: maybe this should be above.
+    #print "type=",type(inputtext)
     if type(inputtext) == str:
         inputtext = unicode(inputtext,'utf-8')
 
 
     #re.MULTILINE|re.DOTALL|re.IGNORECASE|re.|
-    match_iter = re.finditer(re_str,inputtext,re.UNICODE)
+    match_iter = re.finditer(re_str,inputtext,re.UNICODE|re.LOCALE)
 
 
     #Debug
@@ -206,34 +217,44 @@ def parameter_change(inputtext,datadict):
         #    print "Groups(1..n) in this match: " + match.groups())
 
         try:
+
             if match.group(1) is not None:
-                #Case name@()
+                
+                #CASE: name@()
                 #Get data from dict for this match
                 keyname = match.group(1)
-                data_value = datadict[keyname]
-                outputtext += \
-                    inputtext[text_last:match.start()+1] + \
-                    output_value(data_value,DEFAULT_OUTPUT_METHOD,parentesis=True)
+                data_value = datadict[keyname]    #; print "data_value=",data_value
+                outputtext += inputtext[text_last:match.start()+1]
+                outputtext += output_value(data_value,DEFAULT_OUTPUT_METHOD,parentesis=True)
+                
             elif match.group(2) is not None and match.group(3) is not None:
-                #case name@f{0.2g}
+                
+                #CASE: name@f{0.2g}
                 keyname = match.group(2)
                 data_value = datadict[keyname]
                 format_text = r"%" + match.group(3)
                 formated_argument = format_text % data_value
                 outputtext += inputtext[text_last:match.start()+1] + formated_argument
+                
             elif match.group(4) is not None and match.group(5) is not None:
-                #case name@s{RealField15}
+                
+                #CASE: name@s{RealField15}
                 keyname = match.group(4)
                 data_value = datadict[keyname]
                 sage_command = match.group(5) + '(' + str(data_value) +')'
                 ev = eval(sage_command,globals())
                 outputtext += inputtext[text_last:match.start()+1] + str(ev)
+                
             elif match.group(6) is not None and match.group(7) is not None:
-                #case name@c{"text0","text1"}
+                
+                #CASE: name@c{"text0","text1"}
+                #print "match.group(6)=",match.group(6)
+                #print "match.group(7)=",match.group(7)
+                
                 try:
                     #create list with user given strings:
                     #name@c{"text0","text1"} --> ["text0","text1"]
-                    str_list = eval("["+match.group(7)+"]")
+                    str_list = eval(u"["+match.group(7)+u"]")
                     #get value of 'name'
                     keyname = match.group(6)
                     data_value = datadict[keyname]
@@ -261,8 +282,10 @@ def parameter_change(inputtext,datadict):
                 if type(str_value) == str:
                     str_value = unicode(str_value,'utf-8')
                 outputtext += inputtext[text_last:match.start()+1] + str_value
+                
             else: #same as if match.group(5) is not None
-                #case name (wihtout formating)
+            
+                #CASE: name wihtout formating
                 keyname = match.group(8)
                 data_value = datadict[keyname]
                 if type(data_value) is str:
@@ -270,8 +293,11 @@ def parameter_change(inputtext,datadict):
                 elif type(data_value) is unicode:
                     outputtext += inputtext[text_last:match.start()+1] + data_value
                 else:
-                    outputtext += inputtext[text_last:match.start()+1] + output_value(data_value,DEFAULT_OUTPUT_METHOD)
+                    outputtext += inputtext[text_last:match.start()+1] 
+                    outputtext += output_value(data_value,DEFAULT_OUTPUT_METHOD)
+                    
         except KeyError:
+            
                 #outputtext += inputtext[text_last:match.start()+1] + unicode(keyname,'utf-8')
                 outputtext += inputtext[text_last:match.start()+1] + keyname
 
@@ -282,26 +308,46 @@ def parameter_change(inputtext,datadict):
     return outputtext
 
 
+
+
 def output_value(s,output_method=None,parentesis=False):
-    r"""Return a unicode string with the value ``s`` 
-    or some transformation of it.
+    r"""Return a unicode string with the 
+        value or expression ``s`` 
+        or some transformation of it.
+
+    INPUT:
+    
+    - ``s'': an expression or value
+    - ``output_method'': a sequence of bits (see EXPR2LATEX at the top of the file)
+    - ``parentesis'': to write out or not parentesis
+
+    OUTPUT:
+    
+    - an unicode utf8 string appropriatedly formated.
+    
     """
+
     #old def ulatex(...)
     #TODO: var@l => force latex(var)
     #TODO: improve this function
     #print type(s)
-    if output_method & EXPR2LATEX and type(s)==sage.symbolic.expression.Expression:
-        s = unicode(latex(s),'utf-8')
-        if parentesis and bool(s<0):
-            return u'\\left(' + unicode(s,'utf-8') + ur'\\right)'
-        else:
-            return s
+
+    #convert the value into a string
+    if output_method & EXPR2LATEX:
+        s_str = unicode(latex(s),'utf-8')
     else:
-        s = unicode(s)
-        if parentesis and bool(s<0):
-            return r'(' + s + r')'
+        s_str = unicode(str(s),'utf-8')
+    
+    if parentesis and bool(s<0):
+
+        if type(s)==sage.symbolic.expression.Expression:
+            return ur'\left(' + s_str + ur'\right)'
         else:
-            return s  #unicode(s,'utf-8')
+            return r'(' + s_str + r')'
+            
+    else:
+        
+        return s_str  #unicode(s,'utf-8')
 
 
 """
