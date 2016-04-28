@@ -245,13 +245,10 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         self.has_instance = False
         
         #Check if class fields are in str or unicode        
-        self._summary_text = to_unicode(self._summary_text)
-        
-#         _unique_name = None
-#    _summary_text = None
-#    _problem_text = None
-#    _answer_text  = None
-#    _suggestive_name = None
+        self._summary_text    = to_unicode(self._summary_text)
+        self._problem_text    = to_unicode(self._problem_text)
+        self._answer_text     = to_unicode(self._answer_text)
+        self._suggestive_name = to_unicode(self._suggestive_name)
 
         
         try:
