@@ -28,26 +28,28 @@ An example of each kind::
 
 The text "1) name  2) name2@() 3) name@f{2.3g} 4) name2@s{sin}" has 4 placeholders that will be changed.
 
-   >>> from parse_param import parameter_change
-   >>> txt = r'''Examples: 1) name  2) name2@() 3) name@f{2.3g} 4) name@s{sin} 5) name3@c{"text0", "tex-t1"}'''
-   >>> newdict = {'name': -12.123456, 'name2': -34.32, 'name3': 1, '__init__': 'the init', 'self': 'the self' }
-   >>> parameter_change(txt,newdict)
-   u'Examples: 1) -12.123456  2) (-34.32) 3) -12.1 4) 0.42857465435 5) tex-t1'
-   >>> newdict = {'name3': 1 }
-   >>> txt = u'''1) name3@c{"text0", "c\xc3o"} 2) name3@c{"n\xc3o", "name1"} 3) name3@c{"nop", "text2"} '''
-   >>> parameter_change(txt,newdict)
+.. sage output   Examples: 1) -12.1234560000000  2) \left(-34.3200000000000\right) 3) -12.1 4) -34.32
+.. python output Examples: 1) -12.123456  2) \left(-34.32\right) 3) -12.1 4) -34.32
+
+    
+   sage: from megua.parse_param import parameter_change
+   sage: txt = r'''Examples: 1) name  2) name2@() 3) name@f{2.3g} 4) name@s{sin} 5) name3@c{"text0", "tex-t1"}'''
+   sage: newdict = {'name': -12.123456, 'name2': -34.32, 'name3': 1, '__init__': 'the init', 'self': 'the self' }
+   sage: parameter_change(txt,newdict)
+   u'Examples: 1) -12.1234560000000  2) (-34.3200000000000) 3) -12.1 4) 0.42857465435 5) tex-t1'
+   sage: newdict = {'name3': 1 }
+   sage: txt = u'''1) name3@c{"text0", "c\xc3o"} 2) name3@c{"n\xc3o", "name1"} 3) name3@c{"nop", "text2"} '''
+   sage: parameter_change(txt,newdict)
    u'1) c\xc3o 2) name1 3) text2 '
-   >>> txt = u''' name3@c{"m\xe1ximo", "m\xednimo"} '''
-   >>> parameter_change(txt,newdict)
+   sage: txt = u''' name3@c{"m\xe1ximo", "m\xednimo"} '''
+   sage: parameter_change(txt,newdict)
    u' m\xednimo '
 
 #TODO: parse_parm: example that not work because it needs spaces before and after the string
-#   >>> txt = u'''name3@c{"maximo", "minimo"}'''
-#   >>> parameter_change(txt,newdict)
+#   sage: txt = u'''name3@c{"maximo", "minimo"}'''
+#   sage: parameter_change(txt,newdict)
 
 
-.. sage output   Examples: 1) -12.1234560000000  2) \left(-34.3200000000000\right) 3) -12.1 4) -34.32
-.. python output Examples: 1) -12.123456  2) \left(-34.32\right) 3) -12.1 4) -34.32
 
 
 
@@ -115,7 +117,7 @@ import re
 
 # MEGUA modules
 # Named placeholders need functions in mathcommon: latex, R15, ...
-from mathcommon import *
+from megua.mathcommon import *
 
 
 #TODO: answer this
@@ -134,7 +136,11 @@ from mathcommon import *
 BASE_REGEX = ur'\W(\w+)@\(\)|'\
              ur'\W(\w+)@f\{([\.#bcdeEfFgGnosxX<>=\^+\- 0-9\%]+)\}|'\
              ur'\W(\w+)@s\{(\w+)\}|'\
-             ur'\W(\w+)@c\{([\\~\'\s",\-\w\.]+)\}|'  #"|" means this expression will continue below
+             ur'\W(\w+)@c\{(.+?)\}|'  #"|" means this expression will continue below
+
+
+#             ur'\W(\w+)@c\{([\\~\'\s",\-\w\.]+)\}|'  #"|" means this expression will continue below
+
 
 #Original REGEX definition:
 #re_str = r'\W(\w+)@\(\)|'\
@@ -247,14 +253,17 @@ def parameter_change(inputtext,datadict):
                 
             elif match.group(6) is not None and match.group(7) is not None:
                 
-                #CASE: name@c{"text0","text1"}
+                #print """parse_param.py: CASE: name@c{"text0","text1"}"""
                 #print "match.group(6)=",match.group(6)
                 #print "match.group(7)=",match.group(7)
                 
                 try:
                     #create list with user given strings:
                     #name@c{"text0","text1"} --> ["text0","text1"]
-                    str_list = eval(u"["+match.group(7)+u"]")
+                    str_uni = u"[" + match.group(7) + u"]"
+                    #print "parse_param.py: ",str_uni
+                    str_list = eval( str_uni )
+                    
                     #get value of 'name'
                     keyname = match.group(6)
                     data_value = datadict[keyname]
@@ -274,10 +283,12 @@ def parameter_change(inputtext,datadict):
 
                 except SyntaxError as e:
                     #value = keyname
-                    print "Syntax problem on %s." % match.group(7)
+                    print """parse_param.py: syntax problem on name@c{"text0","text1"}. Text say: %s.""" % match.group(7)
+                    raise SyntaxError(e)
                 except NameError as e:
                     #value = keyname
-                    print "Use double quotes even on names (case: %s in '%s')." % (e,match.group(7))
+                    print "parse_param.py: use double quotes even on names (case: %s in '%s')." % (e,match.group(7))
+                    raise NameError(e)
                 #print type(str_value), " ", str_value
                 if type(str_value) == str:
                     str_value = unicode(str_value,'utf-8')
@@ -289,7 +300,7 @@ def parameter_change(inputtext,datadict):
                 keyname = match.group(8)
                 data_value = datadict[keyname]
                 if type(data_value) is str:
-                    outputtext += inputtext[text_last:match.start()+1] + data_value
+                    outputtext += inputtext[text_last:match.start()+1] + unicode(data_value,'utf8')
                 elif type(data_value) is unicode:
                     outputtext += inputtext[text_last:match.start()+1] + data_value
                 else:
