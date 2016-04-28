@@ -1,4 +1,4 @@
-{# megua2smc.py (comment) #}# coding=utf8
+# coding: utf8
 
 
 ########################
@@ -28,4 +28,4 @@ meg.save(r'''
                         
 ''')
 
-
+{# megua2smc.py (comment) #}

@@ -152,6 +152,7 @@ from sage.misc.misc import alarm, cancel_alarm
 from megua.parse_param import parameter_change
 from megua.ur import ur
 from megua.ug import UnifiedGraphics
+from megua.tounicode import to_unicode
 #tirar from megua.mconfig import MEGUA_EXERCISES_OUTPUT
 
 
@@ -242,6 +243,16 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         r"""calls ex.update() but controls execution time.
         """
         self.has_instance = False
+        
+        #Check if class fields are in str or unicode        
+        self._summary_text = to_unicode(self._summary_text)
+        
+#         _unique_name = None
+#    _summary_text = None
+#    _problem_text = None
+#    _answer_text  = None
+#    _suggestive_name = None
+
         
         try:
 

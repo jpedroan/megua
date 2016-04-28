@@ -922,6 +922,7 @@ class ExSiacua(ExerciseBase):
     ]
 
 
+    #TODO: put this into develop manual
     @staticmethod
     def to_latex(txt):
         r"""Convert this siacua exercise into latex:
@@ -993,7 +994,7 @@ def _old_html(input_text):
         input_text, count=0, flags=re.DOTALL|re.UNICODE|re.MULTILINE)
 
     (newtext, nr) = re.subn(
-        '\n', '', 
+        u'\n', u'', 
         newtext, count=0, flags=re.DOTALL|re.UNICODE|re.MULTILINE)
 
     #print "old_html():", nr

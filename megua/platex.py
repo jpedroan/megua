@@ -71,20 +71,21 @@ def pcompile(latexstr, workdir, filename, runs=1, hideoutput=True,silent=True):
     #Unicode or latin1
     if type(latexstr)==unicode:
         #Conversion for ISO-8859-1 http://pt.wikipedia.org/wiki/ISO_8859-1
-        latexstr = latexstr.encode('latin1')
-        latexstr.replace("utf8","latin1")
+        latexstr_latin1 = latexstr.encode('latin1')
+        latexstr_latin1.replace("utf8","latin1")
         
         #Store latexstr in filename
         fullpath = os.path.join(workdir, 'windows-'+filename+'.tex')
         f = open(fullpath,'w')
-        f.write(latexstr)
+        f.write(latexstr_latin1)
         f.close()
 
 
 
     if type(latexstr)==str:
-        #print type(latexstr)
-        latexstr = latexstr.decode('utf-8','ignore')
+        latexstr = latexstr.decode('utf-8') #errors='ignore'
+        print "platex.py say: the type(latexstr) is", type(latexstr)
+        
         
 
     #Store latexstr in filename
@@ -333,7 +334,7 @@ def html2latex(htmltext):
     #Removing spaces and lots of blank lines.
     nr = 1
     while nr >= 1:
-        (newtext, nr) = re.subn('\n\n\n', '\n\n', newtext, count=0, flags=re.UNICODE)
+        (newtext, nr) = re.subn(u'\n\n\n', u'\n\n', newtext, count=0, flags=re.UNICODE)
         #print "html2latex():", nr
 
     return newtext
@@ -343,8 +344,8 @@ HTML2TABULAR = [
             (u'</table>', u'\n\end{tabular}\n'),
             (u'<tr(.*?)>', u'\n'),
             (u'</tr>', u' \\\\ \hline\n'), 
-            (u'<td(.*?)>', ' '),
-            (u'</td>', ' & '),
+            (u'<td(.*?)>', u' '),
+            (u'</td>', u' & '),
         ]
 
 
@@ -359,24 +360,17 @@ def table2tabular(text):
 
 def latexcommentthis(txt):
     """Put % signs in each line"""
-    txt += '\n' #assure last line has "\n"
+    txt += u'\n' #assure last line has "\n"
     tlist = re.findall('(.*?)\n', txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
-    return '\n'.join( [ '%'+t for t in tlist] ) + '\n'
+    return u'\n'.join( [ '%'+t for t in tlist] ) + u'\n'
         
 
 
 def latexunderscore(txt):
     """Put \_  in each underscore"""
-    return re.subn("_","\_",txt)[0]
+    return re.subn("_","\_",txt,flags=re.UNICODE)[0]
 
 def equation2display(txt):
     """Put \displaystyle\$  in each $$"""
     return re.subn(r"\$\$(.*?)\$\$",r"$\displaystyle \1$",txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
         
-r"""
-
-
-
-
-
-"""

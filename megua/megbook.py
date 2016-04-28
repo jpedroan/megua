@@ -1,4 +1,4 @@
-# coding=utf-8
+# coding: utf-8
 
 r"""
 MegBook -- Repository and functionalities for managing exercises.
@@ -71,11 +71,12 @@ Save a new or changed exercise:
    Here one can write few words, keywords about the exercise.
    For example, the subject, MSC code, and so on.
    ==> Problem instance
-   What is the primitive of -1 x + -5/4 ?
+   What is the primitive of -1 x + (-\frac{5}{4}) ?
    ==> Answer instance
    prim1
-   sage: meg
-   MegBook('_output/megbasedb.sqlite')
+
+
+
 
 
 Testing a warning error:
@@ -515,6 +516,8 @@ class MegBook(MegSiacua):
         
         row =  parse_ex(to_unicode(uexercise))
         
+        #print """megbook.py say: in save the type(row["summary_text"])=""",type(row["summary_text"])
+        
         if not row:
             raise
             
@@ -619,12 +622,30 @@ class MegBook(MegSiacua):
 
         cfilename = os.path.join(working_dir,row["unique_name"]+'.sage')
 
-        with codecs.open(cfilename, encoding='utf-8', mode='w', errors="ignore") as f:
+        #TODO: escrever sobre isto
+        #Unicode:
+        # , errors="ignore"
+        # warning: ur"""   \underline{....}     """ generates an unicode error!
+        # , errors='backslashreplace'
+        #
+        #>>> x = ur'\underline'
+        #  File "<stdin>", line 1
+        #SyntaxError: (unicode error) 'rawunicodeescape' codec can't decode bytes in position 0-1: truncated \uXXXX
+
+        with codecs.open(cfilename, encoding='utf-8', mode='w') as f:
             f.write(code_string)
 
         try:
             with warnings.catch_warnings(record=True) as wlist:
                 load(cfilename) #sagemath load command
+                
+                #NOTE:
+                #in cfilename the strings are saved like: r''' .... '''
+                #so they must be converter to unicode again
+                #This is to avoid ur''' \underline ''' make error because of \u !!!
+                #The ExBase.update must then convert to unicode again!
+                                
+                
                 if len(wlist)>0:
                     print 'MegBook.py say: exercise "%s" needs review! See below:' % row['unique_name']
                 for w in wlist:
@@ -946,8 +967,10 @@ class MegBook(MegSiacua):
 
 
     def catalog(self,what='all',export='latex'):
-        r"""Writes exercises in an ordered fashion 
-        Only: all and latex formats, now.
+        r"""
+        Writes exercises in an ordered fashion by sections.
+        
+        WARNING: Only working is what="all" and export="latex" for now.
         """
 
         self.sc = SectionClassifier(self.megbook_store)
@@ -1065,7 +1088,7 @@ class MegBook(MegSiacua):
 
 
         
-    def fast_exam_siacua(self, course, concept_id, num_questions):
+    def fast_exam_siacua(self, course="calculo2", concept_id=100, num_questions=10,siacuatest=True):
         r"""
         The command requests the Siacua system an exam with the following requirements:
         
@@ -1083,11 +1106,19 @@ class MegBook(MegSiacua):
             
         DEVELOPMENT:    
 
-        - o siacua.web.ua.pt devolve uma lista de: nome_ekey (VER EMAIL)
-         
-        EXEMPLO: e12x34_NOME_001        
-        [ [ "E12X34_primitiva_001", 10], [ "E12X34_derivada_002", 13], "E12X34_intdefinido_033", 8 ] ]
-
+        - The siacua.web.ua.pt returns:
+        [["E44A10_TrLaplaceDef_002", 72],
+         ["E44A10_TrLaplaceDef_002", 79],
+         ["E44A10_TrLaplacePol1_001", 44],
+         ["E44A10_TrLaplacePol2_002", 51],
+         ["E44A10_TrLaplacePol2_002", 53],
+         ["E44A10_TrLaplaceInv1_001", 829],
+         ["E44A10_TrLaplaceInv2_002", 832],
+         ["E44A10_TrLaplaceInv2_002", 837],
+         ["E44A10_TrLaplaceInv4_004", 870],
+         ["E44A10_TrLaplaceInv5_005",878]]
+         <form name="formFastExam" method="post" action="./FastExam.aspx"
+         ......
 
         TEM QUE SEGUIR ESTE FORMATO
         send_dict = { "course": "calculo2", "concept_id": 234, "num_questions": 10, "siacua_key": SIACUA_WEBKEY  }
@@ -1102,37 +1133,114 @@ class MegBook(MegSiacua):
         
         
         """
-        #environ["SIACUA_WEBKEY"]
-        send_dict = { "course": "calculo2", "concept_id": 100, "num_questions": 10, "siacua_key": "oblady"  }
-        
+
+        send_dict = { 
+            "course": course, 
+            "concept_id": concept_id, 
+            "num_questions": num_questions, 
+            "siacua_key": environ["SIACUA_WEBKEY"],
+            "siacuatest": siacuatest
+            
+        }
+
         params = urllib.urlencode(send_dict)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         conn = httplib.HTTPConnection("siacuatest.web.ua.pt")
-#        if send_dict["siacuatest"]:
-#            conn = httplib.HTTPConnection("siacuatest.web.ua.pt")
-#        else:  
-#            conn = httplib.HTTPConnection("siacua.web.ua.pt")
+        if send_dict["siacuatest"]:
+            conn = httplib.HTTPConnection("siacuatest.web.ua.pt")
+        else:  
+            conn = httplib.HTTPConnection("siacua.web.ua.pt")
         conn.request("POST", "/FastExam.aspx", params, headers)
         response = conn.getresponse()
-        #TODO: improve message to user.
-
-        print response.read()    
         
-#        if response.status==200:
-#            #print 'Sent to server:  "', send_dict["exname"], '" with ekey=', send_dict["ekey"] 
-#            #print response.status, response.reason
-#            #TODO: remove extra newlines that the user sees on notebook.
-#            data = response.read()
-#            if MEGUA_PLATFORM=='sagews':
-#                import salvus
-#                salvus.html(data.strip())
-#            else: #MEGUA_PLATFORM=='commandline'
-#                print data.strip()
-#        else:
-#            print "Could not send %s exercise to the server." % send_dict["exname"]
-#            print response.status, response.reason
+        #print response.read()    
+        if response.status!=200:
+            print "Could not get an exam from server."
+            print response.status, response.reason
+            conn.close()
+            return
+            
+        #print 'Sent to server:  "', send_dict["exname"], '" with ekey=', send_dict["ekey"] 
+        #print response.status, response.reason
+        #TODO: remove extra newlines that the user sees on notebook.
+        data = response.read().strip()
 
-        conn.close()
+        #parse response (see DEVELOPMENT notes above)
+        pos = data.find("<")
+        data = data[:pos] #remove <form ....> part!
+        #print data
+
+
+        #Join all questions
+        lts = u'\\begin{enumerate}\n\n'            
+        ex_list = eval(data) #creates the list
+
+        for uniquename_ekey in ex_list:
+            
+            unique_name = uniquename_ekey[0]
+            ekey = uniquename_ekey[1]
+            ex = self.new(unique_name,ekey=ekey,returninstance=True)
+            
+            ex_str = templates.render("megbook_catalog_instance.tex",
+                    exformat="siacua",
+                    unique_name_noslash = unique_name.replace("_","\_"),
+                    summary = ex.summary(),
+                    suggestive_name = ex.suggestive_name(),
+                    problem = ExSiacua.to_latex(ex.problem()), 
+                    answer = ExSiacua.to_latex(ex.answer()) 
+            )
+            
+            print "type of ex.summary() is", type( ex.summary() )
+            lts += u'\n\\item '
+            lts += ex_str
+            
+        lts += ur'\n\\end{enumerate}\n\n'
+        
+        latex_string =  templates.render("megbook_fastexam_latex.tex",
+                         exerciseinstanceslatex=lts)
+
+
+        MEGUA_EXERCISE_CATALOG = environ["MEGUA_EXERCISE_CATALOG"]
+        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"exam.tex")
+        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"exam.pdf")
+
+        #Tirar isto
+        f = codecs.open(CATALOG_TEX_PATHNAME+"lixo", mode='w+', encoding='utf8')
+        f.write(ex.summary())
+        f.close()
+
+
+        f = codecs.open(CATALOG_TEX_PATHNAME, mode='w', encoding='utf-8')
+        f.write(latex_string)
+        f.close()
+
+        #TODO: convert all os.system to subprocess.call or subprocess.Popen
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"exam.tex") )
+        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"exam.tex") )
+
+
+        if environ["MEGUA_PLATFORM"]=='SMC':
+            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+                print "MegBook module say:  open ", CATALOG_PDF_PATHNAME
+                #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
+                #Does not work using "sage -python": from smc_pyutil import smc_open
+                #Works using: "python": from smc_pyutil import smc_open
+                #                        smc_open.process([CATALOG_PDF_PATHNAME])
+                #WORKS:subprocess.call(["openpdf.py",CATALOG_PDF_PATHNAME])
+                #ANOTHER SOLUTION (http://stackoverflow.com/questions/3402168/permanently-add-a-directory-to-pythonpath)
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([CATALOG_PDF_PATHNAME])
+            else: #sagews SALVUS
+                from smc_sagews.sage_salvus import salvus
+                salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
+                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
+                salvus.open_tab(CATALOG_PDF_PATHNAME)
+        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+            print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
+            subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
+        else:
+            print """MegBook module say: in context of megbook.fast_exam_siacua() the environ["MEGUA_EXERCISE_CATALOG"] must be properly configured at $HOME/.megua/mconfig.sh"""
 
 
 

@@ -1,0 +1,53 @@
+{# see MegBookWeb.py fast_exam_siacua() function #}
+
+\documentclass[a4paper]{article}
+
+{% include 'common.tex' %}
+
+\usepackage{alltt}
+
+
+\usepackage{spverbatim}
+
+\usepackage[
+    layoutwidth=210mm,
+    layoutheight=295mm,
+    nomarginpar,
+    nofoot,
+    textwidth=170mm,
+    textheight=240mm,
+    inner=25mm,
+    verbose,
+    outer=20mm,
+    top=25mm,
+    centering,
+    footskip=22pt]{geometry}
+
+
+
+%Usado na escolha múltipla para desenhar um quadradinho
+\newcommand{\quadra}{$\sqcup \!\!\!\!\sqcap$}
+\def\singleoption{\item[\quadra\hspace*{0.5cm}]}
+
+
+{# NOTE:  {{ '{#' }} means '{#' in the output #}
+
+
+
+%Remove indentation
+\setlength\parindent{0pt}
+
+
+
+\begin{document}
+
+\textbf{Proposta de Exame}
+
+
+{{exerciseinstanceslatex}}
+
+
+\end{document}
+
+
+

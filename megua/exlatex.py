@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 
 r"""
 exlatex -- an exercise in LaTeX.
@@ -80,15 +80,15 @@ class ExLatex(ExerciseBase):
 
     def _latex_string(self):
 
-        latex_string = templates.render("exlatex_print_instance.tex",
+        lts = templates.render("exlatex_print_instance.tex",
             sname=self.unique_name(),
-            summtxt=self.summary(),
-            probtxt=self.problem(),
-            answtxt=self.answer(),
             ekey = self.ekey,
+            summtxt=self.summary(), 
+            probtxt=self.problem(), 
+            answtxt=self.answer()
          )
 
-        return latex_string
+        return lts
 
 
 
@@ -149,8 +149,4 @@ class ExLatex(ExerciseBase):
             subprocess.Popen(["evince",EXERCISE_PDF_PATHNAME])
         else:
             print """Exlatex module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
-
-
-
-
 
