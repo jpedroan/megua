@@ -997,6 +997,7 @@ class MegBook(MegSiacua):
             #TODO: image render mode to "filenameimage"
             lts += u'\n\nThis section has {0} exercises.\n\n'.format(len(s.exercises)) # {{ => }
             for unique_name in s.exercises:
+                print "megbook.py say: producing %s" % unique_name
                 ex = self.new(unique_name,ekey=0,returninstance=True)
                 if ExLatex in ex.__class__.__bases__:
                     #TODO: incluir tipo no template e na section acima
