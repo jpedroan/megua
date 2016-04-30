@@ -9,6 +9,13 @@ Assume that:
 - if there is an home, there is a single database and project.
 - megua setup (for the single home and "project" ) is at .megua/mconfig.py
 
+
+DEVELOP:
+
+study this:
+- http://stackoverflow.com/questions/8085520/generating-pdf-latex-with-python-script
+
+
 """
 
 

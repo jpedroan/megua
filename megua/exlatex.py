@@ -102,29 +102,10 @@ class ExLatex(ExerciseBase):
         #Use jinja2 template to generate LaTeX.
         latex_string = self._latex_string()
 
+        pcompile(latex_string,self.working_dir,self.unique_name())
+
         EXERCISE_TEX_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.tex')
         EXERCISE_PDF_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.pdf')
-
-        try:
-            pcompile(latex_string,self.working_dir,self.unique_name(),hideoutput=True)
-        except subprocess.CalledProcessError as err:
-            print "Start ExLatex.print_instance() error message:"
-            #Try to show the message to user
-            #print "Error:",err
-            #print "returncode:",err.returncode
-            #print "output:",err.output
-            #print "================"
-            latex_error_pattern = re.compile(r"!.*?l\.\d+(.*?)$",re.DOTALL|re.M)
-            match = latex_error_pattern.search(err.output) #create an iterator
-            if match:
-                print match.group(0)
-            else:
-                print "There was a problem with an latex file."
-
-            print "You can download %s and use your windows LaTeX "\
-                  "editor to help find the error." % EXERCISE_TEX_PATHNAME
-            print "End ExLatex.print_instance()."
-            raise
 
         if environ["MEGUA_PLATFORM"]=='SMC':
             if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua

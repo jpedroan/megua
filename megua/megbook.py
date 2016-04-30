@@ -293,7 +293,7 @@ from megua.jinjatemplates import templates
 from megua.ur import ur
 from megua.megsiacua import MegSiacua
 from megua.csection import SectionClassifier
-#from platex import pcompile
+from megua.platex import pcompile
 #from xmoodle import MoodleExporter
 #from xsphinx import SphinxExporter
 #from xlatex import * #including PDFLaTeXExporter
@@ -563,9 +563,8 @@ class MegBook(MegSiacua):
         
         if returninstance:
             return ex_instance
-        else:
-            ex_instance.print_instance()
-            return
+
+        ex_instance.print_instance()
 
     
 
@@ -1046,7 +1045,7 @@ class MegBook(MegSiacua):
 
         print "MegBook.py say: compiling latex file containing the instances of the exercises."
 
-        latex_string =  templates.render("megbook_catalog_latex.tex",
+        latex_text =  templates.render("megbook_catalog_latex.tex",
                          exerciseinstanceslatex=lts)
 
 
@@ -1054,14 +1053,8 @@ class MegBook(MegSiacua):
         CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"catalog.tex")
         CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"catalog.pdf")
 
-        f = codecs.open(CATALOG_TEX_PATHNAME, mode='w', encoding='utf-8')
-        f.write(latex_string)
-        f.close()
 
-        #TODO: convert all os.system to subprocess.call or subprocess.Popen
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"catalog.tex") )
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"catalog.tex") )
-
+        pcompile(latex_text, MEGUA_EXERCISE_CATALOG, "catalog.tex")
 
         if environ["MEGUA_PLATFORM"]=='SMC':
             if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
@@ -1106,6 +1099,8 @@ class MegBook(MegSiacua):
             
             
         DEVELOPMENT:    
+
+        - TODO: warn when numberof questions is less then num_questions
 
         - The siacua.web.ua.pt returns:
         [["E44A10_TrLaplaceDef_002", 72],
