@@ -1002,6 +1002,7 @@ class MegBook(MegSiacua):
                     #TODO: incluir tipo no template e na section acima
                     ex_str = templates.render("megbook_catalog_instance.tex",
                                 exformat="latex",
+                                unique_name=unique_name,
                                 unique_name_noslash = unique_name.replace("_","\_"),
                                 summary = ex.summary(),
                                 suggestive_name = ex.suggestive_name(),
@@ -1012,6 +1013,7 @@ class MegBook(MegSiacua):
                     #TODO: incluir tipo no template e na section acima
                     ex_str = templates.render("megbook_catalog_instance.tex",
                                 exformat="siacua",
+                                unique_name=unique_name,
                                 unique_name_noslash = unique_name.replace("_","\_"),
                                 summary = ex.summary(),
                                 suggestive_name = ex.suggestive_name(),

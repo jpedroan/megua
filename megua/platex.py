@@ -110,25 +110,52 @@ def pcompile(latex_text, workdir, filename):
         
     lt = ['pdflatex', '-interaction', 'nonstopmode', filename]
     try:
-        output = subprocess.check_output(lt,cwd=workdir)
+        subprocess.check_output(lt,cwd=workdir) #return output in a string
     except subprocess.CalledProcessError as err:
         #Try to show the message to user
         #print "Error:",err
         #print "returncode:",err.returncode
         #print "output:",err.output
         #print "================"
-        print "There was a problem with the tex file.\nYou can inspect\n  %s\nand use your LaTeX "\
-              "editor to help find the error.\n" % fullpath
 
-        latex_error_pattern = re.compile(r"!.*?l\.\d+(.*?)$",re.DOTALL|re.M)
+        #Try to get line information from latex output errors and messages
+        latex_error_pattern = re.compile(r"!.*?l\.(\d+)(.*?)$",re.DOTALL|re.M)
         match = latex_error_pattern.search(err.output) #create an iterator
         if match:
-            print match.group(0)
+            #Try to get a debug mark
+            lines = latex_text.split('\n')
+            error_line = int(match.group(1))-2 #see above
 
-        print "\n"    
-        raise UserWarning("Check LaTeX errors in file '{}'.".format(filename))
+            for dk in xrange(-4,0):
+                print "| :",lines[error_line+dk]
+            print "> :", lines[error_line]
+            for dk in xrange(1,5):
+                print "| :",lines[error_line+dk]
 
-    
+
+            #Find exercise name.
+            #Note that tex file must have tags:
+            #     %LATEX DEBUG START {{unique_name}}
+            #     %LATEX DEBUG END {{unique_name}}
+            #in order to extract its name. 
+            for i in xrange(error_line-1,len(lines)):
+                if lines[i].find(r"%LATEX DEBUG END")>-1:
+                    #First the "end" mark to get 
+                    m_end = re.search("%LATEX DEBUG END (.+)",lines[i])
+                    ex_unique_name = m_end.group(1)
+                    print "Exercise with name '{}' has a LaTeX compilation error.".format(ex_unique_name)
+                    break
+                
+
+        print "\nYou can inspect\n  %s\nand use your LaTeX "\
+              "editor to help find the error in exercise source code.\n" % fullpath
+        if match:
+            print match.group(0) #Estilo: l.9 tal e tal
+            
+        print "\n"
+        raise UserWarning("Check exercise for LaTeX errors")
+
+
 
 #======================
 # Convert html to latex
@@ -154,6 +181,7 @@ HTML2LATEX = [  (ur'(\d)%', ur'\1\%'),  # 3% --> 3\%
             (ur'<center>', '\n'+r'\\begin{center}'+'\n'),
             (ur'</center>', u'\\end{center}\n'),
             (ur'<style>(.*?)</style>', u'\n'),
+            ("\\^'","^\\prime"),
             (ur'<pre>(.*?)</pre>',ur'\n%Falta colocar linhas vazias em baixo\n\\begin{alltt}\n\1\n\\end{alltt}\n\n'), 
         ]
 

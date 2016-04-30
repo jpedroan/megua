@@ -81,7 +81,7 @@ class ExLatex(ExerciseBase):
     def _latex_string(self):
 
         lts = templates.render("exlatex_print_instance.tex",
-            sname=self.unique_name(),
+            unique_name=self.unique_name(),
             ekey = self.ekey,
             summtxt=self.summary(), 
             probtxt=self.problem(), 
