@@ -293,12 +293,13 @@ from megua.jinjatemplates import templates
 from megua.ur import ur
 from megua.megsiacua import MegSiacua
 from megua.csection import SectionClassifier
-from megua.platex import pcompile
+from megua.platex import pcompile, latexunderscore
 #from xmoodle import MoodleExporter
 #from xsphinx import SphinxExporter
 #from xlatex import * #including PDFLaTeXExporter
 
 
+latexunderscore
 
 
 
@@ -984,13 +985,17 @@ class MegBook(MegSiacua):
 
             #Section creation
             if s.level==0: # {{ => }
-                lts += u'\n\n\section{{{0} ({1})}}\n\n'.format(s.sec_name,len(s.exercises))
+                sname = latexunderscore(s.sec_name) #if exist _ => \_
+                lts += u'\n\n\section{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
             elif s.level==1:
-                lts += u'\n\n\subsection{{{0} ({1})}}\n\n'.format(s.sec_name,len(s.exercises))
+                sname = latexunderscore(s.sec_name) #if exist _ => \_
+                lts += u'\n\n\subsection{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
             elif s.level==2:
-                lts += u'\n\n\subsubsection{{{0} ({1})}}\n\n'.format(s.sec_name,len(s.exercises))
+                sname = latexunderscore(s.sec_name) #if exist _ => \_
+                lts += u'\n\n\subsubsection{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
             else:
-                lts += u'\n\n\textbf{{{0} ({1})}}\n\n'.format(s.sec_name,len(s.exercises))
+                sname = latexunderscore(s.sec_name) #if exist _ => \_
+                lts += u'\n\n\textbf{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
 
             #Get the instances, if they exist on this section, subsection or subsubsection
             #TODO: image render mode to "filenameimage"
@@ -1003,7 +1008,7 @@ class MegBook(MegSiacua):
                     ex_str = templates.render("megbook_catalog_instance.tex",
                                 exformat="latex",
                                 unique_name=unique_name,
-                                unique_name_noslash = unique_name.replace("_","\_"),
+                                unique_name_noslash = latexunderscore(unique_name),
                                 summary = ex.summary(),
                                 suggestive_name = ex.suggestive_name(),
                                 problem = ex.problem(),
@@ -1014,7 +1019,7 @@ class MegBook(MegSiacua):
                     ex_str = templates.render("megbook_catalog_instance.tex",
                                 exformat="siacua",
                                 unique_name=unique_name,
-                                unique_name_noslash = unique_name.replace("_","\_"),
+                                unique_name_noslash = latexunderscore(unique_name),
                                 summary = ex.summary(),
                                 suggestive_name = ex.suggestive_name(),
                                 problem = ExSiacua.to_latex(ex.problem()), #u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
@@ -1024,7 +1029,7 @@ class MegBook(MegSiacua):
                     #TODO: incluir tipo no template e na section acima
                     ex_str = templates.render("megbook_catalog_instance.tex",
                                 exformat="textual (exbase)",
-                                unique_name_noslash = unique_name.replace("_","\_"),
+                                unique_name_noslash = latexunderscore(unique_name),
                                 summary = ex.summary(),
                                 suggestive_name = ex.suggestive_name(),
                                 problem = u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',

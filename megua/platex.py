@@ -111,6 +111,9 @@ def pcompile(latex_text, workdir, filename):
     lt = ['pdflatex', '-interaction', 'nonstopmode', filename]
     try:
         output = subprocess.check_output(lt,cwd=workdir) #return output in a string
+        
+        # rerun?
+        # http://tex.stackexchange.com/questions/265744/how-to-know-if-a-latex-file-needs-another-compilation-pass
         if "LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right." in output:
             print "Running laTeX a second time"
             output = subprocess.check_output(lt,cwd=workdir) #return output in a string
