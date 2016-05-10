@@ -21,7 +21,6 @@ A Siacua exercise in portuguese:
 
        sage: from megua.all import *
        sage: meg = MegBook(r'_input/megbook.sqlite') 
-       MegBook('_input/megbook.sqlite')
        sage: meg.save(r'''
        ....: %SUMMARY Probabilidade; Regra de Laplace
        ....:  
@@ -42,15 +41,15 @@ A Siacua exercise in portuguese:
        ....: música popular, mas esqueceu-se de identificar cada um deles. 
        ....: Qual é a probabilidade de ao escolher dois CD ao acaso, 
        ....: um ser de música rock e o outro ser de música popular?
-       ....:  
-       ....: %ANSWER
-       ....:  
+       ....: 
        ....: <multiplechoice>
        ....: <choice> $$vresposta$$ </choice>
        ....: <choice> $$errada1$$ </choice>
        ....: <choice> $$errada2$$ </choice>
        ....: <choice> $$errada3$$ </choice>
        ....: </multiplechoice>
+       ....:  
+       ....: %ANSWER
        ....:  
        ....: A resposta é $vresposta$.<br>
        ....:  
@@ -76,15 +75,14 @@ A Siacua exercise in portuguese:
        ....:         #Opções Erradas
        ....:         s.errada1 = s.cp/s.cf
        ....:         s.errada2 = s.v1*s.v1/s.cp
-       ....:         s.errada3 = s.cf/(s.cp/2)
+       ....:         s.errada3 = s.cf/(s.cp/2)       
        ....: ''')
-       exsiacua module: open file _output/E97K50_Laplace_002/E97K50_Laplace_002.html in the browser and press F5.
+       Exsicua module say: firefox  _output/E97K50_Laplace_002/E97K50_Laplace_002.html
        sage: ex = meg.new("E97K50_Laplace_002", returninstance=True)
        sage: ex.print_instance()
-       exsiacua module: open file _output/E97K50_Laplace_002/E97K50_Laplace_002.html in the browser and press F5.       
+       Exsicua module say: firefox  _output/E97K50_Laplace_002/E97K50_Laplace_002.html
        sage: ex.siacuapreview(ekeys=[10,20,30])
-       exsiacua module, siacuapreview: open file _output/E97K50_Laplace_002/E97K50_Laplace_002_siacuapreview.html in the browser and press F5.
-
+       Exsicua module say: firefox  _output/E97K50_Laplace_002/E97K50_Laplace_002_siacuapreview.html in the browser and press F5.
 
 
 Another example that is sent to siacua system:
@@ -94,7 +92,6 @@ Another example that is sent to siacua system:
        sage: from megua.megbook import MegBook 
        sage: #from megua.exsiacua import ExSiacua
        sage: meg = MegBook(r'_input/megbook.sqlite') 
-       MegBook('_input/megbook.sqlite')
        sage: meg.save(r'''
        ....: %summary Regra de Laplace
        ....:  
@@ -186,7 +183,7 @@ Another example that is sent to siacua system:
        ....:             return '& '
        ....:  
        ....: ''')
-       exsiacua module: open file _output/E97K50_Laplace_001/E97K50_Laplace_001.html in the browser and press F5.
+       Exsicua module say: firefox  _output/E97K50_Laplace_001/E97K50_Laplace_001.html
        sage: ex = meg.new("E97K50_Laplace_001", returninstance=True)
        sage: #ex.siacua(ekeys=[9],sendpost=True,course="matsec",usernamesiacua="f1183",siacuatest=True) #long output
 
@@ -294,6 +291,7 @@ class ExSiacua(ExerciseBase):
         uname   =  self.unique_name()
 
         #Use jinja2 template to generate LaTeX.
+        #TODO: CDATA is stil needed?
         if 'CDATA' in answtxt:
             answtxt_woCDATA = re.subn(
                 '<!\[CDATA\[(.*?)\]\]>', r'\1', 
@@ -307,8 +305,6 @@ class ExSiacua(ExerciseBase):
                 count=0,
                 flags=re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
 
-
-
         html_string = templates.render("exsiacua_print_instance.html",
                 uname=uname,
                 summtxt=summtxt,
@@ -319,17 +315,6 @@ class ExSiacua(ExerciseBase):
 
         #print html_string
 
-        #Produce files for pdf and png graphics if any tikz code embed on exercise
-        #Ver ex.py: now latex images are produced in ex.problem() and ex.answer()
-        #html_string = self.publish_tikz(sname,html_string)
-
-
-        #To be viewed on browser
-        #f = open(sname+'.html','w')
-        #f.write(html_string.encode('latin1'))
-        #f.close()
-
-        
         EXERCISE_HTML_PATHNAME = os.path.join(self.working_dir,uname+'.html')
         f = codecs.open(EXERCISE_HTML_PATHNAME, mode='w', encoding='utf-8')
         f.write(html_string)
@@ -350,7 +335,7 @@ class ExSiacua(ExerciseBase):
                 salvus.html(html_string)
         elif environ["MEGUA_PLATFORM"]=='DESKTOP':
             print "Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME
-            subprocess.Popen(["firefox",EXERCISE_HTML_PATHNAME])
+            subprocess.Popen(["firefox","-new-tab", EXERCISE_HTML_PATHNAME])
         else:
             print """Exsiacua module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
 
@@ -542,7 +527,7 @@ class ExSiacua(ExerciseBase):
                 "exsiacua_previewheader.html",
                 uname = self.unique_name(),
                 allexercises = allexercises,
-                mathjax_header=MATHJAX_HEADER
+                mathjax_header=environ["MATHJAX_HEADER"]
         )
 
 
@@ -551,14 +536,25 @@ class ExSiacua(ExerciseBase):
         f = codecs.open(html_filename, mode='w', encoding='utf-8')
         f.write(html_string)
         f.close()
-         
-        if MEGUA_PLATFORM=='sagews':
-            import salvus
-            salvus.file(html_filename)
-            #salvus.html(html_string)
-        else: #MEGUA_PLATFORM=='commandline'
-            print "exsiacua module, siacuapreview: open file",html_filename,"in the browser and press F5."        
 
+
+        if environ["MEGUA_PLATFORM"]=='SMC':
+            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+                print "Exsiacua module say:  open ", html_filename
+                #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([html_filename])
+            else: #sagews SALVUS
+                from smc_sagews.sage_salvus import salvus
+                salvus.file(EXERCISE_HTML_PATHNAME,show=True,raw=True)
+                print ""
+                salvus.html(html_string)
+        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+            print "Exsicua module say: firefox ",html_filename,"in the browser and press F5."
+            subprocess.Popen(["firefox","-new-tab", html_filename])
+        else:
+            print """Exsiacua.py module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
 
 
     def _problem_whitoutmc(self):
@@ -917,18 +913,23 @@ class ExSiacua(ExerciseBase):
     TO_LATEX = [
         (u'<multiplechoice>', '\n\n'+r'\\begin{enumerate}'+'\n\n'),
         (u'</multiplechoice>', r'\\end{enumerate}'+'\n\n'),
-        (u'<choice>', r'\\singleoption '),    #quadra is \item[\quadra\hspace*{0.5cm}]
-        (u'</choice>', '\n\n'),    
+        (u'<choice>', r'\\singleoption '),
+        (u'</choice>', '\n\n'),
     ]
 
 
     #TODO: put this into develop manual
     @staticmethod
     def to_latex(txt):
-        r"""Convert this siacua exercise into latex:
+        r"""Convert siacua text in problem or answer into latex.
+        The following conversions are done:
+        - the (simple) html used is converted to latex (html2latex procedure)
         - <multiplechoice> tag is converted to \begin{itemize}
-        - html tags and mathjax is converted using pandoc tool.
+        - <choice> is converted to macro \\singleoption  (an \item)
         
+        INPUT:
+        
+        - ``txt``: siacua problem or answer problem.
         
         EXAMPLE::
         
@@ -947,7 +948,25 @@ class ExSiacua(ExerciseBase):
         ....: card1 +lb1 , \quad x \in intw1$$
         ....: </choice>
         ....: </multiplechoice> '''
-        sage: ExSiacua.to_latex(txt)
+        sage: print ExSiacua.to_latex(txt)
+        <BLANKLINE>
+        \begin{center}
+        CENTERED\end{center}
+        <BLANKLINE>
+        \begin{enumerate}
+        <BLANKLINE>
+        \singleoption  
+        $$f1=\sum_{n=0}^{+\infty}{ser1}, \quad x \in intc1$$
+        <BLANKLINE>
+        \singleoption   
+        $$f1=\sum_{n=0}^{+\infty}{ser1}, \quad x \in intw1$$
+        <BLANKLINE>
+        \singleoption   
+        $$\ln{\left(f11\right)}=\sum_{n=0}^{+\infty}{intser11}
+        card1 +lb1 , \quad x \in intw1$$
+        <BLANKLINE>
+        \end{enumerate}
+        <BLANKLINE>
  
         """
         
@@ -957,6 +976,8 @@ class ExSiacua(ExerciseBase):
         
         for pr in ExSiacua.TO_LATEX: #see above, outside function
             (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
+        
+        newtext = newtext.replace("\n\n","\n")
         
         return newtext
 

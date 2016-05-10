@@ -1,8 +1,8 @@
-# coding=utf-8
+# coding: utf-8
 
 """
 Could be useful:
-- .bashrc:export PATH=$HOME/bin:$HOME/.local/bin:$PATH:$HOME/megua/megua
+- .bashrc: export PATH=$HOME/bin:$HOME/.local/bin:$PATH:$HOME/megua/megua
 
 """
 

@@ -602,6 +602,28 @@ class MegBook(MegSiacua):
             - $ python -c "print hex(1508)"
             - $ hd E97H30_Equacaoliteral2_002_latex.sage
 
+            TODO: escrever sobre isto
+            http://stackoverflow.com/questions/1347791/unicode-error-unicodeescape-codec-cant-decode-bytes-cannot-open-text-file
+                Unicode:
+                 , errors="ignore"
+                 warning: ur''' \underline{....} ''' generates an unicode error!
+                 , errors='backslashreplace'
+                
+                >>> x = ur'\underline'
+                  File "<stdin>", line 1
+                SyntaxError: (unicode error) 'rawunicodeescape' codec can't decode bytes in position 0-1: truncated \uXXXX
+
+                What does this mean?
+                ##Author text must be <str> declared in a utf8.
+
+                #See notes above. Avoid use of ur in strings 
+                #because ur" \underline " causes error as \u is a command
+                #Author text must be <str> declared in a utf8.
+                #in cfilename the strings are saved like: r''' .... '''
+                #so they must be converter to unicode again
+                #This is to avoid ur''' \underline ''' make error because of \u !!!
+                #The ExBase.update must then convert to unicode again!
+
         """
         
         code_string = templates.render("megbook_instance_new.sage",
@@ -622,29 +644,13 @@ class MegBook(MegSiacua):
 
         cfilename = os.path.join(working_dir,row["unique_name"]+'.sage')
 
-        #TODO: escrever sobre isto
-        #Unicode:
-        # , errors="ignore"
-        # warning: ur"""   \underline{....}     """ generates an unicode error!
-        # , errors='backslashreplace'
-        #
-        #>>> x = ur'\underline'
-        #  File "<stdin>", line 1
-        #SyntaxError: (unicode error) 'rawunicodeescape' codec can't decode bytes in position 0-1: truncated \uXXXX
-
         with codecs.open(cfilename, encoding='utf-8', mode='w') as f:
             f.write(code_string)
 
         try:
             with warnings.catch_warnings(record=True) as wlist:
+                #See important notes about coding the contents of cfilename.
                 load(cfilename) #sagemath load command
-                
-                #NOTE:
-                #in cfilename the strings are saved like: r''' .... '''
-                #so they must be converter to unicode again
-                #This is to avoid ur''' \underline ''' make error because of \u !!!
-                #The ExBase.update must then convert to unicode again!
-                                
                 
                 if len(wlist)>0:
                     print 'MegBook.py say: exercise "%s" needs review! See below:' % row['unique_name']
@@ -655,6 +661,7 @@ class MegBook(MegSiacua):
                     display_warning(w,code_string) #find in this file
                 if len(wlist)>0:
                     print '======= end of warning list =========='
+
         except SyntaxError as s:
             print 'MegBook.py say: exercise "%s" causes a syntatical error and needs review! See below.' % row['unique_name']
             print 'See line %d in file "%s".' % (s.lineno,cfilename)
@@ -1089,7 +1096,7 @@ class MegBook(MegSiacua):
 
 
         
-    def fast_exam_siacua(self, course="calculo2", concept_id=100, num_questions=10,siacuatest=True):
+    def fast_exam_siacua(self, course="calculo2", concept_id=100, num_questions=10,siacuatest=True, exstate=""):
         r"""
         The command requests the Siacua system an exam with the following requirements:
         
@@ -1098,28 +1105,36 @@ class MegBook(MegSiacua):
         - ``course'' : string  ("calculo2", "calculo3", "matbas", ...)
         - ``concept_id'': in the context of the course <3 digits>
         - ``num_questions'': number of questions
+        - ``exstate`` : a string (empty or a combination of letters v,h,n, see below)
         
         OUTPUT:
         
         - Output a LaTeX file with an exam.
         - VERIFICAR SE O NUMERO DE EXCERCICIO É O PEDIDO OU ENTÃO AVISAR O PROFESSOR.
             
-            
+        The extate parameter receives a combination of letters meaning:
+
+        - emtpy string (default) : requests the same as "vh";
+        - "v": the exam can contain "visible" exercises (validated and visible);
+        - "h": the exam can contain "hidden" exercises (validated but hidden);
+        - "n": the exam can contain non validated (also hidden) exercises.
+
+
         DEVELOPMENT:    
 
         - TODO: warn when numberof questions is less then num_questions
 
         - The siacua.web.ua.pt returns:
-        [["E44A10_TrLaplaceDef_002", 72],
-         ["E44A10_TrLaplaceDef_002", 79],
-         ["E44A10_TrLaplacePol1_001", 44],
-         ["E44A10_TrLaplacePol2_002", 51],
-         ["E44A10_TrLaplacePol2_002", 53],
-         ["E44A10_TrLaplaceInv1_001", 829],
-         ["E44A10_TrLaplaceInv2_002", 832],
-         ["E44A10_TrLaplaceInv2_002", 837],
-         ["E44A10_TrLaplaceInv4_004", 870],
-         ["E44A10_TrLaplaceInv5_005",878]]
+        [["E44A10_TrLaplaceDef_002", 72, "v"],
+         ["E44A10_TrLaplaceDef_002", 79, "v"],
+         ["E44A10_TrLaplacePol1_001", 44, "v"],
+         ["E44A10_TrLaplacePol2_002", 51, "v"],
+         ["E44A10_TrLaplacePol2_002", 53, "v"],
+         ["E44A10_TrLaplaceInv1_001", 829, "v"],
+         ["E44A10_TrLaplaceInv2_002", 832, "v"],
+         ["E44A10_TrLaplaceInv2_002", 837, "v"],
+         ["E44A10_TrLaplaceInv4_004", 870, "v"],
+         ["E44A10_TrLaplaceInv5_005",878, "v"]]
          <form name="formFastExam" method="post" action="./FastExam.aspx"
          ......
 
@@ -1133,16 +1148,28 @@ class MegBook(MegSiacua):
 
         sage: from megua.all import *
         sage: meg.fast_exam_siacua(course="calculo2", concept_id=100, num_questions=10)
-        
+
+        About strings:        
+        http://stackoverflow.com/questions/24804453/how-can-i-copy-a-python-string
         
         """
+        
+        #TODO Parameter Validation (improve this simple idea)
+        
+        exstate = exstate.lower() #  letters "VHN" to "vhn"
+        exs = ''.join(exstate) #duplicate string
+        exs = re.sub("[vhn]","",exs)
+        if exs != "":
+            print "Megbook.py say: exstate parameter must be a string with only 'vhn' chars."
+
 
         send_dict = { 
             "course": course, 
             "concept_id": concept_id, 
             "num_questions": num_questions, 
             "siacua_key": environ["SIACUA_WEBKEY"],
-            "siacuatest": siacuatest
+            "siacuatest": siacuatest,
+            "exstate": exstate,
             
         }
 
@@ -1171,7 +1198,9 @@ class MegBook(MegSiacua):
         #parse response (see DEVELOPMENT notes above)
         pos = data.find("<")
         data = data[:pos] #remove <form ....> part!
-        #print data
+        print "Response from Siacua:"
+        print data
+        print "========"
 
 
         #Join all questions
@@ -1179,6 +1208,8 @@ class MegBook(MegSiacua):
         ex_list = eval(data) #creates the list
 
         for uniquename_ekey in ex_list:
+            
+            print "megbook.py module say: generating exercise %s." % uniquename_ekey 
             
             unique_name = uniquename_ekey[0]
             ekey = uniquename_ekey[1]
