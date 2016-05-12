@@ -25,7 +25,7 @@ setup(
     # https://packaging.python.org/en/latest/single_source_version.html
     #version='1.2.0',
     use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=['setuptools_scm'], #puts setuptools_scm-1.11.0-py2.7.egg in megua root.
 
     description='MEGUA project for SageMath',
     long_description=long_description,
@@ -38,7 +38,7 @@ setup(
     author_email='pedrocruz@ua.pt',
 
     # Choose your license
-    license='GPL 3',
+    license='GPLv3',
 
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -91,18 +91,18 @@ setup(
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
-    extras_require={
-        'dev': ['check-manifest'],
-        'test': ['coverage'],
-    },
+    #extras_require={
+    #    'dev': ['check-manifest'],
+    #    'test': ['coverage'],
+    #},
 
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
-    entry_points={
-        'console_scripts': [
-            'megua=megua:main',  #TODO: rever isto 
-        ],
-    },
+    #entry_points={
+    #    'console_scripts': [
+    #        'megua=megua:main',  #TODO: rever isto 
+    #    ],
+    #},
 )
