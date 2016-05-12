@@ -190,10 +190,6 @@ Another example that is sent to siacua system:
 
 DEVELOPER NOTES:
 
-Some ideas:
-
-- For students that don't ue LaTeX: http://asciimath.org/
-
 
 """
 

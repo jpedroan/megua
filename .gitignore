@@ -3,7 +3,7 @@ spyder_session
 *.swp
 *.pyc
 \.testoutput/
-_images/
+_images
 _input
 _output
 \.vim
@@ -12,3 +12,6 @@ _output
 build
 *.sage-chat
 *.sage-history
+dist
+megua.egg-info
+

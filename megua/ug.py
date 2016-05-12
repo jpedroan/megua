@@ -146,18 +146,6 @@ Example with an ascii art graphic:
        
 DEVELOPMENT:
 
-javascript exporter:
-
-- http://gojs.net/latest/samples/minimal.html    
-    
-Ascii art:
-
-- it is necessary to install this module in sage: 
-- download aalib.tar.gz, uncompress, cd <dir>; sage -python setup.py install
-
-- http://jwilk.net/software/python-aalib    
-- https://pypi.python.org/pypi/python-aalib/
-
 
 """
 
