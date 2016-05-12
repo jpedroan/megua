@@ -2,6 +2,11 @@
 platex -- routines to compile MegUA generated tex files with pdflatex.
 
 
+AUTHORS:
+
+- Pedro Cruz (2011): initial version
+- Pedro Cruz (2016): first modifications for use in SMC.
+
 
 
 DEVELOPMENT:
