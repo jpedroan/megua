@@ -542,9 +542,9 @@ class ExSiacua(ExerciseBase):
                 smc_open.process([html_filename])
             else: #sagews SALVUS
                 from smc_sagews.sage_salvus import salvus
-                salvus.file(EXERCISE_HTML_PATHNAME,show=True,raw=True)
+                salvus.file(html_filename,show=True,raw=True)
                 print ""
-                salvus.html(html_string)
+                #salvus.html(html_string)
         elif environ["MEGUA_PLATFORM"]=='DESKTOP':
             print "Exsicua module say: firefox ",html_filename,"in the browser and press F5."
             subprocess.Popen(["firefox","-new-tab", html_filename])

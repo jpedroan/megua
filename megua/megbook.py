@@ -32,6 +32,7 @@ TESTS:
 Create or edit a database:
 
 ::
+
    sage: from megua.megbook import MegBook
    sage: from megua.exbase import ExerciseBase
    sage: meg = MegBook(r'_output/megbasedb.sqlite')
@@ -212,6 +213,13 @@ Remove an exercise:
    sage: meg.remove('E28E28_nonexistant',dest=r'_output')
    Exercise E28E28_nonexistant is not on the database.
 
+
+Call siacua system (this module inherits from megsiacua.py):
+
+::
+
+   #TODO
+   ssssage: meg.siacua(exname="E97K50_Laplace_001_siacua",ekeys=[1,2,5],sendpost=False,course="calculo2",usernamesiacua="jeremias")
 
 DEVELOP:
 
