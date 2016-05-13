@@ -3,14 +3,28 @@
 %html
 {{html}}
 
-{{marker_output}}{{uuid4}}{{marker_output}}{{json_html}}{{marker_output}}
-
-{{marker_cell}}{{uuid2}}a{{marker_cell}}
+{{marker_output}}{{uuid2}}{{marker_output}}{{json_html}}{{marker_output}}
+{{marker_cell}}{{uuid3}}a{{marker_cell}}
+%auto
 from megua.all import *
-#meg = MegBook('{{megbookfilename}}')
-{{marker_cell}}{{uuid3}}{{marker_cell}}
+meg = MegBook('{{megbookfilename}}')
+{{marker_cell}}{{uuid4}}{{marker_cell}}
+#PARA ESCOLHER CHAVES ANTES DE ENVIAR
+meg.siacuapreview("{{unique_name}}",ekeys=[0,1,2,3,4,5,6,7,8,9])
+{{marker_cell}}{{uuid5}}{{marker_cell}}
+#PARA ENVIAR COM AS MESMAS CHAVES
+meg.siacua(
+  unique_name="{{unique_name}}",
+  ekeys=[0,1,2,3,4,5,6,7,8,9],
+  sendpost=True,
+  course='{{course}}',  #ALTERAR CURSO
+  usernamesiacua='{{usernamesiacua}}',  #ALTERAR USERNAME 
+  siacuatest=True,  #ALTERAR: True ou False
+))
+{{marker_cell}}{{uuid6}}{{marker_cell}}
+{{marker_cell}}{{uuid7}}{{marker_cell}}
 meg.save(r'''
-%SUMMARY  Minha Secção 1; Minha Secção 2; Minha Secção 3
+%SUMMARY  Capítulo; Secção 1; Sub Secção 1.1; Sub sub Secção 1.1.1
 
 Palavras-chave:
 
@@ -51,11 +65,10 @@ class {{unique_name}}(Exsiacua):
                         
 ''')
 
-{{marker_cell}}{{uuid4}}{{marker_cell}}
+{{marker_cell}}{{uuid8}}{{marker_cell}}
 
 meg.new("{{unique_name}}",ekey={{ekey}})
 
 {# https://github.com/sagemath/cloud/blob/master/scripts/sws2sagews.py #}
 
-{# {{marker_cell}}{{uuid2}}a{{marker_cell}} #}
 

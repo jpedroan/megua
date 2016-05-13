@@ -448,6 +448,12 @@ class MegBook(MegSiacua):
                     uuid2=uuid(),
                     uuid3=uuid(),
                     uuid4=uuid(),
+                    uuid5=uuid(),
+                    uuid6=uuid(),
+                    uuid7=uuid(),
+                    uuid8=uuid(),
+                    course=environ["COURSE"],
+                    usernamesiacua=environ["USERNAME_SIACUA"],
                     marker_cell=MARKERS["cell"],
                     marker_output=MARKERS["output"],
                     html=htmlstr,
@@ -500,6 +506,26 @@ class MegBook(MegSiacua):
             #    "_siacua or _moodle and related extension *.sagews or *.sage."
 
 
+        if environ["MEGUA_PLATFORM"]=='SMC':
+            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+                print "MegBook module say:  open ", fullpath
+                #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
+                #Does not work using "sage -python": from smc_pyutil import smc_open
+                #Works using: "python": from smc_pyutil import smc_open
+                #                        smc_open.process([CATALOG_PDF_PATHNAME])
+                #WORKS:subprocess.call(["openpdf.py",CATALOG_PDF_PATHNAME])
+                #ANOTHER SOLUTION (http://stackoverflow.com/questions/3402168/permanently-add-a-directory-to-pythonpath)
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([fullpath])
+            else: #sagews SALVUS
+                from smc_sagews.sage_salvus import salvus
+                salvus.open_tab(fullpath)
+        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+            print "MegBook module say: gvim ",fullpath
+            subprocess.Popen(["gvim",fullpath])
+        else:
+            print """MegBook module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
 
 
         

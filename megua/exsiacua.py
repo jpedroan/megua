@@ -549,7 +549,8 @@ class ExSiacua(ExerciseBase):
             else: #sagews SALVUS
                 from smc_sagews.sage_salvus import salvus
                 salvus.file(html_filename,show=True,raw=True)
-                print "IF the above LINK IS NOT WORKING WAIT FEW SECONDS AND TRY AGAIN."
+                print ""
+                print "IF the above LINK IS NOT WORKING, WAIT FEW SECONDS AND TRY AGAIN."
                 #salvus.html(html_string)
         elif environ["MEGUA_PLATFORM"]=='DESKTOP':
             print "Exsicua module say: firefox ",html_filename,"in the browser and press F5."
@@ -705,9 +706,9 @@ class ExSiacua(ExerciseBase):
             #TODO: Resultado: <span id="resultado">Muito bem, melhorou o exercício, parabéns! id=3883</span>
             data = response.read()
             if "Muito bem, melhorou" in data:
-                akword = "Improved {}"
+                akword = "Ex. improved:"
             else:
-                akword = "New"
+                akword = "New ex.:"
 
             choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
             match_iter = re.finditer(choice_pattern,data) 
