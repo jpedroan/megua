@@ -745,7 +745,7 @@ class ExSiacua(ExerciseBase):
         #    } )
 
         d.update( {
-            "siacua_key": SIACUA_WEBKEY,
+            "siacua_key": environ["SIACUA_WEBKEY"],
             "course": course,
             "exname": exname, 
             "ekey": str(e_number), 
