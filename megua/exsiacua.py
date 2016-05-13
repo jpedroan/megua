@@ -618,6 +618,8 @@ class ExSiacua(ExerciseBase):
             print "Please do 'meg.siacua?' in a cell for usage details."
             return
         
+        all_answers = []        
+        
         for e_number in ekeys:
 
             #Create exercise instance
@@ -656,11 +658,12 @@ class ExSiacua(ExerciseBase):
             #Call siacua for store.
             if sendpost:
                 send_dict.update(dict({'usernamesiacua': usernamesiacua}))
-                self._siacua_send(send_dict)
+                all_answers.append( self._siacua_send(send_dict) )
             else:
                 print "Not sending to siacua. Dictionary is", send_dict
 
-
+        if all_answers:
+            print all_answers
 
     #TODO: tirar isto.
     def _send_images(self):
@@ -702,14 +705,13 @@ class ExSiacua(ExerciseBase):
             #TODO: Resultado: <span id="resultado">Muito bem, melhorou o exercício, parabéns! id=3883</span>
             data = response.read()
             if "Muito bem, melhorou" in data:
-                print "Os exercícios melhorados foram enviados ao Siacua com os id=:"
+                akword = "Improved {}"
             else:
-                print "Os exercícios foram enviados ao Siacua com os id=:"
+                akword = "New"
 
             choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
             match_iter = re.finditer(choice_pattern,data) 
-            all_ids = [ match.group(1) for match in match_iter] #TODO: do this better
-            print all_ids
+            all_ids = [ "{} {}".format(akword,match.group(1)) for match in match_iter] #TODO: do this better
 
                 
             #if environ["MEGUA_PLATFORM"]=="SMC":
@@ -722,6 +724,12 @@ class ExSiacua(ExerciseBase):
             print response.status, response.reason
 
         conn.close()
+        
+        #It's only one exercise sent, each call of this function
+        if all_ids:
+            return all_ids[0]
+        else:
+            return 'Not sent: ekey={}'.format(send_dict["ekey"])
 
 
     def _build_ekeys(self,ekeys,many=2):
