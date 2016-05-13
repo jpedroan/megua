@@ -510,7 +510,7 @@ class ExSiacua(ExerciseBase):
             
             all_options += u'</table>\n'
 
-            ex_text = u'<h3>Random sequence index: ekey=' + str(e_number) + '</h3>'
+            ex_text = u'<h3>Random exercise with ekey=' + str(e_number) + '</h3>'
             ex_text += problem + '<br/>'
             ex_text += all_options 
             ex_text += answer_list[-1]
@@ -557,7 +557,7 @@ class ExSiacua(ExerciseBase):
         The problem text without multiple choice tag.
         """
         assert(self.has_instance)
-        return self._remove_multiplechoicetag(self._problem_text)
+        return self._remove_multiplechoicetag(self.problem())
         
         
     def _answer_whitoutmc(self):
@@ -565,7 +565,7 @@ class ExSiacua(ExerciseBase):
         The answer text without multiple choice tag.
         """
         assert(self.has_instance)
-        return self._remove_multiplechoicetag(self._answer_text)
+        return self._remove_multiplechoicetag(self.answer())
 
 
 

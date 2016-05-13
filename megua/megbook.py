@@ -1081,8 +1081,6 @@ class MegBook(MegSiacua):
                 #lts += u'\\textbf{{Answer}}\n\n{0}\n\n'.format(ex.answer())
 
 
-
-
         print "MegBook.py say: compiling latex file containing the instances of the exercises."
 
         latex_text =  templates.render("megbook_catalog_latex.tex",
@@ -1094,7 +1092,10 @@ class MegBook(MegSiacua):
         CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"catalog.pdf")
 
 
+        #Compile two times because of TableOfContents  \toc
         pcompile(latex_text, MEGUA_EXERCISE_CATALOG, "catalog.tex")
+        pcompile(latex_text, MEGUA_EXERCISE_CATALOG, "catalog.tex")
+
 
         if environ["MEGUA_PLATFORM"]=='SMC':
             if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua

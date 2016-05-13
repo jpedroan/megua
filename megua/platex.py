@@ -120,10 +120,14 @@ def pcompile(latex_text, workdir, filename):
         # rerun?
         # http://tex.stackexchange.com/questions/265744/how-to-know-if-a-latex-file-needs-another-compilation-pass
         if "LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right." in output:
-            print "Running laTeX a second time"
+            print "="*20
+            print "platex.py say: Running laTeX a second time."
+            print "="*20
             output = subprocess.check_output(lt,cwd=workdir) #return output in a string
             if "LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right." in output:
-                print "Running laTeX a third and last time"
+                print "="*20
+                print "platex.py say: Running laTeX a third and last time"
+                print "="*20
                 output = subprocess.check_output(lt,cwd=workdir) #return output in a string
     except subprocess.CalledProcessError as err:
         #Try to show the message to user
