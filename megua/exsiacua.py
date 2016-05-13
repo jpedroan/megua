@@ -235,6 +235,7 @@ class ExSiacua(ExerciseBase):
 
     def update(self,ekey=None,edict=None, render_method=None):
 
+
         #For multiplechoice
         self.all_choices = []
         self.has_multiplechoicetag = None #Don't know yet.
@@ -245,16 +246,22 @@ class ExSiacua(ExerciseBase):
         #Call user derived function to generate a set of random variables.
         ExerciseBase.update(self,ekey,edict)
 
-        #If exist information about MC
-        #extracts it to local variables.
-        #All after all replacements
+        if "multiplechoice" in self.problem():
+            options_txt = self._update_multiplechoice(self.problem(),where="problem")
+        else:
+            options_txt = self._update_multiplechoice(self.answer(), where="answer")
+            print self.unique_name()," has multiplechoice in answer part. CHANGE <multiplechoice> to the %problem"
+
 
         if "multiplechoice" in self.problem():
-            self._multiplechoice_parser(self.problem(),where="problem")
-            self.detailed_answer = self.answer()
+            options_txt = self._update_multiplechoice(self.problem(),where="problem")
         else:
-            print self.unique_name()," has multiplechoice in answer part "
-            self._multiplechoice_parser(self.answer(),where="answer")
+            print self.unique_name()," has multiplechoice in answer part. CHANGE <multiplechoice> to the %problem"
+            self._update_multiplechoice(self.answer(),where="answer")
+
+
+        self.detailed_answer  = self._remove_multiplechoicetag(self.answer())
+        self.formated_problem = self._remove_multiplechoicetag(self.problem()) + u'\n<br/>' + options_txt + u'\n<br/>' 
 
 
 
@@ -326,9 +333,7 @@ class ExSiacua(ExerciseBase):
 
 
 
-
-
-    def _multiplechoice_parser(self,input_text,where):
+    def _update_multiplechoice(self,input_text,where):
         """
         Called by ExSiacua.update()
         
@@ -346,12 +351,12 @@ class ExSiacua(ExerciseBase):
 
         """
 
+        #TODO: remove in a few revisions
         if "CDATA" in input_text:
             print "TODO: in %s, should issue warning when CDATA and multiplechoice are both present." % self.unique_name()
             self.detailed_answer = "Contains [CDATA]\n"
             self.all_choices = []
-            return 
-
+            raise SyntaxError("exsiacua module say:  {} should have <multiplechoice>...</multiplechoice> tags.".format(self.unique_name()))
 
         #Find and extract text inside <multiplechoice>...</multiplechoice>
         choices_match = re.search(r'<\s*multiplechoice\s*>(.+?)<\s*/multiplechoice\s*>', input_text, re.DOTALL|re.UNICODE)
@@ -371,25 +376,24 @@ class ExSiacua(ExerciseBase):
         match_iter = re.finditer(choice_pattern,choice_text) #create an iterator
         self.all_choices = [ match.group(1) for match in match_iter] #TODO: do this better
         #print "=========================="
-        #print "exsiacua.py module say:"
-        #print self.all_choices
+        #print "exsiacua.py module say:", self.all_choices
         #print "=========================="
         
-        if where=="answer":
-            #Find detailed answer and save it
-            self.detailed_answer = input_text[choices_match.end():].strip("\t\n ")
-            #print "=========================="
-            #print "Detailed answer"
-            #print self.detailed_answer
-            #print "=========================="
-            self.formated_problem = self.problem() + u'\n<br/>' + u'\n<br/>'.join(self.all_choices) + u'\n<br/>' 
-        else: #where="problem"
-            self.detailed_answer = self.answer().strip("\t\n ")
-            self.formated_problem = self._remove_multiplechoicetag(self.problem()) + u'\n<br/>' + u'\n<br/>'.join(self.all_choices) + u'\n<br/>' 
+        siacuaoption_template = templates.get_template("exsiacua_previewoption.html")
+
+        all_options = u'<table style="width:100%;">\n'
+
+        for option in self.all_choices:
+            option_html = siacuaoption_template.render(optiontext=option)
+            all_options += option_html
             
-            
+        all_options += u'</table>\n'
         #For sending it's important to know where options are stored.
         self.has_multiplechoicetag = True
+
+        return all_options
+
+            
 
 
 
@@ -511,7 +515,7 @@ class ExSiacua(ExerciseBase):
             all_options += u'</table>\n'
 
             ex_text = u'<h3>Random {} with ekey={}</h3>'.format(self.unique_name(),e_number)
-            ex_text += problem + '<br/>'
+            ex_text += problem + u'<br/><hr /><br />'
             ex_text += all_options 
             ex_text += u'\n<h4>Answer</h4>\n' + answer_list[-1]
 
@@ -543,7 +547,7 @@ class ExSiacua(ExerciseBase):
             else: #sagews SALVUS
                 from smc_sagews.sage_salvus import salvus
                 salvus.file(html_filename,show=True,raw=True)
-                print ""
+                print "IF the above LINK IS NOT WORKING WAIT FEW SECONDS AND TRY AGAIN."
                 #salvus.html(html_string)
         elif environ["MEGUA_PLATFORM"]=='DESKTOP':
             print "Exsicua module say: firefox ",html_filename,"in the browser and press F5."
