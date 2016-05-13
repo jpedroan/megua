@@ -510,10 +510,10 @@ class ExSiacua(ExerciseBase):
             
             all_options += u'</table>\n'
 
-            ex_text = u'<h3>Random exercise with ekey=' + str(e_number) + '</h3>'
+            ex_text = u'<h3>Random {} with ekey={}</h3>'.format(self.unique_name(),e_number)
             ex_text += problem + '<br/>'
             ex_text += all_options 
-            ex_text += answer_list[-1]
+            ex_text += u'\n<h4>Answer</h4>\n' + answer_list[-1]
 
             #Add one more instance with ekey
             allexercises += ex_text
