@@ -697,7 +697,7 @@ class ExSiacua(ExerciseBase):
             #print response.status, response.reason
             #TODO: remove extra newlines that the user sees on notebook.
             data = response.read()
-            if MEGUA_PLATFORM=='sagews':
+            if environ["MEGUA_PLATFORM"]=='sagews':
                 import salvus
                 salvus.html(data.strip())
             else: #MEGUA_PLATFORM=='commandline'
