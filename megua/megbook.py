@@ -423,7 +423,7 @@ class MegBook(MegSiacua):
                 
                 e_string = templates.render("megbook_exlatex.sagews",
                     unique_name=filename[0:-7],
-                    megbookfilename=self.local_store_filename,
+                    megbookfilename=environ["PROJECT_FILENAME"], #self.local_store_filename,
                     uuid1=uuid(),
                     uuid2=uuid(),
                     uuid3=uuid(),
@@ -443,7 +443,7 @@ class MegBook(MegSiacua):
                 
                 e_string = templates.render("megbook_exsiacua.sagews",
                     unique_name=filename[0:-7],
-                    megbookfilename=self.local_store_filename,
+                    megbookfilename=environ["PROJECT_FILENAME"], 
                     uuid1=uuid(),
                     uuid2=uuid(),
                     uuid3=uuid(),
@@ -504,6 +504,7 @@ class MegBook(MegSiacua):
             #print "Megbook.py say: filename must be " 
             #    "a name in form E12X34_SomeName_001_latex ou "
             #    "_siacua or _moodle and related extension *.sagews or *.sage."
+            return
 
 
         if environ["MEGUA_PLATFORM"]=='SMC':
