@@ -286,26 +286,15 @@ class ExSiacua(ExerciseBase):
         answtxt =  self.answer()
         uname   =  self.unique_name()
 
-        #Use jinja2 template to generate LaTeX.
-        #TODO: CDATA is stil needed?
-        if 'CDATA' in answtxt:
-            answtxt_woCDATA = re.subn(
-                '<!\[CDATA\[(.*?)\]\]>', r'\1', 
-                answtxt, 
-                count=0,
-                flags=re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
-        else:
-            answtxt_woCDATA = re.subn(
-                '<choice>(.*?)</choice>', r'<b>Escolha:</b><br>\1<hr>', 
-                answtxt, 
-                count=0,
-                flags=re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
+
 
         html_string = templates.render("exsiacua_print_instance.html",
                 uname=uname,
                 summtxt=summtxt,
                 probtxt=probtxt,
-                answtxt=answtxt_woCDATA,
+                answtxt=answtxt,
+                formated_problem = self.formated_problem,
+                detailed_answer  = self.detailed_answer,
                 ekey=self.ekey,
                 mathjax_header=environ["MATHJAX_HEADER"])
 
@@ -340,10 +329,14 @@ class ExSiacua(ExerciseBase):
 
 
     def _multiplechoice_parser(self,input_text,where):
-        """When <multiplechoice>...</multiplecoice> is present it parses them
-        and puts each option in exercise fields: 
+        """
+        Called by ExSiacua.update()
+        
+        Parses <multiplechoice>...</multiplecoice> and puts each option 
+        in exercise fields: 
 
         * self.all_choices: list of all choices.
+        * self.formated_problem
         * self.detailed_answer: full detailed answer.
         * self.has_multiplechoicetag: tell that choices came from this syntax
 
@@ -388,7 +381,12 @@ class ExSiacua(ExerciseBase):
             #print "Detailed answer"
             #print self.detailed_answer
             #print "=========================="
-
+            self.formated_problem = self.problem() + u'<br/>'.join(self.all_choices)
+        else: #where="problem"
+            self.detailed_answer = self.answer().strip("\t\n ")
+            self.formated_problem = self._remove_multiplechoicetag(self.problem()) + u'<br/>'.join(self.all_choices)
+            
+            
         #For sending it's important to know where options are stored.
         self.has_multiplechoicetag = True
 
