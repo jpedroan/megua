@@ -488,6 +488,8 @@ class ExSiacua(ExerciseBase):
             #Create exercise instance
             self.update(ekey=e_number)
 
+
+            #TODO: do like in print_instance()
             problem = self._problem_whitoutmc()#m.c. options here?
             answer  = self._answer_whitoutmc() #m.c. options here?
     
@@ -695,13 +697,26 @@ class ExSiacua(ExerciseBase):
         if response.status==200:
             #print 'Sent to server:  "', send_dict["exname"], '" with ekey=', send_dict["ekey"] 
             #print response.status, response.reason
-            #TODO: remove extra newlines that the user sees on notebook.
+        
+            #TODO: format this output to extract only the <id> 3883 in siacua:
+            #TODO: Resultado: <span id="resultado">Muito bem, melhorou o exercício, parabéns! id=3883</span>
             data = response.read()
-            if environ["MEGUA_PLATFORM"]=='sagews':
-                import salvus
-                salvus.html(data.strip())
-            else: #MEGUA_PLATFORM=='commandline'
-                print data.strip()
+            if "Muito bem, melhorou" in data:
+                print "Os exercícios melhorados foram enviados ao Siacua com os id=:"
+            else:
+                print "Os exercícios foram enviados ao Siacua com os id=:"
+
+            choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
+            match_iter = re.finditer(choice_pattern,data) 
+            all_ids = [ match.group(1) for match in match_iter] #TODO: do this better
+            print all_ids
+
+                
+            #if environ["MEGUA_PLATFORM"]=="SMC":
+            #    import salvus
+            #    salvus.html(data.strip())
+            #else: #MEGUA_PLATFORM=='commandline'
+            #    print data.strip()
         else:
             print "Could not send %s exercise to the server." % send_dict["exname"]
             print response.status, response.reason
