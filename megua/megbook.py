@@ -299,13 +299,16 @@ from megua.platex import pcompile, latexunderscore
 #from xlatex import * #including PDFLaTeXExporter
 
 
-latexunderscore
-
 
 
 class MegBook(MegSiacua):
     r"""
     A book of exercises of several markup languages.
+    
+    Implements:
+    
+    - MegSiacua: functions only for Siacua
+    - MegLatex: (not yet) functions only for Latex
     
     """
 

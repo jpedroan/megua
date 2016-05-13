@@ -370,10 +370,10 @@ class ExSiacua(ExerciseBase):
         #Collects all <choice>...</choice> pairs
         match_iter = re.finditer(choice_pattern,choice_text) #create an iterator
         self.all_choices = [ match.group(1) for match in match_iter] #TODO: do this better
-        print "=========================="
-        print "exsiacua.py module say:"
-        print self.all_choices
-        print "=========================="
+        #print "=========================="
+        #print "exsiacua.py module say:"
+        #print self.all_choices
+        #print "=========================="
         
         if where=="answer":
             #Find detailed answer and save it

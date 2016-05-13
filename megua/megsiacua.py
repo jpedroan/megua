@@ -199,7 +199,45 @@ class MegSiacua:
         ex_instance.siacua(ekeys,sendpost,course,usernamesiacua,grid2x2,siacuatest)
 
         #done
+
     
+    def siacuapreview(self,unique_name,ekeys):
+        r"""
+
+        INPUT:
+
+        - ``unique_name``: unique exercise name (name in "class E12X34_something_001(Exercise):").
+
+        - ``ekeys``: list of numbers that generate the same problem instance.
+
+        OUTPUT:
+
+        - this command writes an html file with all instances.
+
+        NOTE:
+
+        - you can export between 3 and 6 wrong options and 1 right.
+
+        EXAMPLE:
+
+            sssssage: ex.siacuapreview(ekeys=[1,2,5])
+
+
+        Algorithm:
+            1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
+
+        """
+        #Get summary, problem and answer and class_text
+        row = self.megbook_store.get_classrow(unique_name)
+        if not row:
+            print "megsiacua module: %s cannot be accessed on database." % unique_name
+            return
+        
+        #Create an instance (ekey=0 because it needs one.)
+        ex_instance = self.exerciseinstance(row=row, ekey=0)
+
+        #exercise instance will sent instances to siacua
+        ex_instance.siacuapreview(ekeys)
 
         
 #end class MegSiacua
