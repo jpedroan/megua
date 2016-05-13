@@ -191,7 +191,7 @@ Make a catalog:
 
 ::
 
-   sage: #meg.catalog() #opens evince
+   sage: meg.catalog() #opens evince
    
    
 Search an exercise:
@@ -992,17 +992,23 @@ class MegBook(MegSiacua):
 
             #Section creation
             if s.level==0: # {{ => }
+                section = latexunderscore(s.sec_name)
+                subsection = r""
+                subsubsection = r""
+                sname = latexunderscore(s.sec_name) #if exist _ => \_
+                lts += u'\n\n\chapter{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
+            elif s.level==1:
+                subsection = latexunderscore(s.sec_name)
+                subsubsection = r""
                 sname = latexunderscore(s.sec_name) #if exist _ => \_
                 lts += u'\n\n\section{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
-            elif s.level==1:
+            elif s.level==2:
+                subsubsection = latexunderscore(s.sec_name)
                 sname = latexunderscore(s.sec_name) #if exist _ => \_
                 lts += u'\n\n\subsection{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
-            elif s.level==2:
-                sname = latexunderscore(s.sec_name) #if exist _ => \_
-                lts += u'\n\n\subsubsection{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
             else:
                 sname = latexunderscore(s.sec_name) #if exist _ => \_
-                lts += u'\n\n\textbf{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
+                lts += u'\n\n\subsubsection{{{0} ({1})}}\n\n'.format(sname,len(s.exercises))
 
             #Get the instances, if they exist on this section, subsection or subsubsection
             #TODO: image render mode to "filenameimage"
@@ -1017,6 +1023,9 @@ class MegBook(MegSiacua):
                                 unique_name=unique_name,
                                 unique_name_noslash = latexunderscore(unique_name),
                                 summary = ex.summary(),
+                                section=section,
+                                subsection=subsection,
+                                subsubsection=subsubsection,
                                 suggestive_name = ex.suggestive_name(),
                                 problem = ex.problem(),
                                 answer = ex.answer()
@@ -1028,6 +1037,9 @@ class MegBook(MegSiacua):
                                 unique_name=unique_name,
                                 unique_name_noslash = latexunderscore(unique_name),
                                 summary = ex.summary(),
+                                section=section,
+                                subsection=subsection,
+                                subsubsection=subsubsection,
                                 suggestive_name = ex.suggestive_name(),
                                 problem = ExSiacua.to_latex(ex.problem()), #u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
                                 answer = ExSiacua.to_latex(ex.answer()) #u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
@@ -1038,6 +1050,9 @@ class MegBook(MegSiacua):
                                 exformat="textual (exbase)",
                                 unique_name_noslash = latexunderscore(unique_name),
                                 summary = ex.summary(),
+                                section=section,
+                                subsection=subsection,
+                                subsubsection=subsubsection,
                                 suggestive_name = ex.suggestive_name(),
                                 problem = u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
                                 answer = u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'

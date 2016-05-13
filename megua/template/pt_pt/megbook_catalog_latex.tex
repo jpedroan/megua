@@ -36,29 +36,6 @@
 {# NOTE:  {{ '{#' }} means '{#' in the output #}
 
 
-\newcommand{\reffonte}[2]{
-\vfill\noindent Concretização do exercício~\textbf{{ '{#1}' }}~(ver código fonte na pág. \pageref{{ '{#2}' }}): \par
-}
-
-
-\newcommand{\cfonte}[2]{
-\noindent \hrulefill~\textbf{{ '{#1}' }}~\hrulefill\label{{ '{#2}' }}
-}
-
-%================
-% Listings
-%================
-\usepackage{listings}
-
-\renewcommand{\lstlistingname}{Listagem}
-\renewcommand{\lstlistlistingname}{Listagens}
-
-\lstset{
-    frame=single,
-    breaklines=true,
-    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}},
-    extendedchars=true
-}
 
 %Remove indentation
 \setlength\parindent{0pt}
@@ -74,10 +51,6 @@
 
 
 \mainmatter
-
-
-\chapter{Questões concretizadas}
-
 
 {{exerciseinstanceslatex}}
 
