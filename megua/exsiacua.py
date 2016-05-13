@@ -370,9 +370,10 @@ class ExSiacua(ExerciseBase):
         #Collects all <choice>...</choice> pairs
         match_iter = re.finditer(choice_pattern,choice_text) #create an iterator
         self.all_choices = [ match.group(1) for match in match_iter] #TODO: do this better
-        #print "=========================="
-        #print self.all_choices
-        #print "=========================="
+        print "=========================="
+        print "exsiacua.py module say:"
+        print self.all_choices
+        print "=========================="
         
         if where=="answer":
             #Find detailed answer and save it
@@ -381,10 +382,10 @@ class ExSiacua(ExerciseBase):
             #print "Detailed answer"
             #print self.detailed_answer
             #print "=========================="
-            self.formated_problem = self.problem() + u'<br/>'.join(self.all_choices)
+            self.formated_problem = self.problem() + u'\n<br/>' + u'\n<br/>'.join(self.all_choices) + u'\n<br/>' 
         else: #where="problem"
             self.detailed_answer = self.answer().strip("\t\n ")
-            self.formated_problem = self._remove_multiplechoicetag(self.problem()) + u'<br/>'.join(self.all_choices)
+            self.formated_problem = self._remove_multiplechoicetag(self.problem()) + u'\n<br/>' + u'\n<br/>'.join(self.all_choices) + u'\n<br/>' 
             
             
         #For sending it's important to know where options are stored.
