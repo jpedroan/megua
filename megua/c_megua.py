@@ -50,27 +50,33 @@ def usage(argv):
         print "  catalog             -- produce a catalog based on exercises database"  
         print "  new <filename>      -- make new exercise file"  
         print "  meg2smc             -- convert megua5.2 database to megua for smc"  
-    elif len(argv)==2 and not sys.argv[2] in ['catalog','new']:
+    elif len(argv)==2 and not sys.argv[1] in ['catalog','new']:
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
         print "Arguments:"
         print "  help catalog          -- calls help on command catalog"  
         print "  help new              -- make new exercise file"  
-    elif len(argv)==2 and sys.argv[2]=='catalog':
+    elif len(argv)==3 and sys.argv[1]=='help' and sys.argv[2]=='catalog':
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
-        print "megua catalog: produces a pdf file with an instance with all exercises."
-    elif len(argv)==2 and sys.argv[2]=='':
-        #####  1.......................26..................................................78
-        #####  |.....................--.|...................................................|
-        print "megua new <filename>  --  <filename> is something like:"
-        print "                      --  E12X34_name_001_latex.sagews"
-        print "                      --  E12X34_name_001_siacua.sagews"
-        print "                      --    or"
-        print "                      --  E12X34_name_001_latex.sage"
-        print "                      --  E12X34_name_001_siacua.sage"
+        print "megua catalog         -- produces a pdf file with an instance with all exercises."
+    elif len(argv)==2 and sys.argv[1]=='new':
+        usage_new()
+    elif len(argv)==3 and sys.argv[1]=='help' and sys.argv[2]=='new':
+        usage_new()
     else:
         usage([])        
+
+
+def usage_new():
+    #####  1.......................26..................................................78
+    #####  |.....................--.|...................................................|
+    print "megua new <filename> "
+    print "  <filename> is       --  E12X34_name_001_latex.sagews"
+    print "  <filename> is       --  E12X34_name_001_siacua.sagews"
+    print "      or"
+    print "  <filename> is       --  E12X34_name_001_latex.sage"
+    print "  <filename> is       --  E12X34_name_001_siacua.sage"
 
 
 
@@ -85,7 +91,7 @@ if __name__=="__main__":
     #print 'Argument List:', str(sys.argv)
 
     if len(sys.argv)==1 or not sys.argv[1] in ['help','catalog','new','meg2smc']:
-        usage()
+        usage(sys.argv)
         exit()
 
     if sys.argv[1] == 'help':
