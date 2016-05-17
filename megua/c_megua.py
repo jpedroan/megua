@@ -49,7 +49,6 @@ def usage(argv):
         print "  help <cmd>          -- calls help on command <cmd>"  
         print "  catalog             -- produce a catalog based on exercises database"  
         print "  new <filename>      -- make new exercise file"  
-        print "  meg2smc             -- convert megua5.2 database to megua for smc"  
     elif len(argv)==2 and not sys.argv[1] in ['catalog','new']:
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
@@ -66,6 +65,8 @@ def usage(argv):
         usage_new()
     else:
         usage([])        
+        
+    usage_bash_vars()
 
 
 def usage_new():
@@ -78,6 +79,17 @@ def usage_new():
     print "  <filename> is       --  E12X34_name_001_latex.sage"
     print "  <filename> is       --  E12X34_name_001_siacua.sage"
 
+
+def usage_bash_vars():
+    try:
+        print "\nProject description and directories:"
+        print "  course name (in siacua system):", environ["COURSE"]
+        print "  user name (in siacua system):", environ["USERNAME_SIACUA"]
+        print "  project datbase:", environ["PROJECT_DATABASE"]
+        print "  exercise source directory:", environ["MEGUA_EXERCISE_INPUT"]
+        print "  exercise catalog directory:", environ["MEGUA_EXERCISE_CATALOG"]
+    except KeyError as k:
+        print "\n\nc_megua.py say: contact administrator because there are missing bash variables."
 
 
 def valid_filename(filename):
