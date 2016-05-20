@@ -9,7 +9,7 @@
 {{marker_cell}}{{uuid1}}i{{marker_cell}}
 {{marker_cell}}{{uuid2}}a{{marker_cell}}
 from megua.all import *
-meg.set_current(__file__)
+meg.set_current_exercise(__file__)
 {{marker_cell}}{{uuid3}}{{marker_cell}}
 meg.save(r'''
 %SUMMARY  Capítulo; Minha Secção 1; Minha Secção 2; Minha Secção 3

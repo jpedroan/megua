@@ -449,7 +449,7 @@ class LocalStore:
 
         #INSERT INTO Persons (P_Id, LastName, FirstName) VALUES (5, 'Tjessem', 'Jakob')
         #http://www.w3schools.com/sql/sql_insert.asp
-        print "localstore.py: old_unique_name,unique_name=", old_unique_name,unique_name
+        print "localstore.py: old_unique_name,unique_name=", old_unique_name, unique_name
             
         row = self.get_classrow(unique_name)
         if row:

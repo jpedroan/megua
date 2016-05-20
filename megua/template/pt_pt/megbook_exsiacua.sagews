@@ -8,7 +8,8 @@
 {{marker_cell}}{{uuid3}}a{{marker_cell}}
 %auto
 from megua.all import *
-meg.set_current(__file__) #set filename as exercise name
+meg.set_current_exercise(__file__) #set filename as exercise name
+#FAÇA SHIFT-ENTER NESTA CÉLULA E DEPOIS EM meg.save(...)
 {{marker_cell}}{{uuid4}}{{marker_cell}}
 #PARA ESCOLHER CHAVES ANTES DE ENVIAR
 meg.siacuapreview(
@@ -29,6 +30,16 @@ meg.save(r'''
 %SUMMARY  Capítulo; Secção 1; Sub Secção 1.1; Sub sub Secção 1.1.1
 
 Palavras-chave:
+
+Lista de "concepts" para a árvore Siacua:
+
+* são 3 dígitos (Assunto, Tema, Conceito) ;
+* seguido do peso [0.0 a 1.0] e a soma deve dar 1.0;
+
+SIACUAstart
+level=1;  slip= 0.2; guess=0.25; discr = 0.3
+concepts = [(123, 0.8),(124, 0.2) ]
+SIACUAend
 
 Autores:
 
