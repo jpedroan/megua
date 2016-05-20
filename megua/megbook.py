@@ -414,7 +414,7 @@ class MegBook(MegSiacua):
             #print "megbook.py: Corrected",pathname
         
         
-        assume(ext) #See DEVEL notes above: ext<>''
+        assert(ext) #See DEVEL notes above: ext<>''
         self._current_unique_name = None
 
         if not isidentifier(unique_name):
