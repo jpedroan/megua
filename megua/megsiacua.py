@@ -75,7 +75,7 @@ class MegSiacua:
         """
 
         if not unique_name:
-            unique_name = self._unique_name
+            unique_name = self._current_unique_name
 
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
@@ -119,7 +119,7 @@ class MegSiacua:
 
         """
         if not unique_name:
-            unique_name = self._unique_name
+            unique_name = self._current_unique_name
 
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
