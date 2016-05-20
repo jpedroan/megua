@@ -1,28 +1,27 @@
+{#
 {{marker_cell}}{{uuid1}}i{{marker_cell}}
-{# megbook.py #}
 %html
 {{html}}
-
 {{marker_output}}{{uuid2}}{{marker_output}}{{json_html}}{{marker_output}}
+#}
+{{marker_cell}}{{uuid1}}i{{marker_cell}}
 {{marker_cell}}{{uuid3}}a{{marker_cell}}
 %auto
 from megua.all import *
-meg = MegBook('{{megbookfilename}}')
+meg.set_current(__file__) #set filename as exercise name
 {{marker_cell}}{{uuid4}}{{marker_cell}}
 #PARA ESCOLHER CHAVES ANTES DE ENVIAR
 meg.siacuapreview(
-   unique_name="{{unique_name}}",
    ekeys=[0,1,2,3,4,5,6,7,8,9]
 )
 {{marker_cell}}{{uuid5}}{{marker_cell}}
-#PARA ENVIAR COM AS MESMAS CHAVES
+#PARA ENVIAR 
 meg.siacua(
-  unique_name="{{unique_name}}",
   ekeys=[0,1,2,3,4,5,6,7,8,9],
   sendpost=True,
   course='{{course}}',  #ALTERAR CURSO ??
-  usernamesiacua='{{usernamesiacua}}',  #ALTERAR USERNAME  ??
-  siacuatest=True,  #ALTERAR: True ou False  ??
+  usernamesiacua='{{usernamesiacua}}',  #ALTERAR USERNAME  ?
+  siacuatest=True,  #ALTERAR: True ou False  ?
 )
 {{marker_cell}}{{uuid6}}{{marker_cell}}
 {{marker_cell}}{{uuid7}}{{marker_cell}}
@@ -59,7 +58,7 @@ x^2
 
 
 
-class {{unique_name}}(Exsiacua):
+class {{unique_name}}(ExSiacua):
 
     def make_random(s,edict=None):
 
@@ -70,7 +69,7 @@ class {{unique_name}}(Exsiacua):
 
 {{marker_cell}}{{uuid8}}{{marker_cell}}
 
-meg.new("{{unique_name}}",ekey=10)
+meg.new(ekey=10)
 
 {# https://github.com/sagemath/cloud/blob/master/scripts/sws2sagews.py #}
 

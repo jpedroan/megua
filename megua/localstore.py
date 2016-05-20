@@ -459,7 +459,6 @@ class LocalStore:
         self.conn.commit()
         c.close()
 
-
     def search(self,regex):
         r"""
         Present headers from problems containing keywords from regex anywhere.

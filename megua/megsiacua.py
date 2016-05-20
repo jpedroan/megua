@@ -34,7 +34,7 @@ class MegSiacua:
         
 
     #TODO: rever isto tudo
-    def siacua(self,unique_name,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
+    def siacua(self,unique_name=None,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
         r"""
 
         INPUT:
@@ -74,6 +74,9 @@ class MegSiacua:
 
         """
 
+        if not unique_name:
+            unique_name = self._unique_name
+
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
         if not row:
@@ -89,7 +92,7 @@ class MegSiacua:
         #done
 
     
-    def siacuapreview(self,unique_name,ekeys):
+    def siacuapreview(self,unique_name=None,ekeys=[]):
         r"""
 
         INPUT:
@@ -115,6 +118,9 @@ class MegSiacua:
             1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
 
         """
+        if not unique_name:
+            unique_name = self._unique_name
+
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
         if not row:

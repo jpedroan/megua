@@ -136,7 +136,9 @@ Long computation? Two examples follow:
    ....: Testing the production of exercises with long computations.
    ....:   
    ....: %Problem Long Computation Problem
-   ....: What is the long primitive of ap x + bp@() ?
+   ....: What is the os.path.join(
+            environ["MEGUA_EXERCISE_INPUT"],
+            filename)long primitive of ap x + bp@() ?
    ....:  
    ....: %Answer
    ....:  
@@ -260,7 +262,7 @@ import os
 from os import environ
 import subprocess
 import random
-#import codecs
+import keyword
 import re
 import codecs
 import random as randomlib #random is imported as a funtion somewhere
@@ -294,11 +296,10 @@ from megua.mathcommon import *
 from megua.exbase import ExerciseBase
 from megua.exlatex import ExLatex
 from megua.exsiacua import ExSiacua
-from megua.localstore import LocalStore,ExIter
+from megua.localstore import LocalStore
 from megua.parse_ex import parse_ex
 from megua.tounicode import to_unicode
 from megua.jinjatemplates import templates
-from megua.ur import ur
 from megua.megsiacua import MegSiacua
 from megua.csection import SectionClassifier
 from megua.platex import pcompile, latexunderscore
@@ -328,15 +329,14 @@ class MegBook(MegSiacua):
     def __init__(self,filename=None,natlang='pt_pt',markuplang='latex'): 
         r"""
 
-        INPUT::
+        INPUT:
+        
         - ``filename`` -- filename where the sqlite database is stored.
 
         """
 
         if not filename:
-            #TODO: this must be in the LocalStore code.
-            raise IOError("MegBook needs database filename.")
-
+            filename = os.path.join(environ["MEGUA_EXERCISE_INPUT"],environ["PROJECT_DATABASE"])
     
         #Create or open the database
         try:
@@ -356,6 +356,10 @@ class MegBook(MegSiacua):
         #In seconds, author can change this value when calling save()
         self.max_tried_instances = 10 
 
+        #Somes commands need an exercise.
+        #see: set_current_exercise()
+        self._current_unique_name = None
+
         ExerciseBase._megbook = self
         #print self.__repr__()
 
@@ -364,6 +368,103 @@ class MegBook(MegSiacua):
 
     def __repr__(self):
         return "MegBook('%s')" % self.local_store_filename
+
+    def set_current_exercise(self,pathname):
+        """Receives a pathname. This pathname points to a file that
+        contains an exercise. This routine extracts the filename and extension
+        and produce the unique_name.
+        
+        INPUT:
+        
+        - ``pathname`` --  pathname to the exercise 
+        
+        Typical, this command must be called using
+            meg.set_current_exercise(_file__)
+        so argument pathname points to the file in execution.
+        
+        
+        DEVELOPMENT NOTES:
+        
+            >>> os.path.splitext("ola.lko")
+            ('ola', '.lko')
+            >>> os.path.splitext(".lko")
+            ('.lko', '')
+
+        Parse file contents:
+        
+        1. find "class" line
+        2. if "class" line contains the same name unique_name (see below) do nothing
+        3. if "class" line contains a different name other than unique_name:
+            - try to remove old unique_name from database
+            - change text to the new name
+            - produce a warning.
+
+        TODO:
+            When file does not exist, capture the "IOError" and produce a message.
+            
+        """
+        
+        (edir,filename) = os.path.split(pathname)
+        (unique_name,ext) = os.path.splitext(filename)
+        
+        if ext == '.py':
+            (unique_name,ext) = os.path.splitext(unique_name)
+            assert(ext=='.sage')
+            pathname = os.path.join(edir,unique_name+'.sage')
+            #print "megbook.py: Corrected",pathname
+        
+        
+        assume(ext) #See DEVEL notes above: ext<>''
+        self._current_unique_name = None
+
+        if not isidentifier(unique_name):
+            print "Megbook.py: Filename is not a valid Python identifier."
+            usage_new()
+            raise SyntaxError
+        
+
+
+        #get file contents 
+        unique_name_changed = False
+        with codecs.open(pathname, mode='r', encoding='utf-8') as f:
+            source_code = f.read()
+            #Parse file contents. See above.
+            PATTERN_STRING = ur'^class +([_A-Za-z][_a-zA-Z0-9]*)\((\w+)\):\s*'
+            re_class_match = re.search(PATTERN_STRING,source_code,re.U|re.M)
+            if re_class_match:
+                old_unique_name = re_class_match.group(1)
+                unique_name_changed = old_unique_name != unique_name
+                    
+        if unique_name_changed:
+            #Change source code
+            new_source_code = re.sub(old_unique_name,unique_name,source_code,re.U|re.M)
+            with codecs.open(pathname, mode='w', encoding='utf-8') as f:
+                f.write(new_source_code)
+            print "========================"
+            print "The filename containing the exercise was renamed."
+            print "1. The new name of the exercise is now: {}".format(unique_name)
+            print "2. Confirm the new <name_of_exercise> in the line 'class <name>(...)'."
+            print "3. Execute meg.set_current_exercise(__file__) again."
+            print ""
+            self.remove(re_class_match.group(1),warn=False)
+            print "========================"
+            raise IOError
+                
+        #To be used in all megbook commands
+        self._current_unique_name = unique_name
+        
+        if environ["MEGUA_PLATFORM"]=='SMC':
+            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+                print "Opening exercise ", unique_name
+            else: #sagews SALVUS
+                from smc_sagews.sage_salvus import salvus
+                salvus.html("<h4>{}</h4>".format(unique_name))
+        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+            print "Exercise {}".format(unique_name)
+        else:
+            print """MegBook module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
+
+
 
     def new_exercise(self,filename):
         r"""
@@ -577,7 +678,7 @@ class MegBook(MegSiacua):
         
 
 
-    def new(self, unique_name, ekey=None, edict=None, returninstance=False):
+    def new(self, unique_name=None, ekey=None, edict=None, returninstance=False):
         r"""Prints an exercise instance of a given type
 
         INPUT:
@@ -590,7 +691,13 @@ class MegBook(MegSiacua):
         OUTPUT:
             An instance of class named ``unique_name``.
 
+        if ``unique_name`` is None then self._current_unique_name is used. 
+
         """
+        
+        if not unique_name:
+            unique_name = self._current_unique_name
+            
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
         if not row:
@@ -799,32 +906,44 @@ class MegBook(MegSiacua):
 
 
 
-    def remove(self,unique_namestring,dest='.'):
+    def remove(self,unique_name,warn=True):
         r"""
         Removing an exercise from the database.
 
         INPUT:
 
-        - ``unique_namestring`` -- the class name.
+        - ``unique_name`` -- the class name.
+        - ``warn`` -- tell user if it was removed.        
+        
         """
+        assert(unique_name)
 
         #Get the exercise
-        row = self.megbook_store.get_classrow(unique_namestring)
+        row = self.megbook_store.get_classrow(unique_name)
+        
         if row:            
-            fname = os.path.join(dest,unique_namestring+'.txt')
+            e_string = templates.render("megbook_instance_new.sage",
+                class_text=row['class_text'],
+                unique_name=unique_name,
+                sumtxt=row['summary_text'],
+                probtxt=row['problem_text'],
+                anstxt=row['answer_text'],
+                suggestivename=row['suggestive_name'],
+                sections=row['sections_text'],
+                ekey=0
+            )
+
+            fname = os.path.join(environ["MEGUA_EXERCISE_INPUT"],"removed_"+unique_name+'.sage')
+            
             #store it on a text file
-            f = open(fname,'w')
-            f.write(row['summary_text'].encode('utf-8')) #includes %summary line
-            f.write(row['problem_text'].encode('utf-8')) #includes %problem line
-            f.write(row['answer_text'].encode('utf-8')) #includes %answer line
-            f.write(row['class_text'].encode('utf-8'))
-            f.close()
-            print "Exercise '%s' stored on text file %s." % (unique_namestring,fname)
+            with codecs.open(fname, encoding='utf-8', mode='w') as f:
+                f.write(e_string)
+            print "Exercise '%s' has a backup in %s" % (unique_name,fname)
 
             #remove it
-            self.megbook_store.remove_exercise(unique_namestring)
-        else:
-            print "Exercise %s is not on the database." % unique_namestring
+            self.megbook_store.remove_exercise(unique_name)
+        elif warn:
+            print "Exercise %s is not on the database." % unique_name
 
 
 
@@ -1373,6 +1492,10 @@ def display_syntaxerror(s,code_string):
     #'__subclasshook__', '__unicode__', 'args', 'filename', 'lineno', 'message', 'msg', 
     #'offset', 'print_file_and_line', 'text']
 
+def isidentifier(ident):
+    """Determines, if string is valid Python identifier."""
+    # http://stackoverflow.com/questions/12700893/how-to-check-if-a-string-is-a-valid-python-identifier-including-keyword-check
+    return re.match("[_A-Za-z][_a-zA-Z0-9]*",ident) and not keyword.iskeyword(ident)
 
 #end class MegBook
 

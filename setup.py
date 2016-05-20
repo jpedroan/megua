@@ -13,6 +13,17 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
+
+# MEGUA specific
+
+environ["HOME"]
+.megua
+mconfig.sh  (ir buscar ao template)
+
+
+
+
+
 # Get the long description from the README file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
@@ -38,7 +49,7 @@ setup(
     author_email='pedrocruz@ua.pt',
 
     # Choose your license
-    license='GPLv3',
+    license='GPLv3', #same as sagemath
 
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers

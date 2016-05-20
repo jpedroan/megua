@@ -1,16 +1,18 @@
+{#
 {{marker_cell}}{{uuid1}}i{{marker_cell}}
-{# megbook.py #}
+
 %html
 {{html}}
 
 {{marker_output}}{{uuid4}}{{marker_output}}{{json_html}}{{marker_output}}
-
+#}
+{{marker_cell}}{{uuid1}}i{{marker_cell}}
 {{marker_cell}}{{uuid2}}a{{marker_cell}}
 from megua.all import *
-#meg = MegBook('{{megbookfilename}}')
+meg.set_current(__file__)
 {{marker_cell}}{{uuid3}}{{marker_cell}}
 meg.save(r'''
-%SUMMARY  Minha Secção 1; Minha Secção 2; Minha Secção 3
+%SUMMARY  Capítulo; Minha Secção 1; Minha Secção 2; Minha Secção 3
 
 Palavras-chave:
 
@@ -35,7 +37,7 @@ x^2
 \]
 
 
-class {{unique_name}}(Exlatex):
+class {{unique_name}}(ExLatex):
 
     def make_random(s,edict=None):
 
@@ -46,7 +48,7 @@ class {{unique_name}}(Exlatex):
 
 {{marker_cell}}{{uuid4}}{{marker_cell}}
 
-meg.new("{{unique_name}}",ekey={{ekey}})
+meg.new(ekey={{ekey}})
 
 {# https://github.com/sagemath/cloud/blob/master/scripts/sws2sagews.py #}
 

@@ -18,7 +18,6 @@ from megua.exsiacua import ExSiacua
 from megua.exlatex import ExLatex
 
 #Open the project database (configuration in $HOME/.megua/mconfig.sh)
-from os import environ
-meg = MegBook(environ["PROJECT_DATABASE"])
+meg = MegBook()
 
 

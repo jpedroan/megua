@@ -61,7 +61,9 @@ re_answer = re.compile(ur'[ \t]*%[ \t]*answer[ \t]*(.*)\n',re.IGNORECASE|re.U)
 #Includes grammar for class name in form: E dd letter dd
 #re_class = re.compile(ur'^class[ \t]+(E(\d\d(\b|[\-a-zA-Z])(\b|\d\d))_\w+_\d+)\(Exercise\):\s*',re.U)
 #In this re_class the prefix is less rigorous.
-re_class = re.compile(ur'^class[ \t]+(E([a-zA-Z0-9]+)_\w+_.+)\(\w+\):\s*',re.U)
+
+#re_class = re.compile(ur'^class[ \t]+(E([a-zA-Z0-9]+)_\w+_.+)\(\w+\):\s*',re.U)
+re_class = re.compile(ur'^class[ \t]+([_A-Za-z][_a-zA-Z0-9]*)\((\w+)\):\s*',re.U)
 
 re_wrongclass = re.compile(ur'[ \t]*class[ \t]+(.+):\s*',re.U)
 
@@ -131,6 +133,7 @@ def classify(no,line):
 
     mobj = re_class.match(line)
     if mobj is not None:
+        print "parse_ex.py:",[mobj.group(1),mobj.group(2)]
         return LineToken(no,'re_class',[mobj.group(1),mobj.group(2)],line)
 
     mobj = re_wrongclass.match(line)
@@ -362,11 +365,11 @@ def parse_ex(inputtext):
                 error_found = True
                 txt_class = ''
                 print "Expected python/sage class definition on line %d or class identifier is wrong." % (current+1)
-                print "Class identifier must follow a name like: E12A34_somename_number."
+                print "Class identifier must start with a letter. Suggestion: E12A34_somename_number."
             else:
                 error_found = True
                 print "Expected python/sage class definition on line %d or class identifier is wrong." % (current+1)
-                print "Class identifier must follow a name like: E12A34_somename_number."
+                print "Class identifier must start with a letter. Suggestion: E12A34_somename_number."
 
         elif state == ExState.CLASS: #consume class lines
             #Check transition
@@ -381,7 +384,7 @@ def parse_ex(inputtext):
     if not error_found and state != ExState.CLASS:
         error_found = True
         print "Expected python/sage class definition on line %d or class identifier is wrong." % (current+1)
-        print "Class identifier must follow a name like: E12A34_somename_number."
+        print "Class identifier must start with a letter. Suggestion: E12A34_somename_number."
 
     if warn_found:
         if "unique_name" in locals() and unique_name:
@@ -403,6 +406,8 @@ def parse_ex(inputtext):
             'answer_text': txt_answer.strip(), 
             'class_text': txt_class.strip()
         }
+
+
 
 
 

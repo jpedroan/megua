@@ -3,7 +3,6 @@
 # {{unique_name}}
 
 from megua.all import *
-#meg = MegBook('{{megbookfilename}}')
 
 meg.save(r'''
 %SUMMARY  Minha Secção 1; Minha Secção 2; Minha Secção 3
@@ -41,5 +40,5 @@ class {{unique_name}}(Exlatex):
 ''')
 
 
-#meg.new("{{unique_name}}",ekey={{ekey}})
+#meg.new(ekey={{ekey}})
 

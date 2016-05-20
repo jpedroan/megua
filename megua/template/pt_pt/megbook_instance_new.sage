@@ -7,7 +7,7 @@ from megua.all import *
 
 {{class_text}}
 
-
+#Sections: {{sections}}
 
 {{unique_name}}._unique_name = "{{unique_name}}"
 
