@@ -441,10 +441,14 @@ class MegBook(MegSiacua):
             with codecs.open(pathname, mode='w', encoding='utf-8') as f:
                 f.write(new_source_code)
             print "========================"
-            print "The filename containing the exercise was renamed."
-            print "1. The new name of the exercise is now: {}".format(unique_name)
-            print "2. Confirm the new <name_of_exercise> in the line 'class <name>(...)'."
-            print "3. Execute meg.set_current_exercise(__file__) again."
+            print "Please, do the following:"
+            print "1. Execute meg.set_current_exercise(__file__) again."
+            print "2. Execute meg.save(....) again."
+            print ""
+            print "Explanation:"
+            print "1. The filename containing the exercise was renamed."
+            print "2. The new name of the exercise is now: {}".format(unique_name)
+            print "3. Confirm the new <name_of_exercise> in the line 'class <name>(...)'."
             print ""
             self.remove(re_class_match.group(1),warn=False)
             print "========================"
