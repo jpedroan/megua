@@ -550,7 +550,7 @@ class ExSiacua(ExerciseBase):
                 from smc_sagews.sage_salvus import salvus
                 salvus.file(html_filename,show=True,raw=True)
                 print ""
-                print "IF the above LINK IS NOT WORKING, WAIT FEW SECONDS AND TRY AGAIN."
+                print "IF the above link is not working, wait a few seconds and try again."
                 #salvus.html(html_string)
         elif environ["MEGUA_PLATFORM"]=='DESKTOP':
             print "Exsicua module say: firefox ",html_filename,"in the browser and press F5."

@@ -442,6 +442,33 @@ class LocalStore:
     #    return sum(l)
 
 
+    def rename(self,old_unique_name,unique_name,warn=False):
+        """
+
+        """
+
+        #INSERT INTO Persons (P_Id, LastName, FirstName) VALUES (5, 'Tjessem', 'Jakob')
+        #http://www.w3schools.com/sql/sql_insert.asp
+        row = self.get_classrow(unique_name)
+        if not row:
+            print "Exercise name already exists on database. Please choose a new one or rename with a different one."
+            raise Exception("Exercise name already exists on database")
+
+        c = self.conn.cursor()
+        c.execute("""UPDATE exercises \
+            SET \
+                unique_name=? \
+             WHERE \
+                unique_name=? """,
+            (   unique_name,
+                old_unique_name
+            )
+        )
+        self.conn.commit()
+        c.close()
+        if warn or LocalStore._debug:
+            print "Exercise '" + row['unique_name'] + "' changed in database."
+
 
     def get_classrow(self, unique_name):
         unique_name = to_unicode(unique_name)

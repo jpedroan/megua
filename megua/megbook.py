@@ -436,21 +436,22 @@ class MegBook(MegSiacua):
                 unique_name_changed = old_unique_name != unique_name
                     
         if unique_name_changed:
+            #Try to rename, first in the database:
+            # the new unique_name could already exist
+            self.megbook_store.rename(old_unique_name,unique_name,warn=False)
             #Change source code
             new_source_code = re.sub(old_unique_name,unique_name,source_code,re.U|re.M)
             with codecs.open(pathname, mode='w', encoding='utf-8') as f:
                 f.write(new_source_code)
             print "========================"
-            print "Please, do the following:"
-            print "1. Execute meg.set_current_exercise(__file__) again."
-            print "2. Execute meg.save(....) again."
+            print "Please, "
+            print "1. Execute the above comand again using shift-enter ('meg.set_current_exercise(__file__)')."
             print ""
             print "Explanation:"
             print "1. The filename containing the exercise was renamed."
             print "2. The new name of the exercise is now: {}".format(unique_name)
             print "3. Confirm the new <name_of_exercise> in the line 'class <name>(...)'."
             print ""
-            self.remove(re_class_match.group(1),warn=False)
             print "========================"
             raise IOError
                 
