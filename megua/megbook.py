@@ -399,6 +399,16 @@ class MegBook(MegSiacua):
             - change text to the new name
             - produce a warning.
 
+
+        TESTING "set_current_exercise" on bash:
+        
+              * pasta all/sandbox/megua
+             $  gvim teste_current_unique.sage
+             $  sage teste_current_unique.sage 
+             $  mv teste_current_unique.sage teste_current_unique2.sage
+             $  sqlitebrowser /home/jpedro/all/calculo2/.calculo2.sqlite
+             $  sage teste_current_unique2.sage 
+
         TODO:
             When file does not exist, capture the "IOError" and produce a message.
             

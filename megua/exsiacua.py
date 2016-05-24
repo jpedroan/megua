@@ -437,17 +437,19 @@ class ExSiacua(ExerciseBase):
         #print "=========="
         return l
 
-    def _answer_extract_options(self):
-        r"""
-        Does the parsing of answer to extract options and complete answer.
-        This routine applies when using moodle template with CDATA.
-        """
-        l = re.findall('<!\[CDATA\[(.*?)\]\]>', self.answer(), re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
-        if len(l)<5:
-            raise NameError("""exsiacua: missing multiple choice options."""\
-               """At least 4 options must be given and the first must be """\
-               """the correct one. Also the full answer must be given.""")
-        return l
+
+#TODO: remove this lines soon.
+#    def _answer_extract_options(self):
+#        r"""
+#        Does the parsing of answer to extract options and complete answer.
+#        This routine applies when using moodle template with CDATA.
+#        """
+#        l = re.findall('<!\[CDATA\[(.*?)\]\]>', self.answer(), re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
+#        if len(l)<5:
+#            raise NameError("""exsiacua: missing multiple choice options."""\
+#               """At least 4 options must be given and the first must be """\
+#               """the correct one. Also the full answer must be given.""")
+#        return l
 
 
 
@@ -499,14 +501,8 @@ class ExSiacua(ExerciseBase):
             #    answer = self._adjust_images_url(answer)
             #    self.send_images()
     
-            if self.has_multiplechoicetag:
-                answer_list = self._collect_options_and_answer()
-            else:
-                print "exsiacua module: exercise %s source has"\
-                  " [CDATA] fields."\
-                  " Please change to <showone> ... </showone> tags." % \
-                  self.unique_name()
-                answer_list = self._answer_extract_options()
+            assert(self.has_multiplechoicetag)
+            answer_list = self._collect_options_and_answer()
 
             all_options = u'<table style="width:100%;">\n'
 
@@ -635,16 +631,14 @@ class ExSiacua(ExerciseBase):
             #    self._send_images()
     
 
-            if self.has_multiplechoicetag:
-                # OLD OLD OLD OLD OLD
-                #if self.image_pathnames != []:
-                #    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
-                #else:
-                #   answer_list = ex_instance.collect_options_and_answer()
-                answer_list = self._collect_options_and_answer()
-            else:
-                print self.name,"has [CDATA] field. Please change to <showone> ... </showone> markers."
-                answer_list = self._answer_extract_options()
+            assert(self.has_multiplechoicetag)
+            # OLD OLD OLD OLD OLD
+            #if self.image_pathnames != []:
+            #    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
+            #else:
+            #   answer_list = ex_instance.collect_options_and_answer()
+            answer_list = self._collect_options_and_answer()
+
 
             #Create images for graphics (if they exist) 
                 #for problem
@@ -652,7 +646,7 @@ class ExSiacua(ExerciseBase):
                 #collect consecutive image numbers.
 
             #build json string
-            send_dict =  self._siacua_json(course, self.unique_name(), e_number, self.problem(), answer_list, self.siacua_concepts)
+            send_dict =  self._siacua_json(course, self.unique_name(), e_number, self._problem_whitoutmc(), answer_list, self.siacua_concepts)
             send_dict.update(dict({'usernamesiacua': usernamesiacua, 'grid2x2': grid2x2, 'siacuatest': siacuatest}))
             send_dict.update(self.siacua_parameters)
 
