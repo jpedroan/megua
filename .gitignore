@@ -16,5 +16,5 @@ dist
 megua.egg-info
 setuptools_scm-1.11.0-py2.7.egg
 *~
-sage
+sage*
 

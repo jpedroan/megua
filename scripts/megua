@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+source $HOME/.megua/mconfig.sh
+
+# NOTE:
+#
+# The following variable must be set here and not in "mconfig.sh"
+# because it should be turned off below, and this,
+# because megua code must know it was called 
+# from "megua bash commandline".
+#
+# BASH completion --- to read:
+# http://stackoverflow.com/questions/5570795/how-does-bash-tab-completion-work
+# See: /etc/bash_completion.d; 
+
+export MEGUA_BASH_CALL='on'
+
+$SAGECMD -python $MEGUA_MODULES_DIR/c_megua.py "$@"
+
+export MEGUA_BASH_CALL='off'
+
+exit
+
+

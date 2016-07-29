@@ -1,9 +1,18 @@
 """A setuptools setup module for MEGUA package.
 
 See:
+
 https://packaging.python.org/en/latest/distributing.html
 https://setuptools.readthedocs.io/en/latest/
 https://github.com/pypa/sampleproject
+
+SMC and python packages:
+
+https://github.com/sagemathinc/smc/wiki/FAQ#-question-how-can-i-install-python-packages-from-httpspypipythonorgpypi--using-pip
+
+https://github.com/sagemathinc/smc/wiki/FAQ#pip
+
+
 """
 
 # Always prefer setuptools over distutils
@@ -106,7 +115,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'megua=megua.main:main',  
+            'megua = main:main',  
         ],
     },
 )

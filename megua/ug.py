@@ -146,6 +146,14 @@ Example with an ascii art graphic:
        
 DEVELOPMENT:
 
+Install aalib insto SageMath using this:
+
+$ sage -pip install --user https://pypi.python.org/packages/2d/3d/dca492960070685bc1bc12535d274a840f35cf5267f2a4a6ee36f3eb3dd7/python-aalib-0.3.tar.gz#md5=00afa7ef3479649cec99046449c07ef9Collecting https://pypi.python.org/packages/2d/3d/dca492960070685bc1bc12535d274a840f35cf5267f2a4a6ee36f3eb3dd7/python-aalib-0.3.tar.gz#md5=00afa7ef3479649cec99046449c07ef9
+  Downloading python-aalib-0.3.tar.gz
+Installing collected packages: python-aalib
+  Running setup.py install for python-aalib ... done
+Successfully installed python-aalib
+
 
 """
 

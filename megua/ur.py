@@ -153,7 +153,9 @@ import numpy.random as nprandom
 #Random numbers from R using RPy2
 # 1. Always do casts to python rpy2 commands.
 # 2. To do: study how does rpy2 works.
-import rpy2.robjects as robjects
+
+
+###import rpy2.robjects as robjects
 
 #to restart random
 import time 
@@ -163,7 +165,7 @@ import time
 # SAGEMATH modules
 #====================
 #Random numbers from Sage
-from sage.all import *
+from sage.all  import *
 
 
 
@@ -253,8 +255,9 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         #set PYTHON RANDOM module seed
         random.seed(self.seed_value)
         
+        #TODO: remove this from megua because sage does not use it.
         #set R from rpy2
-        self._rpy2_setseed(self.seed_value) 
+        #self._rpy2_setseed(self.seed_value) 
         
         #Set PYTHON NUMPY MODULE seed
         nprandom.seed(int(self.seed_value))
@@ -579,7 +582,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
             return - UnifiedRandom._qlist[qr]
         else:
             return + UnifiedRandom._qlist[qr]
-
+'''
 
     """
     RPy2 wrappers
@@ -639,7 +642,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         if prec:
             res = round(res,prec)
         return res
-    
+'''    
 
 
 

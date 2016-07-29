@@ -136,9 +136,7 @@ Long computation? Two examples follow:
    ....: Testing the production of exercises with long computations.
    ....:   
    ....: %Problem Long Computation Problem
-   ....: What is the os.path.join(
-            environ["MEGUA_EXERCISE_INPUT"],
-            filename)long primitive of ap x + bp@() ?
+   ....: What is the long primitive of ap x + bp@() ?
    ....:  
    ....: %Answer
    ....:  
@@ -195,6 +193,10 @@ Make a catalog:
 ::
 
    sage: meg.catalog() #opens evince
+   MegBook.py say: making instances of the exercises.
+   megbook.py say: producing E28E28_pdirect_001
+   MegBook.py say: compiling latex file containing the instances of the exercises.
+   MegBook module say: evince  _output/catalog.pdf
    
    
 Search an exercise:
@@ -210,9 +212,9 @@ Remove an exercise:
 
 ::
 
-   sage: meg.remove('E28E28_pdirect_001',dest=r'_output')
-   Exercise 'E28E28_pdirect_001' stored on text file _output/E28E28_pdirect_001.txt.
-   sage: meg.remove('E28E28_nonexistant',dest=r'_output')
+   sage: meg.remove('E28E28_pdirect_001')
+   Exercise 'E28E28_pdirect_001' has a backup in _input/removed_E28E28_pdirect_001.sage
+   sage: meg.remove('E28E28_nonexistant')
    Exercise E28E28_nonexistant is not on the database.
 
 
@@ -259,7 +261,7 @@ TODO: read http://stackoverflow.com/questions/1301346/the-meaning-of-a-single-an
 #import shutil
 import sqlite3 #for row objects as result from localstore.py
 import os
-from os import environ
+#from os import environ
 import subprocess
 import random
 import keyword
@@ -292,6 +294,7 @@ from sage.all import * #needed in exec (see exerciseinstance)
 
 
 #MEGUA modules:
+from megua.megoptions import *
 from megua.mathcommon import *
 from megua.exbase import ExerciseBase
 from megua.exlatex import ExLatex
@@ -336,7 +339,8 @@ class MegBook(MegSiacua):
         """
 
         if not filename:
-            filename = os.path.join(environ["MEGUA_EXERCISE_INPUT"],environ["PROJECT_DATABASE"])
+            #filename = os.path.join(environ["MEGUA_EXERCISE_INPUT"],environ["PROJECT_DATABASE"])
+            filename = PROJECT_DATABASE
     
         #Create or open the database
         try:
@@ -468,13 +472,13 @@ class MegBook(MegSiacua):
         #To be used in all megbook commands
         self._current_unique_name = unique_name
         
-        if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+        if MEGUA_PLATFORM=='SMC':
+            if MEGUA_CALLED_FROM_BASH: #see megua bash script at megua/megua
                 print "Opening exercise ", unique_name
             else: #sagews SALVUS
                 from smc_sagews.sage_salvus import salvus
                 salvus.html("<h4>{}</h4>".format(unique_name))
-        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+        elif MEGUA_PLATFORM=='DESKTOP':
             print "Exercise {}".format(unique_name)
         else:
             print """MegBook module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
@@ -516,7 +520,7 @@ class MegBook(MegSiacua):
         # Directory where exercises are stored
 
         fullpath = os.path.join(
-            environ["MEGUA_EXERCISE_INPUT"],
+            MEGUA_EXERCISE_INPUT,
             filename)
         
         if os.path.isfile(fullpath) :
@@ -539,7 +543,7 @@ class MegBook(MegSiacua):
                 
                 e_string = templates.render("megbook_exlatex.sagews",
                     unique_name=filename[0:-7],
-                    megbookfilename=environ["PROJECT_FILENAME"], #self.local_store_filename,
+                    megbookfilename=PROJECT_DATABASENAME, #self.local_store_filename,
                     uuid1=uuid(),
                     uuid2=uuid(),
                     uuid3=uuid(),
@@ -559,7 +563,7 @@ class MegBook(MegSiacua):
                 
                 e_string = templates.render("megbook_exsiacua.sagews",
                     unique_name=filename[0:-7],
-                    megbookfilename=environ["PROJECT_FILENAME"], 
+                    megbookfilename=PROJECT_DATABASENAME, 
                     uuid1=uuid(),
                     uuid2=uuid(),
                     uuid3=uuid(),
@@ -568,8 +572,8 @@ class MegBook(MegSiacua):
                     uuid6=uuid(),
                     uuid7=uuid(),
                     uuid8=uuid(),
-                    course=environ["COURSE"],
-                    usernamesiacua=environ["USERNAME_SIACUA"],
+                    course=SICUA_COURSENAME,
+                    usernamesiacua=SIACUA_USERNAME,
                     marker_cell=MARKERS["cell"],
                     marker_output=MARKERS["output"],
                     html=htmlstr,
@@ -623,8 +627,8 @@ class MegBook(MegSiacua):
             return
 
 
-        if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+        if MEGUA_PLATFORM=='SMC':
+            if MEGUA_CALLED_FROM_BASH: #see megua bash script at megua/megua
                 print "MegBook module say:  open ", fullpath
                 #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
                 #Does not work using "sage -python": from smc_pyutil import smc_open
@@ -638,7 +642,7 @@ class MegBook(MegSiacua):
             else: #sagews SALVUS
                 from smc_sagews.sage_salvus import salvus
                 salvus.open_tab(fullpath)
-        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+        elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: gvim ",fullpath
             subprocess.Popen(["gvim",fullpath])
         else:
@@ -769,7 +773,7 @@ class MegBook(MegSiacua):
                  warning: ur''' \underline{....} ''' generates an unicode error!
                  , errors='backslashreplace'
                 
-                >>> x = ur'\underline'
+                <python> x = ur'\underline'
                   File "<stdin>", line 1
                 SyntaxError: (unicode error) 'rawunicodeescape' codec can't decode bytes in position 0-1: truncated \uXXXX
 
@@ -798,7 +802,7 @@ class MegBook(MegSiacua):
          )
 
         #Create if not exist: exercise working directory (images, latex,...)
-        working_dir = os.path.join(environ["MEGUA_EXERCISE_OUTPUT"],row["unique_name"])
+        working_dir = os.path.join(MEGUA_EXERCISE_OUTPUT,row["unique_name"])
         if not os.path.exists(working_dir):
             os.makedirs(working_dir)
 
@@ -948,7 +952,7 @@ class MegBook(MegSiacua):
                 ekey=0
             )
 
-            fname = os.path.join(environ["MEGUA_EXERCISE_INPUT"],"removed_"+unique_name+'.sage')
+            fname = os.path.join(MEGUA_EXERCISE_INPUT,"removed_"+unique_name+'.sage')
             
             #store it on a text file
             with codecs.open(fname, encoding='utf-8', mode='w') as f:
@@ -1248,18 +1252,17 @@ class MegBook(MegSiacua):
                          exerciseinstanceslatex=lts)
 
 
-        MEGUA_EXERCISE_CATALOG = environ["MEGUA_EXERCISE_CATALOG"]
-        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"catalog.tex")
-        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"catalog.pdf")
+        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"catalog.tex")
+        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"catalog.pdf")
 
 
         #Compile two times because of TableOfContents  \toc
-        pcompile(latex_text, MEGUA_EXERCISE_CATALOG, "catalog.tex")
-        pcompile(latex_text, MEGUA_EXERCISE_CATALOG, "catalog.tex")
+        pcompile(latex_text, MEGUA_EXERCISE_CATALOGS, "catalog.tex")
+        pcompile(latex_text, MEGUA_EXERCISE_CATALOGS, "catalog.tex")
 
 
-        if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+        if MEGUA_PLATFORM=='SMC':
+            if MEGUA_CALLED_FROM_BASH: #see megua bash script at megua/megua
                 print "MegBook module say:  open ", CATALOG_PDF_PATHNAME
                 #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
                 #Does not work using "sage -python": from smc_pyutil import smc_open
@@ -1275,7 +1278,7 @@ class MegBook(MegSiacua):
                 salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
                 salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
                 salvus.open_tab(CATALOG_PDF_PATHNAME)
-        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+        elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:
@@ -1334,8 +1337,10 @@ class MegBook(MegSiacua):
         - Futuro: melhorar a catalogação para disponível/por rever/escondido para avaliação/ .....
         
 
-        sage: from megua.all import *
-        sage: meg.fast_exam_siacua(course="calculo2", concept_id=100, num_questions=10)
+        Examples:
+        
+        (sage:) from megua.all import *
+        (sage:) meg.fast_exam_siacua(course="calculo2", concept_id=100, num_questions=10)
 
         About strings:        
         http://stackoverflow.com/questions/24804453/how-can-i-copy-a-python-string
@@ -1422,9 +1427,8 @@ class MegBook(MegSiacua):
                          exerciseinstanceslatex=lts)
 
 
-        MEGUA_EXERCISE_CATALOG = environ["MEGUA_EXERCISE_CATALOG"]
-        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"exam.tex")
-        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOG,"exam.pdf")
+        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.tex")
+        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.pdf")
 
         #Tirar isto
         f = codecs.open(CATALOG_TEX_PATHNAME+"lixo", mode='w+', encoding='utf8')
@@ -1441,8 +1445,8 @@ class MegBook(MegSiacua):
         os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"exam.tex") )
 
 
-        if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+        if MEGUA_PLATFORM=='SMC':
+            if MEGUA_CALLED_FROM_BASH: #see megua bash script at megua/megua
                 print "MegBook module say:  open ", CATALOG_PDF_PATHNAME
                 #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
                 #Does not work using "sage -python": from smc_pyutil import smc_open
@@ -1458,7 +1462,7 @@ class MegBook(MegSiacua):
                 salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
                 salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
                 salvus.open_tab(CATALOG_PDF_PATHNAME)
-        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+        elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:

@@ -86,13 +86,15 @@ Solution using environment variables:
 
 #PYTHON modules
 import jinja2  #see notes on Jinj2 above.
-from os import environ
+#from os import environ
 
 #SAGE modules
 #OLD? from megua.mconfpackage import MEGUA_TEMPLATE_DIR
 
 #tirar? from megua.mconfig import MEGUA_TEMPLATE_DIR
 
+#MEGUA modules
+from megoptions import *
 
 
 
@@ -100,7 +102,7 @@ class JinjaTemplate:
     
     def __init__(self):
   
-        self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(environ["MEGUA_TEMPLATE_DIR"]))
+        self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(MEGUA_TEMPLATE_DIR)) #environ["MEGUA_TEMPLATE_DIR"]
         
 
     def get_template(self,templatefilename):

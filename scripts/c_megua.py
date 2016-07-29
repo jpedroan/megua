@@ -97,14 +97,23 @@ def valid_filename(filename):
     return ("_siacua" in filename or "_latex" in filename) and ( filename[-7:] == '.sagews' or filename[-5:] == '.sage')
 
 
-
-if __name__=="__main__":
+def main():
+    """
+    This routine will be called by a script produced by
+    
+    ::
+        sage -python setup.py install 
+        
+            
+    #if __name__=="__main__":
     #print 'Number of arguments:', len(sys.argv), 'arguments.'
     #print 'Argument List:', str(sys.argv)
+            
+    """
 
     if len(sys.argv)==1 or not sys.argv[1] in ['help','catalog','new','meg2smc']:
         usage(sys.argv)
-        exit()
+        return 0
 
     if sys.argv[1] == 'help':
         usage(sys.argv)
@@ -113,7 +122,7 @@ if __name__=="__main__":
     elif sys.argv[1] == 'new':
         if len(sys.argv)<3: # or (len(sys.argv)==3 and not valid_filename(sys.argv[2])):
             usage(sys.argv)
-            exit()
+            return 0
         if len(sys.argv)>3:
             print "megua new <filename>, only; other arguments were ignored."
         meg.new_exercise(sys.argv[2])
@@ -122,5 +131,6 @@ if __name__=="__main__":
     else:
         print "Command not known."
         usage()
-        exit()
+        return 0
 
+    return 0

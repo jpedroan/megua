@@ -133,7 +133,7 @@ def classify(no,line):
 
     mobj = re_class.match(line)
     if mobj is not None:
-        print "parse_ex.py:",[mobj.group(1),mobj.group(2)]
+        #print "parse_ex.py:",[mobj.group(1),mobj.group(2)]
         return LineToken(no,'re_class',[mobj.group(1),mobj.group(2)],line)
 
     mobj = re_wrongclass.match(line)

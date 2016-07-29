@@ -151,6 +151,7 @@ AUTHOR:
        Each problem can have a suggestive name. 
        Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
        <BLANKLINE>
+       Check exercise E28E28_pdirect_003 for the above warnings.
        -------------------------------
        Instance of: E28E28_pdirect_003
        -------------------------------
@@ -184,7 +185,7 @@ AUTHOR:
 
        sage: meg = MegBook("_input/paula.sqlite") 
        sage: s = SectionClassifier(meg.megbook_store)
-       sage: for section in section_iterator(s):
+       sage: for section in s.section_iterator():
        ....:     print section
        
 

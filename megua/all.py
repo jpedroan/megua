@@ -5,6 +5,7 @@
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 
+
 #Common libaries
 from megua.ur import ur
 from megua.mathcommon import *
@@ -17,7 +18,7 @@ from megua.exbase import ExerciseBase
 from megua.exsiacua import ExSiacua
 from megua.exlatex import ExLatex
 
-#Open the project database (configuration in $HOME/.megua/mconfig.sh)
+#Open the project database 
+#(see configuration in $HOME/.megua/conf.py or at megua/megua/sage bash)
 meg = MegBook()
-
 

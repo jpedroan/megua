@@ -41,6 +41,7 @@ Defining a new exercise template:
        sage: class AddingTwoIntegers(ExerciseBase):
        ....:     #class variables   
        ....:     _unique_name  = "AddingTwoIntegers"
+       ....:     _suggestive_name = "Adding Two Integers"
        ....:     _summary_text = "Adding two integers."
        ....:     _problem_text = "Calculate a1 + a2@()."
        ....:     _answer_text  = "Result is a1 + a2@() = r1."
@@ -94,6 +95,7 @@ Call "old megua" solve(self) method, if exists:
        sage: class CallSolveTest(ExerciseBase):
        ....:     #class variables   
        ....:     _unique_name  = "AddingTwoIntegers"
+       ....:     _suggestive_name = "Adding Two Integers"
        ....:     _summary_text = "Adding two integers."
        ....:     _problem_text = "Calculate a1 + a2@()."
        ....:     _answer_text  = "Result is a1 + a2@() = r1."
@@ -114,6 +116,7 @@ Make a static, ie, non parameterized exercise:
        sage: class StaticExercise(ExerciseBase):
        ....:     #class variables   
        ....:     _unique_name  = "StaticExercise"
+       ....:     _suggestive_name = "Adding Two Integers"
        ....:     _summary_text = "Adding two integers."
        ....:     _problem_text = "Calculate 10 + 20."
        ....:     _answer_text  = "Result is 30."
@@ -144,9 +147,7 @@ from os import environ
 
 #SAGEMATH modules
 from sage.all import SageObject 
-from sage.misc.misc import alarm, cancel_alarm
-
-
+from cysignals.alarm import AlarmInterrupt, alarm, cancel_alarm
 
 #MEGUA modules
 from megua.parse_param import parameter_change
@@ -263,12 +264,12 @@ class ExerciseBase(SageObject,UnifiedGraphics):
             
             self.update(ekey,edict,render_method)
 
-        except KeyboardInterrupt:
+        except AlarmInterrupt:
             print 'Exercise "%s" is taking too long to make!' % self.unique_name()
             print 'Check make_random() routine or increase meg.max_computation_time.'
             # if the computation finished early, though, the alarm is still ticking!
             # so let's turn it off below.
-            raise KeyboardInterrupt
+            raise AlarmInterrupt
 
         #Turn off alarm because make has been done in time.
         #cancel_alarm is from sage.misc.misc
