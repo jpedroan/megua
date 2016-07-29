@@ -71,18 +71,18 @@ Using numpy random numbers::
 
 Using RPy2 random numbers::
 
-    sage: from megua.ur import ur
-    sage: ur.start_at(10)
+    sage: #from megua.ur import ur
+    sage: #ur.start_at(10)
     10
-    sage: ur.rpy2_rnorm(0,1)
+    sage: #ur.rpy2_rnorm(0,1)
     0.018746170941826425
-    sage: ur.rpy2_rnorm(0,1)
+    sage: #ur.rpy2_rnorm(0,1)
     -0.18425254206906366
-    sage: ur.start_at(10)
+    sage: #ur.start_at(10)
     10
-    sage: ur.rpy2_rnorm(0,1)
+    sage: #ur.rpy2_rnorm(0,1)
     0.018746170941826425
-    sage: ur.rpy2_rnorm(0,1)
+    sage: #ur.rpy2_rnorm(0,1)
     -0.18425254206906366
 
 
@@ -583,7 +583,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         else:
             return + UnifiedRandom._qlist[qr]
 '''
-
+#TODO: remove rpy2 routines
     """
     RPy2 wrappers
      
@@ -629,11 +629,11 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         EXAMPLES::
  
             sage: from megua.ur import ur
-            sage: ur.start_at(10)
+            sage: #ur.start_at(10)
             10
-            sage: ur.rpy2_rnorm(0,1,2) #two decimals 
+            sage: #ur.rpy2_rnorm(0,1,2) #two decimals 
             0.02
-            sage: ur.rpy2_rnorm(0,1) 
+            sage: #ur.rpy2_rnorm(0,1) 
             -0.18425254206906366
  
         """

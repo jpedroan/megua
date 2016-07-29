@@ -258,7 +258,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
             #alarm is from sage.misc.misc
             if not self._megbook:
-                alarm(5)
+                alarm(60)
             else:                
                 alarm(self._megbook.max_computation_time)
             

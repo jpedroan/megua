@@ -71,7 +71,7 @@ from sage.misc.latex import have_pdflatex
 
 
 # MEGUA modules
-from tounicode import to_unicode
+from megua.tounicode import to_unicode
 
 
 

@@ -46,6 +46,7 @@ Defining a new exercise template:
     sage: class DrawSegment(ExerciseBase):
     ....:     #class variables
     ....:     _unique_name  = "DrawSegment"
+    ....:     _suggestive_name = "Draw a segment"
     ....:     _summary_text = "Draw a segment."
     ....:     _problem_text = "Draw the segment a1 + a2@()x for x in [x1,x2]."
     ....:     _answer_text  = "<p>fig1</p><p>img1</p>"
@@ -97,18 +98,19 @@ Using LaTeX to generate graphics or extractions from LaTeX:
 
        sage: class LaTexBasedImages(ExerciseBase):
        ....:     #class variables   
-       ....:     _unique_name  = "DrawSegment"
-       ....:     _summary_text = "Draw a segment."
+       ....:     _unique_name  = "LaTexBasedImages"
+       ....:     _suggestive_name = "LaTex Based Images"
+       ....:     _summary_text = "LaTex Based Images."
        ....:     _problem_text = "Check this:"
        ....:     _answer_text  =  r'''<latex 100%>\[\sqrt x\]</latex> '''\
        ....:                      r'''<latex 100%>\fbox{Olá}</latex>'''
-       sage: ex = LaTexBasedImages()   
+       sage: ex = LaTexBasedImages()
        sage: ex.update(ekey=0,render_method="imagefile")
        sage: print ex.latex_render(ex.answer()) #long output
        <BLANKLINE>
-       <img src='_output/DrawSegment/DrawSegment-0-00.png' alt='DrawSegment-0-00.png graphic' height='47' width='47'></img>
+       <img src='_output/LaTexBasedImages/LaTexBasedImages-0-00.png' alt='LaTexBasedImages-0-00.png graphic' height='47' width='47'></img>
        <BLANKLINE>
-       <img src='_output/DrawSegment/DrawSegment-0-01.png' alt='DrawSegment-0-01.png graphic' height='59' width='47'></img>
+       <img src='_output/LaTexBasedImages/LaTexBasedImages-0-01.png' alt='LaTexBasedImages-0-01.png graphic' height='59' width='47'></img>
        <BLANKLINE>
 
 
@@ -119,6 +121,7 @@ Example with an ascii art graphic:
        sage: class UnitCircle(ExerciseBase):
        ....:     #class variables   
        ....:     _unique_name  = "UnitCircle"
+       ....:     _suggestive_name = "Draw a segment."
        ....:     _summary_text = "Plot a Circle"
        ....:     _problem_text = "Draw a unit circle."
        ....:     _answer_text  = "\nplot1\n"
@@ -249,7 +252,7 @@ class UnifiedGraphics:
         """
 
         assert(gfilename)
-
+        
         pathname  = os.path.join(self.imagedirectory,gfilename)
         self.image_pathnames.append(pathname) 
 
@@ -349,9 +352,10 @@ class UnifiedGraphics:
 
 
     def latex_render(self,input_text):
-        """Returns a new text: all tag pairs <latex percent%> ... </latex> that 
-        are present in `input_text` are replaced by "images" created from 
-        the LaTeX inside tag pairs and a `new_text` is returned.
+        """Returns a new text obtained by transforming `input_text`: 
+        * all tag pairs <latex percent%> ... </latex> that 
+           are present in `input_text` are replaced by "images" created from 
+           the LaTeX inside tag pairs and a `new_text` is returned.
         
         INPUT:
         
@@ -423,7 +427,9 @@ class UnifiedGraphics:
             
                 cmd = "cd {2};convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
                     gfilename_base,match.group(1),self.imagedirectory)
+
                     
+                #TODO: check that "convert" is installed
                 os.system(cmd)
 
                 graphic_number += 1

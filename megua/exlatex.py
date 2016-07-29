@@ -47,8 +47,8 @@ Creation a LaTeX exercise:
        ....:         x=SR.var('x')
        ....:         self.prim1 = latex(integrate(self.ap * x + self.bp,x))
        ....: ''')
-       exlatex module: open pdf file _output/E28E28_pdirect_001/E28E28_pdirect_001.pdf
-
+       Exlatex module say: evince  _output/E28E28_pdirect_001/E28E28_pdirect_001.pdf
+       
 """
 
 
