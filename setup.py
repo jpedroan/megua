@@ -85,7 +85,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    #packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
@@ -95,7 +95,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-#    install_requires=['jinja2', 'pil-compat', 'python-aalib'],
+    install_requires=['jinja2', 'pil-compat', 'python-aalib'],
     ## VER 'PIL.Image'
 
 
@@ -109,11 +109,11 @@ setup(
     #    'test': ['coverage'],
     #},
 
-#    include_package_data = True,    # include everything in source control
+    include_package_data = True,    # include everything in source control
 
-    package_data = {
-        'megua':  ['megua/template/pt_pt/*']
-    },
+#    package_data = {
+#        'megua':  ['megua/template/pt_pt/*']
+#    },
 
 #    data_files = [ ('template/pt_pt', ['megua/template/pt_pt/*']) ],
 
