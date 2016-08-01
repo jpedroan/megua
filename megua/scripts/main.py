@@ -1,19 +1,56 @@
 # -*- coding: utf-8 -*-
-# megua_main.py
-"""
-Created on Sat Jun  4 11:26:18 2016
 
-@author: jpedro
-"""
+
+#
+# https://setuptools.readthedocs.io/en/latest/setuptools.html#automatic-script-creation
+#
+
+
+from os import environ,path,mkdir,error
+import shutil
+
+r"""
+From 
+    .../megua/script/main.py
+to 
+    .../megua/templates/pt_pt
+
+DETAILS:    
+
+   https://docs.python.org/2/library/os.path.html
+    
+"""    
+MEGUA_TEMPLATE_DIR = path.join( 
+    path.dirname(path.dirname(path.abspath(__file__))),
+    "template/pt_pt")
+
 
 
 def main():
 
-    print "================"
-    print " Here am I."
-    print "================"
+    print "==============================="
+    print "main.py: MEGUA_TEMPLATE_DIR =", MEGUA_TEMPLATE_DIR
+    print "==============================="
+
+    PATH_CONF_PY = path.join(environ["HOME"],".megua","conf.py")
     
+    if not path.isfile(PATH_CONF_PY):
+        
+        #1. create .megua
+        try:
+            mkdir(path.join(environ["HOME"],".megua"))
+        except error as e: #error is os.error alias of exceptions.OSError
+            print e.message
+        
+        #2. get template of conf.py (conf_megua.py because there is conf.py for rest)
+        source = path.join(MEGUA_TEMPLATE_DIR,"conf_megua.py")
+        shutil.copyfile(source,PATH_CONF_PY)
+
     
+    return 0
+
+
+
 '''
 
 # MEGUA specific
