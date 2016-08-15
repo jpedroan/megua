@@ -38,12 +38,12 @@ Automatic script creation (install process using setuptools):
 #import re
 #import subprocess
 import sys
-from os import environ,path,mkdir,error
+from os import environ,path,mkdir,makedirs,error
 import shutil
 
 
 #MEGUA modules
-from megua.all import *
+#See main function for: from megua.all import *
 
 
 r"""
@@ -88,7 +88,7 @@ def usage(argv):
     else:
         usage([])        
         
-    usage_bash_vars()
+    usage_show_options()
 
 
 def usage_new():
@@ -102,16 +102,13 @@ def usage_new():
     print "  <filename> is       --  E12X34_name_001_siacua.sage"
 
 
-def usage_bash_vars():
+def usage_show_options():
     try:
-        print "\nProject description and directories:"
-        print "  course name (in siacua system):", environ["COURSE"]
-        print "  user name (in siacua system):", environ["USERNAME_SIACUA"]
-        print "  project datbase:", environ["PROJECT_DATABASE"]
-        print "  exercise source directory:", environ["MEGUA_EXERCISE_INPUT"]
-        print "  exercise catalog directory:", environ["MEGUA_EXERCISE_CATALOG"]
+        print "\nProject directories:"
+        print "  exercises source directory:", MEGUA_EXERCISE_INPUT
+        print "  catalogs directory:", MEGUA_EXERCISE_CATALOGS
     except KeyError as k:
-        print "\n\nc_megua.py say: contact administrator because there are missing bash variables."
+        print "\n\nscripts/main.py say: there are missing variables in '.megua/conf.py'."
 
 
 def valid_filename(filename):
@@ -123,9 +120,9 @@ def valid_filename(filename):
 def init():
     
     
-    print "==============================="
-    print "script/main.py: MEGUA_TEMPLATE_DIR =", MEGUA_TEMPLATE_DIR
-    print "==============================="
+    #print "==============================="
+    #print "script/main.py: MEGUA_TEMPLATE_DIR =", MEGUA_TEMPLATE_DIR
+    #print "==============================="
 
     PATH_CONF_PY = path.join(environ["HOME"],".megua","conf.py")
     
@@ -143,10 +140,10 @@ def init():
         source = path.join(MEGUA_TEMPLATE_DIR,"conf_megua.py")
         shutil.copyfile(source,PATH_CONF_PY)
         
-        print "Configuration file created at:"
-        print PATH_CONF_PY
-        print "Edit working directories in that file for your project."
-        print "Call '$ megua help' for help on other routines."
+        print "NOTE:"
+        print "1. Configuration file 'conf.py' created at:", PATH_CONF_PY
+        print "2. Edit pathnames in 'conf.py' and other options, if necessary."
+        print "3. Call '$ megua help' for help on other routines."
         return 'user-must-run-again'
         
 
@@ -154,23 +151,22 @@ def init():
     #if directories exist, otherwise, create them.
 
     #load path variables to this module space
-    execfile( PATH_CONF_PY )
+    execfile( PATH_CONF_PY, globals())
 
-
-
-    #CODE: it's important that the configuration variables be mentioned 
-    #in templates/<lang>/conf_megua.py
-    
 
     # =========================
     # ENVIRONMENT CONFIGURATION
     # =========================
+
+    #CODE: it's important that the configuration variables below be mentioned 
+    #      in templates/<lang>/conf_megua.py
+
     if not path.isdir(MEGUA_EXERCISE_INPUT):
-        mkdirs(MEGUA_EXERCISE_INPUT)
+        makedirs(MEGUA_EXERCISE_INPUT)
     if not path.isdir(MEGUA_EXERCISE_OUTPUT):
-        mkdirs(MEGUA_EXERCISE_OUTPUT)
+        makedirs(MEGUA_EXERCISE_OUTPUT)
     if not path.isdir(MEGUA_EXERCISE_CATALOGS):
-        mkdirs(MEGUA_EXERCISE_CATALOGS)
+        makedirs(MEGUA_EXERCISE_CATALOGS)
     
     # =====================
     # PROJECT CONFIGURATION
@@ -214,6 +210,9 @@ def main():
         usage(sys.argv)
         return 0
 
+        
+    from megua.all import meg 
+    
     if sys.argv[1] == 'help':
         usage(sys.argv)
     elif sys.argv[1] == 'catalog':

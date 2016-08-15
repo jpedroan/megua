@@ -88,7 +88,7 @@ MEGUA_EXERCISE_OUTPUT=os.path.join(os.environ["HOME"],".megua",".output")
 ####################
 
 SIACUA_WEBKEY=
-SICUA_COURSENAME=
+SIACUA_COURSENAME=
 SIACUA_USERNAME=
 """
 

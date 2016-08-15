@@ -95,7 +95,8 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['jinja2', 'pil-compat', 'python-aalib'],
+##### correta:    install_requires=['jinja2', 'pil-compat', 'python-aalib'],
+    install_requires=['jinja2'],
     ## VER 'PIL.Image'
 
 
