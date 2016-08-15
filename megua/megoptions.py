@@ -111,7 +111,8 @@ else: #MEGUA setup is in $HOME/.megua/conf.py
     #load path variables to this module space
     execfile( PATH_CONF_PY )
 
-
+    
+    
     
 #===================
 # Check directories

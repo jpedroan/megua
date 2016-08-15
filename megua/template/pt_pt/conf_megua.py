@@ -84,38 +84,14 @@ MEGUA_EXERCISE_OUTPUT=os.path.join(os.environ["HOME"],".megua",".output")
 
 """
 ####################
-# Only when siacua system http://siacua.web.ua.pt/ is used.     
+# Use only when "siacua" system http://siacua.web.ua.pt/ is used.     
 ####################
 
-#siacua key
-
-export SIACUA_WEBKEY=
-export SICUA_COURSENAME=
-export SIACUA_USERNAME=
-
-
-####################     
-# This is here only for use in a bash command that calls megua:
-####################
-
-read -d '' MATHJAX_HEADER <<"EOF"
-<script type='text/x-mathjax-config'> 
-  MathJax.Hub.Config({ 
-    extensions: ['tex2jax.js'], 
-    jax: ['input/TeX', 'output/HTML-CSS'], 
-    tex2jax: { 
-      inlineMath: [ ['$','$'], ['\\(','\\)'] ], 
-      displayMath: [ ['$$','$$'], ['\\[','\\]'] ], 
-      processEscapes: true 
-    }, 
-    'HTML-CSS': { availableFonts: ['TeX'] } 
-  }); 
-</script> 
-<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'> 
-</script> 
-EOF
-
-export MATHJAX_HEADER
-
-$SAGECMD "$@"
+SIACUA_WEBKEY=
+SICUA_COURSENAME=
+SIACUA_USERNAME=
 """
+
+
+
+# End.
