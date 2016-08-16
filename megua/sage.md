@@ -29,7 +29,7 @@ export MEGUA_MODULES_DIR="$HOME/megua/megua"
 export MEGUA_TEMPLATE_DIR="$HOME/megua/megua/template/pt_pt"
 
 #Options: desktop, smc
-export MEGUA_BASH_ENVIRONMENT="desktop"
+export MEGUA_BASH_ENVIRONMENT="DESKTOP_BASH"
 
 #Options: DESKTOP, SMC (waiting mode: jupyter, sagenb)
 export MEGUA_PLATFORM="DESKTOP"

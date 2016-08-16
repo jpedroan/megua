@@ -43,13 +43,15 @@ from string import join
 import jinja2
 import os
 
+
 #SAGEMATH modules
 #from sage.all import var,RealField,SR,function,e
 from sage.all import *
 
+
 #MEGUA modules
 from megua.ur import ur
-from tounicode import to_unicode
+from megua.tounicode import to_unicode
 
 
 

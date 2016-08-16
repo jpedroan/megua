@@ -256,9 +256,14 @@ def parse_ex(inputtext):
     Each problem can have a suggestive name. 
     Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.
     <BLANKLINE>
-    Expected python/sage class definition on line 8 or class identifier is wrong.
-    Class identifier must follow a name like: E12A34_somename_number.
-    Check the exercise for the above warnings.
+    Check exercise name_001 for the above warnings.
+    {'answer_text': 'My answer.',
+     'class_text': 'class name_001(ExerciseBase):\n      more lines',
+     'problem_text': 'My Problem.',
+     'sections_text': '',
+     'suggestive_name': '(...)',
+     'summary_text': 'My summary.',
+     'unique_name': 'name_001'}
     """
 
     #Parse each line to LineToken "lines"

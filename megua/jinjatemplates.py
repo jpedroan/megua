@@ -94,7 +94,7 @@ import jinja2  #see notes on Jinj2 above.
 #tirar? from megua.mconfig import MEGUA_TEMPLATE_DIR
 
 #MEGUA modules
-from megoptions import *
+from megua.megoptions import MEGUA_TEMPLATE_DIR
 
 
 

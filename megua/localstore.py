@@ -56,7 +56,7 @@ import shutil
 
 
 #MEGUA modules
-from megua.convertdb import convertdb
+#TODO: remove this later: from megua.convertdb import convertdb
 from megua.tounicode import to_unicode
 
 
@@ -194,7 +194,10 @@ class LocalStore:
             #Open database to use (and receive exercises from old database)
             self._open_to_use()
             
-            convertdb(old_dbfilename, self, version)
+            #TODO: create this function.
+            #convertdb(old_dbfilename, self, version)
+
+            raise "localstore.py: no convertion available."
 
         else:
 
