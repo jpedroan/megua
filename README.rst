@@ -14,10 +14,12 @@ Development state: `alpha version <https://en.wikipedia.org/wiki/Software_releas
 INSTALL and USE in SageMath Cloud (SMC)
 ---------------------------------------
 
-**Target for this instructions is SIACUA**
+The target for the following instructions is SIACUA system (siacua.webua.pt) -- portuguese.
 
 1. Create an acount in SMC and create a project; add other users/authors to this project.
+
 2. Create a terminal named BASH.term
+
 3. In the terminal do:
 ::
 
@@ -70,8 +72,9 @@ There are two branches in this repository:
 - **master**: version to be adopted for SageMathCloud use, command-line, etc. 
 - **old_megua**: running in a non public server from november 2010 to 2015.
 
-DEVELOP
--------
+
+DEVELOPMENT NOTES
+-----------------
 
 * etoolbox.sty: sudo apt-get install texlive-latex-extra
 
@@ -86,8 +89,7 @@ DEVELOP
 * http://doc.sagemath.org/html/en/reference/calculus/sage/symbolic/function_factory.html
 
 
-Answered questions
-------------------
+**Answered questions by SMC team**
 
 - startup file for sagews 
 
@@ -98,17 +100,15 @@ que se converteu num ticket:
 https://github.com/sagemathinc/smc/issues/369
 
 
-## Sobre o salvus
+- About "salvus"
 
-HTML e Links
+HTML and Links
 
 https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/dg4mhp99cOg/9LiiIdEonlYJ
 
-Imagens
+Images
 
 https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/-nChfU76j7Q/D-y8rIPfUngJ
-
-
 
 
 **END**
