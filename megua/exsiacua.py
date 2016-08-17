@@ -301,7 +301,7 @@ class ExSiacua(ExerciseBase):
                 formated_problem = self.formated_problem,
                 detailed_answer  = self.detailed_answer,
                 ekey=self.ekey,
-                mathjax_header=MATHJAX_HEADER
+                mathjax_header=MATHJAX_HEADER)
 
         #print html_string
 
@@ -312,26 +312,16 @@ class ExSiacua(ExerciseBase):
 
 
         if MEGUA_PLATFORM=='SMC':
-            if MEGUA_BASH_CALL=='on': #see megua bash script at megua/megua
-                print "Exsiacua module say:  open ", EXERCISE_HTML_PATHNAME
-                #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([EXERCISE_HTML_PATHNAME])
-            else: #sagews SALVUS
-                #does not work anymore?
-                #from smc_sagews.sage_salvus import salvus
-                #salvus.file(EXERCISE_HTML_PATHNAME,show=True,raw=True)
-                #print ""
-                #salvus.html(html_string)
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([EXERCISE_HTML_PATHNAME])
+            #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
+            sys.path.append('/usr/local/lib/python2.7/dist-packages')
+            from smc_pyutil import smc_open
+            print "exsiacua.py: open",EXERCISE_HTML_PATHNAME
+            smc_open.process([EXERCISE_HTML_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
             print "Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME
             subprocess.Popen(["firefox","-new-tab", EXERCISE_HTML_PATHNAME])
         else:
-            print """Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/mconfig.sh"""
+            print "Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
 
 
 
@@ -538,26 +528,16 @@ class ExSiacua(ExerciseBase):
 
 
         if MEGUA_PLATFORM=='SMC':
-            if MEGUA_BASH_CALL=='on': #see megua bash script at megua/megua
-                print "Exsiacua module say:  open ", html_filename
-                #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([html_filename])
-            else: #sagews SALVUS
-                #from smc_sagews.sage_salvus import salvus
-                #salvus.file(html_filename,show=True,raw=True)
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([html_filename])
-                #print ""
-                #print "IF the above link is not working, wait a few seconds and try again."
-                #salvus.html(html_string)
+            print "exsiacua.py module say: open", html_filename
+            #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
+            sys.path.append('/usr/local/lib/python2.7/dist-packages')
+            from smc_pyutil import smc_open
+            smc_open.process([html_filename])
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "Exsicua module say: firefox ",html_filename,"in the browser and press F5."
+            print "exsiacua.py module say: firefox ",html_filename,"in the browser and press F5."
             subprocess.Popen(["firefox","-new-tab", html_filename])
         else:
-            print """Exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/mconfig.sh"""
+            print "exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
 
 
     def _problem_whitoutmc(self):
@@ -714,11 +694,6 @@ class ExSiacua(ExerciseBase):
             all_ids = [ "{} {}".format(akword,match.group(1)) for match in match_iter] #TODO: do this better
 
                 
-            #if environ["MEGUA_PLATFORM"]=="SMC":
-            #    import salvus
-            #    salvus.html(data.strip())
-            #else: #MEGUA_PLATFORM=='commandline'
-            #    print data.strip()
         else:
             print "Could not send %s exercise to the server." % send_dict["exname"]
             print response.status, response.reason

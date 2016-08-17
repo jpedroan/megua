@@ -18,12 +18,6 @@ import os
 # =========================
 
 
-#Where bash is running
-#Options: 
-# "DESKTOP_BASH" - if running in a desktop it use "evince ..."
-# "SMC_BASH" - if bash is running in smc it can use "open ..."
-MEGUA_BASH_ENVIRONMENT="SMC_BASH"
-
 
 #Where exercises are being build
 #Options: 
@@ -31,12 +25,6 @@ MEGUA_BASH_ENVIRONMENT="SMC_BASH"
 # "SMC" - means exercises are created in SAGEWS files
 # TODO: waiting other editors: jupyter, (old) sagenb
 MEGUA_PLATFORM="SMC"
-
-
-#For a proper output its important 
-#to know where the call was originated
-MEGUA_CALLED_FROM_BASH=False
-
 
 
 #When exercises are built to use in HTML

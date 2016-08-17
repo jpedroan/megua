@@ -6,10 +6,9 @@
 #}
 {{marker_cell}}{{uuid1}}i{{marker_cell}}
 {{marker_cell}}{{uuid3}}a{{marker_cell}}
-%auto
+#FAÇA SHIFT-ENTER NESTA CÉLULA
 from megua.all import *
-meg.set_current_exercise(__file__) #set filename as exercise name
-#FAÇA SHIFT-ENTER NESTA CÉLULA E DEPOIS EM meg.save(...)
+meg.set_current_exercise(__file__)
 {{marker_cell}}{{uuid4}}{{marker_cell}}
 #PARA ESCOLHER CHAVES ANTES DE ENVIAR
 meg.siacuapreview(

@@ -71,8 +71,7 @@ import subprocess
 from megua.platex import pcompile
 from megua.exbase import ExerciseBase
 from megua.jinjatemplates import templates
-#tirar? from megua.mconfig import MEGUA_PLATFORM
-
+from megua.megoptions import *
 
 class ExLatex(ExerciseBase):
 
@@ -107,27 +106,15 @@ class ExLatex(ExerciseBase):
         EXERCISE_TEX_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.tex')
         EXERCISE_PDF_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.pdf')
 
-        if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
-                print "Exlatex module say:  open ", EXERCISE_PDF_PATHNAME
-                #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([EXERCISE_PDF_PATHNAME])
-            else: #sagews SALVUS
-                from smc_sagews.sage_salvus import salvus
-                #Windows latin1 tex
-                forwindows_fullpath = os.path.join(self.working_dir, 'windows-'+self.unique_name()+'.tex')
-                salvus.file(forwindows_fullpath,show=True,raw=True); print ""
-                #utf-8 tex
-                salvus.file(EXERCISE_TEX_PATHNAME,show=True,raw=True); print ""
-                #pdf file
-                salvus.file(EXERCISE_PDF_PATHNAME,show=True,raw=True); print ""
-                #salvus.pdf(fullpath)
-                salvus.open_tab(EXERCISE_PDF_PATHNAME)
-        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
-            print "Exlatex module say: evince ",EXERCISE_PDF_PATHNAME
+        if MEGUA_PLATFORM=='SMC':
+            print "exlatex.py module say:  open", EXERCISE_PDF_PATHNAME
+            #does not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
+            sys.path.append('/usr/local/lib/python2.7/dist-packages')
+            from smc_pyutil import smc_open
+            smc_open.process([EXERCISE_PDF_PATHNAME])
+        elif MEGUA_PLATFORM=='DESKTOP':
+            print "exlatex module say: evince ",EXERCISE_PDF_PATHNAME
             subprocess.Popen(["evince",EXERCISE_PDF_PATHNAME])
         else:
-            print """Exlatex module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            print "exlatex module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
 

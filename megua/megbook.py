@@ -473,15 +473,12 @@ class MegBook(MegSiacua):
         self._current_unique_name = unique_name
         
         if MEGUA_PLATFORM=='SMC':
-            if MEGUA_CALLED_FROM_BASH: #see megua bash script at megua/megua
-                print "Opening exercise ", unique_name
-            else: #sagews SALVUS
-                from smc_sagews.sage_salvus import salvus
-                salvus.html("<h4>{}</h4>".format(unique_name))
+            from smc_sagews.sage_salvus import salvus
+            salvus.html("<h4>{}</h4>".format(unique_name))
         elif MEGUA_PLATFORM=='DESKTOP':
             print "Exercise {}".format(unique_name)
         else:
-            print """MegBook module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            print "megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
 
 
 
@@ -628,30 +625,15 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
-            if MEGUA_CALLED_FROM_BASH: #see megua bash script at megua/megua
-                print "MegBook module say:  open ", fullpath
-                #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
-                #Does not work using "sage -python": from smc_pyutil import smc_open
-                #Works using: "python": from smc_pyutil import smc_open
-                #                        smc_open.process([CATALOG_PDF_PATHNAME])
-                #WORKS:subprocess.call(["openpdf.py",CATALOG_PDF_PATHNAME])
-                #ANOTHER SOLUTION (http://stackoverflow.com/questions/3402168/permanently-add-a-directory-to-pythonpath)
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([fullpath])
-            else: #sagews SALVUS
-                #Stopped working, name "salvus" is now NoneType?
-                #from smc_sagews.sage_salvus import salvus
-                #salvus.open_tab(fullpath)
-                #equal to above
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([fullpath])
+            print "megbook.py module say:  open", fullpath
+            sys.path.append('/usr/local/lib/python2.7/dist-packages')
+            from smc_pyutil import smc_open
+            smc_open.process([fullpath])
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: gvim ",fullpath
             subprocess.Popen(["gvim",fullpath])
         else:
-            print """MegBook module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            print "megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
 
 
         
@@ -1267,27 +1249,15 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
-            if MEGUA_CALLED_FROM_BASH: #see megua bash script at megua/megua
-                print "MegBook module say:  open ", CATALOG_PDF_PATHNAME
-                #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
-                #Does not work using "sage -python": from smc_pyutil import smc_open
-                #Works using: "python": from smc_pyutil import smc_open
-                #                        smc_open.process([CATALOG_PDF_PATHNAME])
-                #WORKS:subprocess.call(["openpdf.py",CATALOG_PDF_PATHNAME])
-                #ANOTHER SOLUTION (http://stackoverflow.com/questions/3402168/permanently-add-a-directory-to-pythonpath)
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([CATALOG_PDF_PATHNAME])
-            else: #sagews SALVUS
-                from smc_sagews.sage_salvus import salvus
-                salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
-                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
-                salvus.open_tab(CATALOG_PDF_PATHNAME)
+            print "megbook.py module say:  open ", CATALOG_PDF_PATHNAME
+            sys.path.append('/usr/local/lib/python2.7/dist-packages')
+            from smc_pyutil import smc_open
+            smc_open.process([CATALOG_PDF_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:
-            print """MegBook module say: environ["MEGUA_EXERCISE_CATALOG"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            print "megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py"
 
 
 
@@ -1451,27 +1421,15 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
-            if MEGUA_CALLED_FROM_BASH: #see megua bash script at megua/megua
-                print "MegBook module say:  open ", CATALOG_PDF_PATHNAME
-                #Does not work in SMC: subprocess.Popen(["/bin/open",CATALOG_PDF_PATHNAME])
-                #Does not work using "sage -python": from smc_pyutil import smc_open
-                #Works using: "python": from smc_pyutil import smc_open
-                #                        smc_open.process([CATALOG_PDF_PATHNAME])
-                #WORKS:subprocess.call(["openpdf.py",CATALOG_PDF_PATHNAME])
-                #ANOTHER SOLUTION (http://stackoverflow.com/questions/3402168/permanently-add-a-directory-to-pythonpath)
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([CATALOG_PDF_PATHNAME])
-            else: #sagews SALVUS
-                from smc_sagews.sage_salvus import salvus
-                salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
-                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
-                salvus.open_tab(CATALOG_PDF_PATHNAME)
+            print "megbook.py module say:  open ", CATALOG_PDF_PATHNAME
+            sys.path.append('/usr/local/lib/python2.7/dist-packages')
+            from smc_pyutil import smc_open
+            smc_open.process([CATALOG_PDF_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:
-            print """MegBook module say: in context of megbook.fast_exam_siacua() the environ["MEGUA_EXERCISE_CATALOG"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            print "megbook.py module say: in context of megbook.fast_exam_siacua() the MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py"
 
 
 
