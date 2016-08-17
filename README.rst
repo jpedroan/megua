@@ -17,8 +17,11 @@ INSTALL and USE in SageMath Cloud (SMC)
 The target for the following instructions is SIACUA system (siacua.webua.pt) -- portuguese.
 
 1. Create an acount in SMC and create a project; add other users/authors to this project.
+::
 
 2. Create a terminal named BASH.term
+::
+
 
 3. In the terminal do:
 ::
