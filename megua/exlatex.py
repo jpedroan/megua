@@ -107,11 +107,10 @@ class ExLatex(ExerciseBase):
         EXERCISE_PDF_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.pdf')
 
         if MEGUA_PLATFORM=='SMC':
-            print "exlatex.py module say:  open", EXERCISE_PDF_PATHNAME
-            #does not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
-            sys.path.append('/usr/local/lib/python2.7/dist-packages')
-            from smc_pyutil import smc_open
-            smc_open.process([EXERCISE_PDF_PATHNAME])
+            from smc_sagews.sage_salvus import salvus
+            salvus.file(EXERCISE_PDF_PATHNAME,show=True,raw=True); print "\n"
+            salvus.file(EXERCISE_TEX_PATHNAME,show=True,raw=True); print "\n"
+            salvus.open_tab(EXERCISE_PDF_PATHNAME)
         elif MEGUA_PLATFORM=='DESKTOP':
             print "exlatex module say: evince ",EXERCISE_PDF_PATHNAME
             subprocess.Popen(["evince",EXERCISE_PDF_PATHNAME])

@@ -312,11 +312,8 @@ class ExSiacua(ExerciseBase):
 
 
         if MEGUA_PLATFORM=='SMC':
-            #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
-            sys.path.append('/usr/local/lib/python2.7/dist-packages')
-            from smc_pyutil import smc_open
-            print "exsiacua.py: open",EXERCISE_HTML_PATHNAME
-            smc_open.process([EXERCISE_HTML_PATHNAME])
+            from smc_sagews.sage_salvus import salvus
+            salvus.html(html_string)
         elif MEGUA_PLATFORM=='DESKTOP':
             print "Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME
             subprocess.Popen(["firefox","-new-tab", EXERCISE_HTML_PATHNAME])
@@ -528,11 +525,8 @@ class ExSiacua(ExerciseBase):
 
 
         if MEGUA_PLATFORM=='SMC':
-            print "exsiacua.py module say: open", html_filename
-            #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
-            sys.path.append('/usr/local/lib/python2.7/dist-packages')
-            from smc_pyutil import smc_open
-            smc_open.process([html_filename])
+            from smc_sagews.sage_salvus import salvus
+            salvus.html(html_string)
         elif MEGUA_PLATFORM=='DESKTOP':
             print "exsiacua.py module say: firefox ",html_filename,"in the browser and press F5."
             subprocess.Popen(["firefox","-new-tab", html_filename])

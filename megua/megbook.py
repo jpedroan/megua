@@ -625,10 +625,9 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
-            print "megbook.py module say:  open", fullpath
-            sys.path.append('/usr/local/lib/python2.7/dist-packages')
-            from smc_pyutil import smc_open
-            smc_open.process([fullpath])
+            from smc_sagews.sage_salvus import salvus
+            salvus.file(fullpath,show=True,raw=True); print "\n"
+            salvus.open_tab(fullpath)
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: gvim ",fullpath
             subprocess.Popen(["gvim",fullpath])
@@ -1249,10 +1248,10 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
-            print "megbook.py module say:  open ", CATALOG_PDF_PATHNAME
-            sys.path.append('/usr/local/lib/python2.7/dist-packages')
-            from smc_pyutil import smc_open
-            smc_open.process([CATALOG_PDF_PATHNAME])
+                from smc_sagews.sage_salvus import salvus
+                salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
+                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
+                salvus.open_tab(CATALOG_PDF_PATHNAME)
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
