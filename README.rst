@@ -1,19 +1,64 @@
 
 
-MEGUA package
-=============
+MEGUA package for SageMath and SageMath Cloud
+=============================================
 
-**Alpha version**
+MEGUA is a package for SageMath for creating parametrized exercises in HTML+MathJAX or LaTeX+PDF files and more formats are planned. 
+
+* `Tutorial em português <http://megua.readthedocs.io/pt/latest/>`_ (contacto: pedrocruz@ua.pt)
+* `Tutorial in english <http://megua.readthedocs.io/en/latest/>`_ (contact: pedrocruz@ua.pt)
+
+Development state: `alpha version <https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha>`_
+
+
+INSTALL and USE in SageMath Cloud (SMC)
+---------------------------------------
+
+**Target for this instructions is SIACUA**
+
+1. Create an acount in SMC and create a project; add other users/authors to this project.
+2. Create a terminal named BASH.term
+3. In the terminal do:
+::
+
+    $ pip install  --user git+https://github.com/jpedroan/megua
+
+4. Run for initialization:
+::
+
+    $ megua
+
+5. Change working options with (siacua needs changes in this file):
+::
+
+    $ open ~/.megua/conf.py
+
+5. Create the first exercise for siacua (a worksheet will open)
+::
+
+    $ megua new E12X34_AddTwoNumbers_001_siacua.sagews
+
+
+6. Create a catalog of all exercises:
+::
+
+   $ megua catalog
+   
+7. More options with:
+::
+
+    $ megua help
+
+8. Contat pedrocruz@ua.pt for more details.
+
+HISTORY
+-------
+
 
 Started in 2011, MEGUA is an external package for Sagemath for creating parametrized exercises in HTML+MathJAX or LaTeX PDF files. Software docs strings are in english but the following documentation is in [portuguese](https://pt.wikipedia.org/wiki/L%C3%ADngua_portuguesa):
 
 - `MEGUA PACKAGE FOR PARAMETERIZED EXERCISES <http://cms.ua.pt/megua>`_: people, works, seminars, and related things.
 - `Tutorial (portuguese) <http://megua.readthedocs.org/pt/latest/>`_: concepts and practice.
-
-
-
-HISTORY
--------
 
 Presented at:
 
@@ -23,7 +68,7 @@ Presented at:
 There are two branches in this repository:
 
 - **master**: version to be adopted for SageMathCloud use, command-line, etc. 
-- **old_megua**: running in a non public server from november 2010 to 2015 (well 5 years...!!).
+- **old_megua**: running in a non public server from november 2010 to 2015.
 
 DEVELOP
 -------
@@ -66,5 +111,4 @@ https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/-nChfU76
 
 
 
-**FIM**
-
+**END**
