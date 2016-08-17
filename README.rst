@@ -26,7 +26,7 @@ The target for the following instructions is SIACUA system (siacua.webua.pt) -- 
 3a. In the terminal do:
 ::
 
-    $ pip install  --user git+https://github.com/jpedroan/megua
+    $ sage -pip install  --user git+https://github.com/jpedroan/megua
 
 3b. In the terminal do:
 ::
@@ -63,8 +63,9 @@ The target for the following instructions is SIACUA system (siacua.webua.pt) -- 
     $ megua help
 
 
-9. Contat pedrocruz@ua.pt for more details.
 
+9. Contat pedrocruz@ua.pt for more details.
+::
 
 
 HISTORY
