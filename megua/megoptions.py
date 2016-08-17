@@ -87,7 +87,7 @@ if MEGUA_READ_ENV:
     #optinal: siacua project
     try:
         SIACUA_WEBKEY=environ["SIACUA_WEBKEY"]
-        SICUA_COURSENAME=environ["SICUA_COURSENAME"]
+        SIACUA_COURSENAME=environ["SICUA_COURSENAME"]
         SIACUA_USERNAME=environ["SIACUA_USERNAME"]
     except KeyError:
         pass 

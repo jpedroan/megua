@@ -204,7 +204,6 @@ DEVELOPER NOTES:
 #PYTHON modules
 import httplib, urllib
 import os
-from os import environ
 import re
 import codecs
 import subprocess
@@ -223,11 +222,10 @@ import subprocess
 
 #MEGUA modules  
 from megua.exbase import ExerciseBase
-#from megua.ug import UnifiedGraphics  
-#from megua.ur import ur
 from megua.jinjatemplates import templates
 from megua.platex import html2latex
-#tirar? from megua.mconfig import *
+from megua.megoptions import *
+
 
 
 class ExSiacua(ExerciseBase):    
@@ -303,7 +301,7 @@ class ExSiacua(ExerciseBase):
                 formated_problem = self.formated_problem,
                 detailed_answer  = self.detailed_answer,
                 ekey=self.ekey,
-                mathjax_header=environ["MATHJAX_HEADER"])
+                mathjax_header=MATHJAX_HEADER
 
         #print html_string
 
@@ -313,23 +311,27 @@ class ExSiacua(ExerciseBase):
         f.close()
 
 
-        if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+        if MEGUA_PLATFORM=='SMC':
+            if MEGUA_BASH_CALL=='on': #see megua bash script at megua/megua
                 print "Exsiacua module say:  open ", EXERCISE_HTML_PATHNAME
                 #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
                 sys.path.append('/usr/local/lib/python2.7/dist-packages')
                 from smc_pyutil import smc_open
                 smc_open.process([EXERCISE_HTML_PATHNAME])
             else: #sagews SALVUS
-                from smc_sagews.sage_salvus import salvus
-                salvus.file(EXERCISE_HTML_PATHNAME,show=True,raw=True)
-                print ""
-                salvus.html(html_string)
-        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+                #does not work anymore?
+                #from smc_sagews.sage_salvus import salvus
+                #salvus.file(EXERCISE_HTML_PATHNAME,show=True,raw=True)
+                #print ""
+                #salvus.html(html_string)
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([EXERCISE_HTML_PATHNAME])
+        elif MEGUA_PLATFORM=='DESKTOP':
             print "Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME
             subprocess.Popen(["firefox","-new-tab", EXERCISE_HTML_PATHNAME])
         else:
-            print """Exsiacua module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            print """Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/mconfig.sh"""
 
 
 
@@ -524,7 +526,7 @@ class ExSiacua(ExerciseBase):
                 "exsiacua_previewheader.html",
                 uname = self.unique_name(),
                 allexercises = allexercises,
-                mathjax_header=environ["MATHJAX_HEADER"]
+                mathjax_header=MATHJAX_HEADER
         )
 
 
@@ -535,24 +537,27 @@ class ExSiacua(ExerciseBase):
         f.close()
 
 
-        if environ["MEGUA_PLATFORM"]=='SMC':
-            if environ["MEGUA_BASH_CALL"]=='on': #see megua bash script at megua/megua
+        if MEGUA_PLATFORM=='SMC':
+            if MEGUA_BASH_CALL=='on': #see megua bash script at megua/megua
                 print "Exsiacua module say:  open ", html_filename
                 #dows not work: subprocess.Popen(["open",EXERCISE_PDF_PATHNAME])
                 sys.path.append('/usr/local/lib/python2.7/dist-packages')
                 from smc_pyutil import smc_open
                 smc_open.process([html_filename])
             else: #sagews SALVUS
-                from smc_sagews.sage_salvus import salvus
-                salvus.file(html_filename,show=True,raw=True)
-                print ""
-                print "IF the above link is not working, wait a few seconds and try again."
+                #from smc_sagews.sage_salvus import salvus
+                #salvus.file(html_filename,show=True,raw=True)
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([html_filename])
+                #print ""
+                #print "IF the above link is not working, wait a few seconds and try again."
                 #salvus.html(html_string)
-        elif environ["MEGUA_PLATFORM"]=='DESKTOP':
+        elif MEGUA_PLATFORM=='DESKTOP':
             print "Exsicua module say: firefox ",html_filename,"in the browser and press F5."
             subprocess.Popen(["firefox","-new-tab", html_filename])
         else:
-            print """Exsiacua.py module say: environ["MEGUA_PLATFORM"] must be properly configured at $HOME/.megua/mconfig.sh"""
+            print """Exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/mconfig.sh"""
 
 
     def _problem_whitoutmc(self):
@@ -763,7 +768,7 @@ class ExSiacua(ExerciseBase):
         #    } )
 
         d.update( {
-            "siacua_key": environ["SIACUA_WEBKEY"],
+            "siacua_key": SIACUA_WEBKEY,
             "course": course,
             "exname": exname, 
             "ekey": str(e_number), 

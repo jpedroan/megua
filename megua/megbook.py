@@ -572,7 +572,7 @@ class MegBook(MegSiacua):
                     uuid6=uuid(),
                     uuid7=uuid(),
                     uuid8=uuid(),
-                    course=SICUA_COURSENAME,
+                    course=SIACUA_COURSENAME,
                     usernamesiacua=SIACUA_USERNAME,
                     marker_cell=MARKERS["cell"],
                     marker_output=MARKERS["output"],
@@ -640,8 +640,13 @@ class MegBook(MegSiacua):
                 from smc_pyutil import smc_open
                 smc_open.process([fullpath])
             else: #sagews SALVUS
-                from smc_sagews.sage_salvus import salvus
-                salvus.open_tab(fullpath)
+                #Stopped working, name "salvus" is now NoneType?
+                #from smc_sagews.sage_salvus import salvus
+                #salvus.open_tab(fullpath)
+                #equal to above
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([fullpath])
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: gvim ",fullpath
             subprocess.Popen(["gvim",fullpath])
