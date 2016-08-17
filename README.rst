@@ -23,10 +23,17 @@ The target for the following instructions is SIACUA system (siacua.webua.pt) -- 
 ::
 
 
-3. In the terminal do:
+3a. In the terminal do:
 ::
 
     $ pip install  --user git+https://github.com/jpedroan/megua
+
+3b. In the terminal do:
+::
+
+    $ open ~/.local/bin/megua
+    and change first line to #!/usr/local/bin/sage
+    and remove __requirement__ line.
 
 4. Run for initialization:
 ::
@@ -38,23 +45,27 @@ The target for the following instructions is SIACUA system (siacua.webua.pt) -- 
 
     $ open ~/.megua/conf.py
 
-5. Create the first exercise for siacua (a worksheet will open)
+6. Create the first exercise for siacua (a worksheet will open)
 ::
 
     $ megua new E12X34_AddTwoNumbers_001_siacua.sagews
 
 
-6. Create a catalog of all exercises:
+7. Create a catalog of all exercises:
 ::
 
    $ megua catalog
+ 
    
-7. More options with:
+8. More options with:
 ::
 
     $ megua help
 
-8. Contat pedrocruz@ua.pt for more details.
+
+9. Contat pedrocruz@ua.pt for more details.
+
+
 
 HISTORY
 -------
@@ -96,22 +107,18 @@ DEVELOPMENT NOTES
 
 - startup file for sagews 
 
-https://groups.google.com/forum/#!topic/sage-cloud/L-9QwvlfnvY
+    - https://groups.google.com/forum/#!topic/sage-cloud/L-9QwvlfnvY
+    - https://github.com/sagemathinc/smc/issues/369
 
-que se converteu num ticket:
-
-https://github.com/sagemathinc/smc/issues/369
-
-
-- About "salvus"
+- about "salvus"
 
 HTML and Links
 
-https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/dg4mhp99cOg/9LiiIdEonlYJ
+  - https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/dg4mhp99cOg/9LiiIdEonlYJ
 
 Images
 
-https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/-nChfU76j7Q/D-y8rIPfUngJ
+   - https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/-nChfU76j7Q/D-y8rIPfUngJ
 
 
 **END**
