@@ -143,18 +143,24 @@ import warnings
 #warnings.filterwarnings("error")
 import re
 import os
-from os import environ
+#remove: from os import environ
 
 #SAGEMATH modules
 from sage.all import SageObject 
-from cysignals.alarm import AlarmInterrupt, alarm, cancel_alarm
+try:
+    #new sagemath (don't know version)
+    from cysignals.alarm import AlarmInterrupt, alarm, cancel_alarm
+except ImportError:
+    #old sagemath (don't know version)
+    from sage.misc.misc import AlarmInterrupt, alarm, cancel_alarm
+    
 
 #MEGUA modules
 from megua.parse_param import parameter_change
 from megua.ur import ur
 from megua.ug import UnifiedGraphics
 from megua.tounicode import to_unicode
-#tirar from megua.mconfig import MEGUA_EXERCISES_OUTPUT
+from megua.megoptions import *
 
 
 
@@ -212,7 +218,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         assert(self._answer_text)
 
         #Create if not exist: exercise working directory (images, latex,...)
-        self.working_dir = os.path.join(environ["MEGUA_EXERCISE_OUTPUT"],self._unique_name)
+        self.working_dir = os.path.join(MEGUA_EXERCISE_OUTPUT,self._unique_name)
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
 
