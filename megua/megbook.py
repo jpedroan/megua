@@ -1248,10 +1248,15 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
-                from smc_sagews.sage_salvus import salvus
+            from smc_sagews.sage_salvus import salvus
+            if salvus:
                 salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
                 salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
                 salvus.open_tab(CATALOG_PDF_PATHNAME)
+            else:
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([CATALOG_PDF_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
@@ -1401,16 +1406,16 @@ class MegBook(MegSiacua):
                          exerciseinstanceslatex=lts)
 
 
-        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.tex")
-        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.pdf")
+        EXAM_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.tex")
+        EXAM_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.pdf")
 
         #Tirar isto
-        f = codecs.open(CATALOG_TEX_PATHNAME+"lixo", mode='w+', encoding='utf8')
+        f = codecs.open(EXAM_TEX_PATHNAME+"lixo", mode='w+', encoding='utf8')
         f.write(ex.summary())
         f.close()
 
 
-        f = codecs.open(CATALOG_TEX_PATHNAME, mode='w', encoding='utf-8')
+        f = codecs.open(EXAM_TEX_PATHNAME, mode='w', encoding='utf-8')
         f.write(latex_string)
         f.close()
 
@@ -1420,13 +1425,18 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
-            print "megbook.py module say:  open ", CATALOG_PDF_PATHNAME
-            sys.path.append('/usr/local/lib/python2.7/dist-packages')
-            from smc_pyutil import smc_open
-            smc_open.process([CATALOG_PDF_PATHNAME])
+            from smc_sagews.sage_salvus import salvus
+            if salvus:
+                salvus.file(EXAM_PDF_PATHNAME,show=True,raw=True); print "\n"
+                salvus.file(EXAM_TEX_PATHNAME,show=True,raw=True); print "\n"
+                salvus.open_tab(EXAM_TEX_PATHNAME)
+            else:
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([CATALOG_TEX_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
-            subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
+            print "MegBook module say: evince ",EXAM_PDF_PATHNAME
+            subprocess.Popen(["evince",EXAM_PDF_PATHNAME])
         else:
             print "megbook.py module say: in context of megbook.fast_exam_siacua() the MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py"
 

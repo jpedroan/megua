@@ -148,14 +148,12 @@ import os
 #SAGEMATH modules
 from sage.all import SageObject 
 
-#TODO: restore this alarm thing
-#TODO: also in megbook.py
-#try:
-#    #new sagemath (don't know version)
-#    from cysignals.alarm import AlarmInterrupt, alarm, cancel_alarm
-#except ImportError:
-#    #old sagemath (don't know version)
-#    from sage.misc.misc import AlarmInterrupt, alarm, cancel_alarm
+try:
+    #new sagemath (don't know version)
+    from cysignals.alarm import AlarmInterrupt, alarm, cancel_alarm
+except ImportError:
+    #old sagemath (don't know version)
+    from sage.misc.misc import AlarmInterrupt, alarm, cancel_alarm
     
 
 #MEGUA modules
@@ -259,11 +257,31 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         self._problem_text    = to_unicode(self._problem_text)
         self._answer_text     = to_unicode(self._answer_text)
         self._suggestive_name = to_unicode(self._suggestive_name)
-        self.update(ekey,edict,render_method)
 
-        #TODO: restore alarm, see bottom
+        
+        try:
 
+            #Keep author in control of max time in megbook.
 
+            #alarm: see import at top lines. 
+            if not self._megbook:
+                alarm(60)
+            else:                
+                alarm(self._megbook.max_computation_time)
+            
+            self.update(ekey,edict,render_method)
+
+        except AlarmInterrupt:
+            print 'Exercise "%s" is taking too long to make!' % self.unique_name()
+            print 'Check make_random() routine or increase meg.max_computation_time.'
+            # if the computation finished early, though, the alarm is still ticking!
+            # so let's turn it off below.
+            raise AlarmInterrupt
+
+        #Turn off alarm because make has been done in time.
+        #cancel_alarm is from sage.misc.misc
+        cancel_alarm()             
+        
 
     def update(self,ekey=None,edict=None, render_method=None):
         r"""Does this:
@@ -488,45 +506,6 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
         return options
 
-'''
-    TODO: RESTORE THIS FOR ALARM
-
-    def update_timed(self,ekey=None,edict=None, render_method=None):
-        r"""calls ex.update() but controls execution time.
-        """
-        self.has_instance = False
-        
-        #Check if class fields are in str or unicode        
-        self._summary_text    = to_unicode(self._summary_text)
-        self._problem_text    = to_unicode(self._problem_text)
-        self._answer_text     = to_unicode(self._answer_text)
-        self._suggestive_name = to_unicode(self._suggestive_name)
-
-        
-        try:
-
-            #Keep author in control of max time in megbook.
-
-            #alarm: see import at top lines. 
-            if not self._megbook:
-                #alarm(60)
-            else:                
-                alarm(self._megbook.max_computation_time)
-            
-            self.update(ekey,edict,render_method)
-
-        except AlarmInterrupt:
-            print 'Exercise "%s" is taking too long to make!' % self.unique_name()
-            print 'Check make_random() routine or increase meg.max_computation_time.'
-            # if the computation finished early, though, the alarm is still ticking!
-            # so let's turn it off below.
-            raise AlarmInterrupt
-
-        #Turn off alarm because make has been done in time.
-        #cancel_alarm is from sage.misc.misc
-        cancel_alarm()             
-        
-'''
     
 #end of exbase.py
     
