@@ -14,7 +14,6 @@ Development state: `alpha version <https://en.wikipedia.org/wiki/Software_releas
 INSTALL and USE in SageMath Cloud (SMC)
 ---------------------------------------
 
-The target for the following instructions is SIACUA system (siacua.webua.pt) -- portuguese.
 
 1. Create an acount in SMC and create a project; add other users/authors to this project.
 ::
@@ -39,10 +38,10 @@ The target for the following instructions is SIACUA system (siacua.webua.pt) -- 
 
     $ open ~/.megua/conf.py
 
-6. Create the first exercise for siacua (a worksheet will open)
+6. Create the first exercise targeting LaTex (a worksheet will open)
 ::
 
-    $ megua new E12X34_AddTwoNumbers_001_siacua.sagews
+    $ megua new E12X34_AddTwoNumbers_001_latex.sagews
 
 
 7. Create a catalog of all exercises:
@@ -58,8 +57,32 @@ The target for the following instructions is SIACUA system (siacua.webua.pt) -- 
 
 
 
-9. Contat pedrocruz@ua.pt for more details.
+9. Contact pedrocruz@ua.pt for more details.
 ::
+
+
+Sistema SIACUA (português)
+---------------------------
+
+- As instruções seguintes são para o sistema SIACUA (siacua.web.ua.pt).
+- Devem ser realizados os passos de instalação mencionados acima.
+
+Para criar exercícios:
+
+1. Criar um exercício para o SIACUA (esta etapa abre uma janela com o novo exercício)
+::
+
+    $ megua new E12X34_AddTwoNumbers_001_siacua.sagews
+
+
+2. Criar um catálogo com todos os exercícios transcritos para um ficheiro LaTeX (catalog.tex):
+:: 
+
+   $ megua catalog
+ 
+3. Contacto luisd@ua.pt ou pedrocruz@ua.pt para ajuda.
+::
+
 
 
 HISTORY
