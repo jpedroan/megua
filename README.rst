@@ -5,6 +5,8 @@ MEGUA package for SageMath and SageMath Cloud
 
 MEGUA is a package for SageMath for creating parametrized exercises in HTML+MathJAX or LaTeX+PDF files (more formats are planned). 
 
+This tutorials are older than code but give a good ideia of the topics of this project:
+
 * `Tutorial em português <http://megua.readthedocs.io/pt/latest/>`_
 * `Tutorial in english <http://megua.readthedocs.io/en/latest/>`_ 
 * Contact: pedrocruz@ua.pt
@@ -16,8 +18,13 @@ INSTALL and USE in SageMath Cloud (SMC)
 ---------------------------------------
 
 
-1. Create an acount in SMC and create a project; add other users/authors to this project.
+1. Create an account in SMC `https://cloud.sagemath.com`_, 
 ::
+
+
+- then create a project; 
+- other users must create an account 
+- and then add them to this project.
 
 
 2. Create a terminal named BASH.term
@@ -45,7 +52,7 @@ INSTALL and USE in SageMath Cloud (SMC)
 
     $ open ~/.megua/conf.py
 
-6. Create the first exercise targeting LaTex (a worksheet will open)
+6. Create the first exercise targeting LaTeX (a worksheet will open)
 ::
 
     $ megua new E12X34_AddTwoNumbers_001_latex.sagews
@@ -73,7 +80,7 @@ As instruções seguintes são para o sistema SIACUA (siacua.web.ua.pt).
 
 - Em particular, deve ser criado um terminal com nome BASH.term
 
-- Mudar o nome do curso e username e password assim:
+- O SIACUA requer o nome do curso, um username e uma password de sistema. Para isso deve ser editar 'conf.py' com:
 ::
 
     $ open ~/.megua/conf.py
@@ -81,6 +88,7 @@ As instruções seguintes são para o sistema SIACUA (siacua.web.ua.pt).
 - Contacto luisd@ua.pt ou pedrocruz@ua.pt para ajuda.
 ::
 
+- A conversão de exercícios de "SIACUA" para "LaTeX" está satisfatória e outras conversões vão sendo criadas.
 
 Para criar exercícios:
 
