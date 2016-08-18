@@ -33,7 +33,7 @@ INSTALL and USE in SageMath Cloud (SMC)
 
     $ megua
 
-5. Change working options with (siacua needs changes in this file):
+5. Change working options with (portuguese: for siacua system see bellow):
 ::
 
     $ open ~/.megua/conf.py
@@ -64,10 +64,18 @@ INSTALL and USE in SageMath Cloud (SMC)
 Sistema SIACUA (português)
 ---------------------------
 
-- As instruções seguintes são para o sistema SIACUA (siacua.web.ua.pt).
+As instruções seguintes são para o sistema SIACUA (siacua.web.ua.pt).
+
 - Devem ser realizados os passos de instalação mencionados acima.
 
+- Mudar o nome do curso e username e password assim:
+::
+
+    $ open ~/.megua/conf.py
+
+
 Para criar exercícios:
+
 
 1. Criar um exercício para o SIACUA (esta etapa abre uma janela com o novo exercício)
 ::
