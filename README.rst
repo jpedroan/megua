@@ -23,17 +23,11 @@ The target for the following instructions is SIACUA system (siacua.webua.pt) -- 
 ::
 
 
-3a. In the terminal do:
+3. In the terminal do:
 ::
 
     $ sage -pip install  --user git+https://github.com/jpedroan/megua
 
-3b. In the terminal do:
-::
-
-    $ open ~/.local/bin/megua
-    and change first line to #!/usr/local/bin/sage
-    and remove __requirement__ line.
 
 4. Run for initialization:
 ::
