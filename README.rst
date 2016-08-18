@@ -19,11 +19,14 @@ INSTALL and USE in SageMath Cloud (SMC)
 1. Create an acount in SMC and create a project; add other users/authors to this project.
 ::
 
-2. Create a terminal named BASH.term
 
-  - Button "+NEW"
-  - Change name to "BASH"
-  - Press ">_Terminal" button
+2. Create a terminal named BASH.term
+::
+
+
+- Button "+NEW"
+- Change name to "BASH"
+- Press ">_Terminal" button
 
 
 3. In the terminal do:
