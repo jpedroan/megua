@@ -24,6 +24,10 @@ from os import path
 
 setup_filepath = path.abspath(path.dirname(__file__))
 
+import sys
+sys.executable = "/usr/bin/env sage"
+ 
+ 
 
 # Get the long description from the README file
 with open(path.join(setup_filepath, 'README.rst'), encoding='utf-8') as f:
