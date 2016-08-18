@@ -153,7 +153,8 @@ try:
     from cysignals.alarm import AlarmInterrupt, alarm, cancel_alarm
 except ImportError:
     #old sagemath (don't know version)
-    from sage.misc.misc import AlarmInterrupt, alarm, cancel_alarm
+    from sage.ext.interrupt.interrupt import AlarmInterrupt
+    from sage.misc.misc import alarm, cancel_alarm
     
 
 #MEGUA modules

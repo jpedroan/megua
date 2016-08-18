@@ -1,4 +1,15 @@
 
-Megbook.py say: filename must be a name in form E12X34_SomeName_001_latex ou _siacua or _moodle and related extension *.sagews or *.sage.
+
+$ megua new <filename>
+
+    for cloud.sagemath.com system:
+
+          <filename> is like  --  E12X34_name_001_latex.sagews
+          <filename> is like  --  E12X34_name_001_siacua.sagews
+
+    for desktop (linux):
+
+          <filename> is like  --  E12X34_name_001_latex.sage
+          <filename> is like  --  E12X34_name_001_siacua.sage
 
 

@@ -626,8 +626,13 @@ class MegBook(MegSiacua):
 
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus
-            salvus.file(fullpath,show=True,raw=True); print "\n"
-            salvus.open_tab(fullpath)
+            if salvus:
+                salvus.file(fullpath,show=True,raw=True); print "\n"
+                salvus.open_tab(fullpath)
+            else:
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([fullpath])                
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: gvim ",fullpath
             subprocess.Popen(["gvim",fullpath])
