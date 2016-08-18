@@ -3,10 +3,13 @@
 MEGUA package for SageMath and SageMath Cloud
 =============================================
 
-MEGUA is a package for SageMath for creating parametrized exercises in HTML+MathJAX or LaTeX+PDF files and more formats are planned. 
+MEGUA is a package for SageMath for creating parametrized exercises in HTML+MathJAX or LaTeX+PDF files (more formats are planned). 
 
-* `Tutorial em português <http://megua.readthedocs.io/pt/latest/>`_ (contacto: pedrocruz@ua.pt)
-* `Tutorial in english <http://megua.readthedocs.io/en/latest/>`_ (contact: pedrocruz@ua.pt)
+This tutorials are older than code but give a good ideia of the topics of this project:
+
+* `Tutorial em português <http://megua.readthedocs.io/pt/latest/>`_
+* `Tutorial in english <http://megua.readthedocs.io/en/latest/>`_ 
+* Contact: pedrocruz@ua.pt
 
 Development state: `alpha version <https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha>`_
 
@@ -14,41 +17,45 @@ Development state: `alpha version <https://en.wikipedia.org/wiki/Software_releas
 INSTALL and USE in SageMath Cloud (SMC)
 ---------------------------------------
 
-The target for the following instructions is SIACUA system (siacua.webua.pt) -- portuguese.
 
-1. Create an acount in SMC and create a project; add other users/authors to this project.
+1. Create an account in SMC `https://cloud.sagemath.com`_, 
 ::
+
+
+- then create a project; 
+- other users must create an account 
+- and then add them to this project.
+
 
 2. Create a terminal named BASH.term
 ::
 
 
-3a. In the terminal do:
+- Button "+NEW"
+- Change name to "BASH"
+- Press ">_Terminal" button
+
+
+3. In the terminal do:
 ::
 
     $ sage -pip install  --user git+https://github.com/jpedroan/megua
 
-3b. In the terminal do:
-::
-
-    $ open ~/.local/bin/megua
-    and change first line to #!/usr/local/bin/sage
-    and remove __requirement__ line.
 
 4. Run for initialization:
 ::
 
     $ megua
 
-5. Change working options with (siacua needs changes in this file):
+5. Change working options with (portuguese: for siacua system see bellow):
 ::
 
     $ open ~/.megua/conf.py
 
-6. Create the first exercise for siacua (a worksheet will open)
+6. Create the first exercise targeting LaTeX (a worksheet will open)
 ::
 
-    $ megua new E12X34_AddTwoNumbers_001_siacua.sagews
+    $ megua new E12X34_AddTwoNumbers_001_latex.sagews
 
 
 7. Create a catalog of all exercises:
@@ -64,8 +71,39 @@ The target for the following instructions is SIACUA system (siacua.webua.pt) -- 
 
 
 
-9. Contat pedrocruz@ua.pt for more details.
+MEGUA para o sistema SIACUA (português)
+---------------------------------------
+
+As instruções seguintes são para o sistema SIACUA (siacua.web.ua.pt).
+
+- Devem ser realizados os passos de instalação mencionados acima.
+
+- Em particular, deve ser criado um terminal com nome BASH.term
+
+- O SIACUA requer o nome do curso, um username e uma password de sistema. Para isso deve ser editar 'conf.py' com:
 ::
+
+    $ open ~/.megua/conf.py
+
+- Contacto luisd@ua.pt ou pedrocruz@ua.pt para ajuda.
+::
+
+- A conversão de exercícios de "SIACUA" para "LaTeX" está satisfatória e outras conversões vão sendo criadas.
+
+Para criar exercícios:
+
+
+1. Criar um exercício para o SIACUA (esta etapa abre uma janela com o novo exercício)
+::
+
+    $ megua new E12X34_AddTwoNumbers_001_siacua.sagews
+
+
+2. Criar um catálogo com todos os exercícios transcritos para um ficheiro LaTeX (catalog.tex):
+:: 
+
+   $ megua catalog
+ 
 
 
 HISTORY
