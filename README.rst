@@ -3,10 +3,11 @@
 MEGUA package for SageMath and SageMath Cloud
 =============================================
 
-MEGUA is a package for SageMath for creating parametrized exercises in HTML+MathJAX or LaTeX+PDF files and more formats are planned. 
+MEGUA is a package for SageMath for creating parametrized exercises in HTML+MathJAX or LaTeX+PDF files (more formats are planned). 
 
-* `Tutorial em português <http://megua.readthedocs.io/pt/latest/>`_ (contacto: pedrocruz@ua.pt)
-* `Tutorial in english <http://megua.readthedocs.io/en/latest/>`_ (contact: pedrocruz@ua.pt)
+* `Tutorial em português <http://megua.readthedocs.io/pt/latest/>`_
+* `Tutorial in english <http://megua.readthedocs.io/en/latest/>`_ 
+* Contact: pedrocruz@ua.pt
 
 Development state: `alpha version <https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha>`_
 
@@ -19,7 +20,10 @@ INSTALL and USE in SageMath Cloud (SMC)
 ::
 
 2. Create a terminal named BASH.term
-::
+
+  - Button "+NEW"
+  - Change name to "BASH"
+  - Press ">_Terminal" button
 
 
 3. In the terminal do:
@@ -57,21 +61,22 @@ INSTALL and USE in SageMath Cloud (SMC)
 
 
 
-9. Contact pedrocruz@ua.pt for more details.
-::
-
-
-Sistema SIACUA (português)
----------------------------
+MEGUA para o sistema SIACUA (português)
+---------------------------------------
 
 As instruções seguintes são para o sistema SIACUA (siacua.web.ua.pt).
 
 - Devem ser realizados os passos de instalação mencionados acima.
 
+- Em particular, deve ser criado um terminal com nome BASH.term
+
 - Mudar o nome do curso e username e password assim:
 ::
 
     $ open ~/.megua/conf.py
+
+- Contacto luisd@ua.pt ou pedrocruz@ua.pt para ajuda.
+::
 
 
 Para criar exercícios:
@@ -88,9 +93,6 @@ Para criar exercícios:
 
    $ megua catalog
  
-3. Contacto luisd@ua.pt ou pedrocruz@ua.pt para ajuda.
-::
-
 
 
 HISTORY
