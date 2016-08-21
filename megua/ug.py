@@ -181,8 +181,11 @@ from megua.platex import pcompile
 #import io
 #import urllib2
 import os
-import PIL.Image
-import aalib
+
+#TODO: postponed because of problems with python setup.py install
+#import PIL.Image
+#import aalib
+
 import re
 import subprocess
 
@@ -271,10 +274,12 @@ class UnifiedGraphics:
         if self._rendermethod=='imagefile':
             return r"\n<img src='%s' alt='%s' height='%d' width='%d'></img>\n" % (pathname,gfilename+' graphic',dimx,dimy)
         elif self._rendermethod=='asciiart':
-            screen = aalib.AsciiScreen(width=dimx, height=dimy)
-            image = PIL.Image.open(pathname).convert('L').resize(screen.virtual_size)
-            screen.put_image((0, 0), image)
-            return screen.render()
+            print "ug.py say: 'asciiart' is not yet implemented"
+            #screen = aalib.AsciiScreen(width=dimx, height=dimy)
+            #image = PIL.Image.open(pathname).convert('L').resize(screen.virtual_size)
+            #screen.put_image((0, 0), image)
+            #return screen.render()
+            return "ug.py say: 'asciiart' is not yet implemented"
         elif self._rendermethod=='base64':
             #'\n<img height="%d" width="%d" src="data:image/png;base64,{0}"></img>\n'.format(....)
             data_uri = open(pathname, 'rb').read().encode('base64').replace('\n', '')
