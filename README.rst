@@ -293,46 +293,6 @@ Install Ubuntu/linux desktop
 
 
 
-Development Notes
------------------
-
-
-There are two "main" branches in this repository:
-
-- **master**: version to be adopted for SageMathCloud use, command-line, etc. 
-- **old_megua**: running in a non public server from november 2010 to 2015.
-
-
-* etoolbox.sty: sudo apt-get install texlive-latex-extra
-
-* salvus: /projects/sage/sage-6.10/local/lib/python2.7/site-packages/smc_sagews
-
-* from smc_sagews.sage_salvus import salvus #Functions: salvus.file(), salvus.html()
-
-* sage_server.py: contains definitions of "def file()" and "def html()", see useful arguments
-
-* decorators dynamically alter the functionality of a function, method or class without having to directly use subclasses, http://thecodeship.com/patterns/guide-to-python-function-decorators/
-
-* http://doc.sagemath.org/html/en/reference/calculus/sage/symbolic/function_factory.html
-
-
-**Answered questions by SMC team**
-
-- startup file for sagews 
-
-    - https://groups.google.com/forum/#!topic/sage-cloud/L-9QwvlfnvY
-    - https://github.com/sagemathinc/smc/issues/369
-
-- about "salvus"
-
-HTML and Links
-
-  - https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/dg4mhp99cOg/9LiiIdEonlYJ
-
-Images
-
-   - https://groups.google.com/forum/#!searchin/sage-cloud/salvus/sage-cloud/-nChfU76j7Q/D-y8rIPfUngJ
-
 
    
 Memória (português)
