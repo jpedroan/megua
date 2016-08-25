@@ -16,12 +16,6 @@ This tutorials are being revised but now they give a good ideia of the topics of
 Development state: `alpha version <https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha>`_
 
 
-Instalation procedures:
-
-1. (português) Sistema SIACUA com uma conta Free no SMC 
-2. Free account in SMC `<https://cloud.sagemath.com>`_
-3. Payed account on SMC  `<https://cloud.sagemath.com>`_
-4. Ubuntu/linux desktop
 
 SageMath Cloud (SMC) is `<https://cloud.sagemath.com>`_
 
@@ -256,11 +250,45 @@ With this type of account it is necessary to turn "internet access" in Setting a
 
 
  
-Ubuntu/linux desktop
---------------------
+Install Ubuntu/linux desktop
+----------------------------
+
+1. Download and install `SageMath <http://www.sagemath.org/>`_
+::
+    
+
+2. In a terminal do:
+::
+
+    $ sage -pip install  --user git+https://github.com/jpedroan/megua
 
 
-If you choose this option then please use what is necessary from "Install on Payed account on SMC" if you have internet access in your linux box.
+3. Run for initialization:
+::
+
+    $ megua
+
+4. Change working options with (portuguese: for siacua system see topic above):
+::
+
+    $ open ~/.megua/conf.py
+
+5. Create the first exercise targeting LaTeX (a worksheet will open)
+::
+
+    $ megua new E12X34_AddTwoNumbers_001_latex.sagews
+
+
+6. Create a catalog of all exercises:
+::
+
+   $ megua catalog
+ 
+   
+7. More options with:
+::
+
+    $ megua help
 
 
 
@@ -269,7 +297,7 @@ Development Notes
 -----------------
 
 
-There are two branches in this repository:
+There are two "main" branches in this repository:
 
 - **master**: version to be adopted for SageMathCloud use, command-line, etc. 
 - **old_megua**: running in a non public server from november 2010 to 2015.
