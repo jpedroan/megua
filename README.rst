@@ -23,8 +23,9 @@ Instalation procedures:
 3. Payed account on SMC  `<https://cloud.sagemath.com>`_
 4. Ubuntu/linux desktop
 
+SageMath Cloud (SMC) is `<https://cloud.sagemath.com>`_
 
-.. contents:: Contents
+.. contents:: Contents and Instalation procedures
     :depth: 2
 
 
@@ -104,14 +105,14 @@ Neste tipo de conta, o usuário não tem acesso direto à internet estando dentr
 
 
 
-9. Para criar
+10. Para criar
 ::
 
    $ megua catalog
    (mostra todos os exercícios criados para siacua ou latex)
 
   
-10. Mais opções futuras com:
+11. Mais opções futuras com:
 ::
 
     $ megua help
@@ -121,8 +122,8 @@ Neste tipo de conta, o usuário não tem acesso direto à internet estando dentr
 
 .. nonpayed:
 
-Install on a Free account on SMC
---------------------------------
+Install on a SMC Free account
+-----------------------------
 
 With this type of account the user does not have "internet access" using command-line or scripts but can use manual upload and download of files. Package MEGUA must be downloaded to your computer from `PYPi <https://pypi.python.org/pypi/megua>`_ and then uploaded to project area as the folloing instructions suggest.
 
@@ -196,8 +197,8 @@ With this type of account the user does not have "internet access" using command
 
 .. payed:
 
-Install on Payed account on SMC
--------------------------------
+Install on a SMC Payed account
+------------------------------
 
 With this type of account it is necessary to turn "internet access" in Setting and MEGUA could be downloaded from github directly with recent updates in "master" branch.
 
@@ -264,7 +265,7 @@ If you choose this option then please use what is necessary from "Install on Pay
 
 
 
-DEVELOPMENT NOTES
+Development Notes
 -----------------
 
 
