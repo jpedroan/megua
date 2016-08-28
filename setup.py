@@ -39,7 +39,14 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    #version='1.2.0',
+
+    #MEGUA: to use pypi it seems we have to use "version=....." and the following
+    #   instructions where usefull: 
+    #   http://peterdowns.com/posts/first-time-with-pypi.html
+    version='2016.1.1a1',
+
+    #MEGUA: this one works with git.
+    #MEGUA: geracao automatica de versoes
     use_scm_version=True,
     setup_requires=['setuptools_scm'], #puts setuptools_scm-1.11.0-py2.7.egg in megua root.
 
@@ -60,7 +67,7 @@ setup(
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? 
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
         'Intended Audience :: Education',
