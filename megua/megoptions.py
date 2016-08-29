@@ -69,13 +69,14 @@ try:
 except KeyError:
     pass
 
+#print "MEGUA_READ_ENV=",MEGUA_READ_ENV
 
 if MEGUA_READ_ENV:
 
     # SYSTEM CONFIGURATION
-    MEGUA_BASH_ENVIRONMENT=environ["MEGUA_BASH_ENVIRONMENT"]
+    #MEGUA_BASH_ENVIRONMENT=environ["MEGUA_BASH_ENVIRONMENT"]
     MEGUA_PLATFORM=environ["MEGUA_PLATFORM"]
-    MEGUA_CALLED_FROM_BASH=environ["MEGUA_CALLED_FROM_BASH"]=="True"
+    #MEGUA_CALLED_FROM_BASH=environ["MEGUA_CALLED_FROM_BASH"]=="True"
     MATHJAX_HEADER=environ["MATHJAX_HEADER"]
     # PROJECT CONFIGURATION
     MEGUA_EXERCISE_INPUT=environ["MEGUA_EXERCISE_INPUT"]
@@ -112,7 +113,7 @@ else: #MEGUA setup is in $HOME/.megua/conf.py
     execfile( PATH_CONF_PY )
 
     
-    
+#print "MEGUA_PLATFORM=",MEGUA_PLATFORM
     
 #===================
 # Check directories
