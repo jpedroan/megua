@@ -8,6 +8,7 @@
 #}
 {{marker_cell}}{{uuid1}}i{{marker_cell}}
 {{marker_cell}}{{uuid2}}a{{marker_cell}}
+#FAÇA SHIFT-ENTER NESTA CÉLULA
 from megua.all import *
 meg.set_current_exercise(__file__)
 {{marker_cell}}{{uuid3}}{{marker_cell}}

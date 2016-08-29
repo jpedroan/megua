@@ -101,11 +101,11 @@ class ExAMC(ExerciseBase):
 
         #Use jinja2 template to generate LaTeX.
         latex_string = templates.render("examc_print_instance.tex",
-            sname=self.unique_name(),
+            unique_name=self.unique_name(),
+            ekey = self.ekey,
             summtxt=self.summary(),
             probtxt=self.problem(),
             answtxt=self.answer(),
-            ekey = self.ekey,
          )
 
         #copy amc.sty to the working_dir
