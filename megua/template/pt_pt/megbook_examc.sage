@@ -30,7 +30,7 @@ x^2
 \]
 
 
-class {{unique_name}}(ExLatex):
+class {{unique_name}}(ExAMC):
 
     def make_random(s,edict=None):
 

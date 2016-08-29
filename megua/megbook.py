@@ -516,6 +516,8 @@ class MegBook(MegSiacua):
 
         # Directory where exercises are stored
 
+        #print "megbook.py, new_exercise:",filename
+
         fullpath = os.path.join(
             MEGUA_EXERCISE_INPUT,
             filename)
@@ -539,6 +541,26 @@ class MegBook(MegSiacua):
                 htmlstr = u'<h4>%s (Latex)</h4>' % filename[0:-7]
                 
                 e_string = templates.render("megbook_exlatex.sagews",
+                    unique_name=filename[0:-7],
+                    megbookfilename=PROJECT_DATABASENAME, #self.local_store_filename,
+                    uuid1=uuid(),
+                    uuid2=uuid(),
+                    uuid3=uuid(),
+                    uuid4=uuid(),
+                    marker_cell=MARKERS["cell"],
+                    marker_output=MARKERS["output"],
+                    html=htmlstr,
+                    json_html=json.dumps({'html':htmlstr})
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            elif '_amc' in filename:
+                
+                htmlstr = u'<h4>%s (Latex for AMC)</h4>' % filename[0:-7]
+                
+                e_string = templates.render("megbook_examc.sagews",
                     unique_name=filename[0:-7],
                     megbookfilename=PROJECT_DATABASENAME, #self.local_store_filename,
                     uuid1=uuid(),
@@ -583,6 +605,8 @@ class MegBook(MegSiacua):
             else:
                 
                 print templates.render("megbook_new_exercise_usage.txt")
+                return
+                
             
         elif filename[-5:] == '.sage':
 
@@ -590,9 +614,21 @@ class MegBook(MegSiacua):
             # decision by exercise type
             # =====
 
+            #TODO: improve this
+
             if '_latex' in filename:
                 
                 e_string = templates.render("megbook_exlatex.sage",
+                    unique_name=filename[0:-5],
+                    megbookfilename=self.local_store_filename,
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            elif '_amc' in filename:
+                
+                e_string = templates.render("megbook_examc.sage",
                     unique_name=filename[0:-5],
                     megbookfilename=self.local_store_filename,
                 )
@@ -613,6 +649,7 @@ class MegBook(MegSiacua):
             else:
                 
                 print templates.render("megbook_new_exercise_usage.txt")
+                return
             
             
         else:

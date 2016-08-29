@@ -1,0 +1,57 @@
+{# see  megbook.print_instance() 
+
+Check this variables also:
+
+  from sage.misc.latex import LATEX_HEADER
+  from sage.misc.latex import COMMON_HEADER
+  from sage.misc.latex import latex_extra_preamble
+
+#}
+
+\documentclass{article}
+
+
+{% include 'common.tex' %}
+
+%Como instalar o automultiplechoice package no Windows ?
+\usepackage[box,completemulti]{automultiplechoice}
+\usepackage{amcpt}
+
+
+\pagestyle{empty}
+
+
+\oddsidemargin 0.0in
+\evensidemargin 0.0in
+\textwidth 6.45in
+\topmargin 0.0in
+\headheight 0.0in
+\headsep 0.0in
+\textheight 9.0in
+
+
+\begin{document}
+
+%LATEX DEBUG START {{unique_name}}
+
+{\centering\bf \verb"{{unique_name}}" }
+
+\noindent\textbf{Sumário}
+
+\begin{verbatim}
+{{summtxt}}
+\end{verbatim}
+
+\noindent\textbf{Problema ekey={{ ekey }} }
+
+{{probtxt}}
+
+\noindent\textbf{Resolução}
+
+{{answtxt}}
+
+%LATEX DEBUG END {{unique_name}}
+
+\end{document}
+
+

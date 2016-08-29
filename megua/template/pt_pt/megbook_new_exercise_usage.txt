@@ -1,15 +1,21 @@
-
-
+Instructions for a new file:
 $ megua new <filename>
 
     for cloud.sagemath.com system:
 
           <filename> is like  --  E12X34_name_001_latex.sagews
           <filename> is like  --  E12X34_name_001_siacua.sagews
+          <filename> is like  --  E12X34_name_001_amc.sagews
 
     for desktop (linux):
 
           <filename> is like  --  E12X34_name_001_latex.sage
           <filename> is like  --  E12X34_name_001_siacua.sage
+          <filename> is like  --  E12X34_name_001_amc.sage
 
+For mathematics: 
 
+"E12X34" must be replaced by the main code of the area:
+	http://www.ams.org/msc/msc2010.html
+
+Other areas, under request.
