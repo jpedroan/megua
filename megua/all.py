@@ -17,6 +17,7 @@ from megua.megbook import MegBook
 from megua.exbase import ExerciseBase
 from megua.exsiacua import ExSiacua
 from megua.exlatex import ExLatex
+from megua.ex_amc import ExAMC
 
 #Open the project database 
 #(see configuration in $HOME/.megua/conf.py or at megua/megua/sage bash)
