@@ -56,6 +56,57 @@ def inputfiles_status():
     else:
         search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sage")
 
+    #to search exercise code
+    re_save = re.compile(ur'save\(r\'\'\'(.+?)\'\'\'\)',re.IGNORECASE|re.U|re.M|re.S)
+        
+    for fn in glob.glob(search_pattern):
+
+        with open(fn,"r") as f:
+            exstr = f.read()
+            
+        #Parse contents
+        mobj = re_save.search(exstr)
+
+        if mobj:
+            #print mobj.groups()
+            uexercise = mobj.group(1)
+
+            #print uexercise
+            row =  parse_ex(to_unicode(uexercise))
+
+            if not row:
+                print "Check",fn,"(cannot save the exercise)."
+                continue
+
+            #print row["unique_name"]
+            
+            if not meg.megbook_store.get_classrow(row["unique_name"]):
+                print row["unique_name"],"is not in",PROJECT_DATABASE
+                
+        else:
+            print "\n",fn,"does not have 'save' command (it seems it does not have an exercise).\n"
+            
+
+
+def inputfiles_add():
+    """
+    Opens folder MEGUA_EXERCISE_INPUT and compares its files to
+    contents in database PROJECT_DATABASE, checking if:
+    - filename, without extension, is the name in save(...) part
+    - the exercise exists in db
+    - fields have changed
+    and warns the user of this events
+    
+    Types of files: *.sage and *.sagews
+    Check if MEGUA_PLATFORM="SMC" or "DESKTOP" (see templates/pt_pt/conf_megua.py)
+    
+    """
+    
+    if MEGUA_PLATFORM=="SMC":
+        search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sagews")
+    else:
+        search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sage")
+
 
     #to search exercise code
     re_save = re.compile(ur'save\(r\'\'\'(.+?)\'\'\'\)',re.IGNORECASE|re.U|re.M|re.S)
@@ -75,11 +126,19 @@ def inputfiles_status():
             #print uexercise
             row =  parse_ex(to_unicode(uexercise))
             
+            if not row:
+                print "Check",fn,"(cannot save the exercise)."
+                continue
+            
             if not meg.megbook_store.get_classrow(row["unique_name"]):
-                print row["unique_name"],"is not in",PROJECT_DATABASE
+                #meg.save(uexercise)        
+                ex_instance = meg.exerciseinstance(row,ekey=0)
+                #After all that, save it on database:                        
+                meg.megbook_store.insertchange(row)
                 
         else:
             print fn,"does not have 'save' command (it seems it does not have an exercise)."
             
+
 
 

@@ -50,7 +50,7 @@ import shutil
 
 #MEGUA modules
 #See main function for: from megua.all import *
-from megua.scripts.megsync import inputfiles_status
+from megua.scripts.megsync import inputfiles_status,inputfiles_add
 #The following import is placed where needed below 
 #from megua.all import meg
 
@@ -81,13 +81,15 @@ def usage(argv):
         print "  new <filename>      -- make new exercise file"  
         print "  catalog             -- produce a catalog based on exercises database"  
         print "  status              -- show unsyncronized worksheet exercise files"  
-    elif len(argv)==2 and not sys.argv[1] in ['catalog','new','status']:
+        print "  add                 -- add unsyncronized worksheet exercise files"  
+    elif len(argv)==2 and not sys.argv[1] in ['catalog','new','status','add']:
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
         print "Arguments:"
         print "  help catalog          -- calls help on command catalog"  
         print "  help new              -- calls help on command new"  
         print "  help status           -- calls help on command status"  
+        print "  add                   -- add unsyncronized worksheet exercise files"  
     elif len(argv)==3 and sys.argv[1]=='help' and sys.argv[2]=='catalog':
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
@@ -102,6 +104,7 @@ def usage(argv):
         print "2. when a record is in the database, checks if a filename exists."
         print "3. if 'status test' is given, and a filename is recorded in the database, checks if it runs properly."
         #TODO: 3. is not READY! Write more help above,  store help in templates, make 'test' option work
+        #TODO: a general help file is easy!
     elif len(argv)==2 and sys.argv[1]=='new':
         usage_new()
     elif len(argv)==3 and sys.argv[1]=='help' and sys.argv[2]=='new':
@@ -227,7 +230,7 @@ def main():
         return 0
 
 
-    if len(sys.argv)==1 or not sys.argv[1] in ['help','catalog','new','status']:
+    if len(sys.argv)==1 or not sys.argv[1] in ['help','catalog','new','status','add']:
         usage(sys.argv)
         return 0
 
@@ -241,6 +244,8 @@ def main():
         meg.catalog()
     elif sys.argv[1] == 'status':
         inputfiles_status()
+    elif sys.argv[1] == 'add':
+        inputfiles_add()
     elif sys.argv[1] == 'new':
         if len(sys.argv)<3: # or (len(sys.argv)==3 and not valid_filename(sys.argv[2])):
             usage(sys.argv)
