@@ -159,6 +159,8 @@ def inputfiles_add():
             if not meg.megbook_store.get_classrow(row["unique_name"]):
                 #meg.save(uexercise)        
                 ex_instance = meg.exerciseinstance(row,ekey=0)
+                if not ex_instance:
+                    continue
                 #After all that, save it on database:                        
                 meg.megbook_store.insertchange(row)
                 
@@ -174,7 +176,9 @@ def inputfiles_add():
             fn = os.path.join(MEGUA_EXERCISE_INPUT,row['unique_name']+'.sage')
             
         if not os.path.isfile(fn):
-            print "Exercise",row['unique_name'],"exists in",PROJECT_DATABASE,"but not in filesystem."
+            meg.megbook_store.rename(row['unique_name'],row['unique_name']+"_siacua",warn=False)
+            print "Exercise",row['unique_name'],"in",PROJECT_DATABASE,"is now", row['unique_name']+"_siacua"
+            #print "Exercise",row['unique_name'],"exists in",PROJECT_DATABASE,"but not in filesystem."
 
 
 
