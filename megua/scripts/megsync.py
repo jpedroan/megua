@@ -36,6 +36,7 @@ from megua.megoptions import PROJECT_DATABASE, MEGUA_EXERCISE_INPUT, MEGUA_PLATF
 from megua.parse_ex import parse_ex
 from megua.tounicode import to_unicode
 from megua.all import meg
+from megua.localstore import ExIter
 
 def inputfiles_status():
     """
@@ -51,11 +52,19 @@ def inputfiles_status():
     
     """
     
+    
+    
     if MEGUA_PLATFORM=="SMC":
         search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sagews")
     else:
         search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sage")
 
+
+    print "="*23+"\n"
+    print "Check files that are not in the database."
+    print "="*23+"\n"
+
+    
     #to search exercise code
     re_save = re.compile(ur'save\(r\'\'\'(.+?)\'\'\'\)',re.IGNORECASE|re.U|re.M|re.S)
         
@@ -85,6 +94,23 @@ def inputfiles_status():
                 
         else:
             print "\n",fn,"does not have 'save' command (it seems it does not have an exercise).\n"
+
+
+    print "="*23+"\n"
+    print "Check records in the database that are not in the files."
+    print "="*23+"\n"
+
+    #Check db for records and verify if they exist as a file
+    for row in ExIter(meg.megbook_store):
+        if MEGUA_PLATFORM=="SMC":
+            fn = os.path.join(MEGUA_EXERCISE_INPUT,row['unique_name']+'.sagews')
+        else:
+            fn = os.path.join(MEGUA_EXERCISE_INPUT,row['unique_name']+'.sage')
+            
+        if not os.path.isfile(fn):
+            print "Exercise",row['unique_name'],"exists in",PROJECT_DATABASE,"but not in filesystem."
+            
+            
             
 
 
@@ -139,6 +165,17 @@ def inputfiles_add():
         else:
             print fn,"does not have 'save' command (it seems it does not have an exercise)."
             
+
+    #Check db for records and verify if they exist as a file
+    for row in ExIter(meg.megbook_store):
+        if MEGUA_PLATFORM=="SMC":
+            fn = os.path.join(MEGUA_EXERCISE_INPUT,row['unique_name']+'.sagews')
+        else:
+            fn = os.path.join(MEGUA_EXERCISE_INPUT,row['unique_name']+'.sage')
+            
+        if not os.path.isfile(fn):
+            print "Exercise",row['unique_name'],"exists in",PROJECT_DATABASE,"but not in filesystem."
+
 
 
 
