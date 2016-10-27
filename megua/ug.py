@@ -65,7 +65,7 @@ Defining a new exercise template:
 Plot using embed images with base64 and svg:
        
 ::
-
+open /projects/69b82f4f-dc00-498d-817e-f3575041e14e/.local/lib/python2.7/site-packages/megua/ug.py
        sage: ex = DrawSegment(ekey=0)
        sage: #ex.print_instance() #render = base64, long textual answer
        
@@ -183,8 +183,8 @@ from megua.platex import pcompile
 import os
 
 #TODO: postponed because of problems with python setup.py install
-#import PIL.Image
 #import aalib
+import PIL.Image
 
 import re
 import subprocess
