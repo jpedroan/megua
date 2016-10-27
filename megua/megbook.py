@@ -1285,8 +1285,15 @@ class MegBook(MegSiacua):
 
 
         #Compile two times because of TableOfContents  \toc
-        pcompile(latex_text, MEGUA_EXERCISE_CATALOGS, "catalog.tex")
-        pcompile(latex_text, MEGUA_EXERCISE_CATALOGS, "catalog.tex")
+        try:
+            pcompile(latex_text, MEGUA_EXERCISE_CATALOGS, "catalog.tex")
+            pcompile(latex_text, MEGUA_EXERCISE_CATALOGS, "catalog.tex")
+        except:
+            print "="*30
+            print "megbook.py: file catalog.tex need to be edited."
+            print CATALOG_TEX_PATHNAME
+            print "="*30
+            return
 
 
         if MEGUA_PLATFORM=='SMC':
