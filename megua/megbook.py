@@ -1628,7 +1628,7 @@ class MegBook(MegSiacua):
 
             #TODO: temporary while siacua unique_keys don't have "_siacua" at end
             #TODO: se no SIACUA, o unique_name for E12X34_nome_001_siauca_disciplina da mal. Deve ser "disciplina_nome_siacua"!
-            if uniquename_ekey[0][-7] == '_siacua':
+            if uniquename_ekey[0][-7:] == '_siacua':
                 unique_name = uniquename_ekey[0]
             else:
                 unique_name = uniquename_ekey[0]+'_siacua'

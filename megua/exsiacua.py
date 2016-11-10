@@ -596,7 +596,7 @@ class ExSiacua(ExerciseBase):
             print "Please do 'meg.siacua?' in a cell for usage details."
             return
         
-        all_answers = []        
+        all_answers = []
         
         for e_number in ekeys:
 
@@ -634,6 +634,7 @@ class ExSiacua(ExerciseBase):
             #Call siacua for store.
             if sendpost:
                 send_dict.update(dict({'usernamesiacua': usernamesiacua}))
+                print "exsiacua.py: send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
                 all_answers.append( self._siacua_send(send_dict) )
             else:
                 print "Not sending to siacua. Dictionary is", send_dict
@@ -715,7 +716,7 @@ class ExSiacua(ExerciseBase):
 
         else:
 
-            print "Could not send %s exercise to the server." % send_dict["exname"]
+            print "Could not send exercise to the server: %s" % str(send_dict)
             print response.status, response.reason
 
         conn.close()
@@ -723,7 +724,7 @@ class ExSiacua(ExerciseBase):
         #TODO: improve this because it's only one sent!
         #It's only one exercise sent, each call of this function
         if response.status==200:
-            return all_ids[0]
+            return str(all_ids)
         else:
             return 'Not sent: ekey={}'.format(send_dict["ekey"])
 
