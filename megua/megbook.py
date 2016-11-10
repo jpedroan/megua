@@ -1549,39 +1549,38 @@ class MegBook(MegSiacua):
 
         TEM QUE SEGUIR ESTE FORMATO
         send_dict = { "course": "calculo2", "concept_id": 234, "num_questions": 10, "siacua_key": SIACUA_WEBKEY  }
-           
+
         NO SIACUA:
         - de momento só vai buscar exercícios marcados como disponíveis para os alunos no siacua;  
         - Futuro: melhorar a catalogação para disponível/por rever/escondido para avaliação/ .....
-        
+
 
         Examples:
-        
+
         (sage:) from megua.all import *
         (sage:) meg.fast_exam_siacua(course="calculo2", concept_id=100, num_questions=10)
 
         About strings:        
         http://stackoverflow.com/questions/24804453/how-can-i-copy-a-python-string
-        
+
         """
-        
+
         #TODO Parameter Validation (improve this simple idea)
-        
+
         exstate = exstate.lower() #  letters "VHN" to "vhn"
-        exs = ''.join(exstate) #duplicate string
+        exs = ''.join(exstate) #duplicate stringnum_questions
         exs = re.sub("[vhn]","",exs)
         if exs != "":
             print "Megbook.py say: exstate parameter must be a string with only 'vhn' chars."
 
-
         send_dict = { 
             "course": course, 
             "concept_id": concept_id, 
-            "num_questions": num_questions, 
-            "siacua_key": environ["SIACUA_WEBKEY"],
+            "num_questions": num_questions * 2, #requests more exercises because some 
+                                                #of them could be in siacua but on in database
+            "siacua_key": SIACUA_WEBKEY,
             "siacuatest": siacuatest,
             "exstate": exstate,
-            
         }
 
         params = urllib.urlencode(send_dict)
@@ -1593,14 +1592,13 @@ class MegBook(MegSiacua):
             conn = httplib.HTTPConnection("siacua.web.ua.pt")
         conn.request("POST", "/FastExam.aspx", params, headers)
         response = conn.getresponse()
-        
+
         #print response.read()    
         if response.status!=200:
             print "Could not get an exam from server."
             print response.status, response.reason
             conn.close()
             return
-            
         #print 'Sent to server:  "', send_dict["exname"], '" with ekey=', send_dict["ekey"] 
         #print response.status, response.reason
         #TODO: remove extra newlines that the user sees on notebook.
@@ -1609,44 +1607,72 @@ class MegBook(MegSiacua):
         #parse response (see DEVELOPMENT notes above)
         pos = data.find("<")
         data = data[:pos] #remove <form ....> part!
-        print "Response from Siacua:"
-        print data
-        print "========"
-
+        #print "Response from Siacua:"
+        #print data
+        #print "========"
+        s = "System siacua (or siacuatest) has randomly collected, according to bayesian tree with weigths, the following exercises:"
+        print "="*len(s)
+        print s
+        print "="*len(s),"\n"
+        
 
         #Join all questions
-        lts = u'\\begin{enumerate}\n\n'            
+        lts = u'\\begin{enumerate}\n\n'
         ex_list = eval(data) #creates the list
 
+        #requests more exercises because some of them could be in siacua but on in database
+        count = 0 
+        
         for uniquename_ekey in ex_list:
-            
-            print "megbook.py module say: generating exercise %s." % uniquename_ekey 
-            
-            unique_name = uniquename_ekey[0]
+
+
+            #TODO: temporary while siacua unique_keys don't have "_siacua" at end
+            #TODO: se no SIACUA, o unique_name for E12X34_nome_001_siauca_disciplina da mal. Deve ser "disciplina_nome_siacua"!
+            if uniquename_ekey[0][-7] == '_siacua':
+                unique_name = uniquename_ekey[0]
+            else:
+                unique_name = uniquename_ekey[0]+'_siacua'
+
             ekey = uniquename_ekey[1]
+
+            print "megbook.py module say: generating exercise %s." % unique_name, "with ekey=",ekey, "\n\n"
+
             ex = self.new(unique_name,ekey=ekey,returninstance=True)
+
+            #print ex
             
+            if not ex:
+                print "megbook.fast_exam_siacua: exercise", unique_name, "is not on database."
+                continue
+
             ex_str = templates.render("megbook_catalog_instance.tex",
-                    exformat="siacua",
+                    exformat ="siacua",
                     unique_name_noslash = unique_name.replace("_","\_"),
                     summary = ex.summary(),
                     suggestive_name = ex.suggestive_name(),
                     problem = ExSiacua.to_latex(ex.problem()), 
                     answer = ExSiacua.to_latex(ex.answer()) 
             )
-            
-            print "type of ex.summary() is", type( ex.summary() )
+
+            #print "type of ex.summary() is", type( ex.summary() )
             lts += u'\n\\item '
             lts += ex_str
+            count = count + 1
             
+            #requests more exercises because some of them could be in siacua but on in database
+            if count == num_questions:
+                break
+
         lts += ur'\n\\end{enumerate}\n\n'
-        
+
         latex_string =  templates.render("megbook_fastexam_latex.tex",
                          exerciseinstanceslatex=lts)
 
-
-        EXAM_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.tex")
-        EXAM_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.pdf")
+        #SMC open_tab need the path to be relative to working directory:
+        #EXAM_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.tex")
+        #EXAM_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,"exam.pdf")
+        EXAM_TEX_PATHNAME = "exam.tex"
+        EXAM_PDF_PATHNAME = "exam.pdf"
 
         #Tirar isto
         f = codecs.open(EXAM_TEX_PATHNAME+"lixo", mode='w+', encoding='utf8')
@@ -1659,20 +1685,24 @@ class MegBook(MegSiacua):
         f.close()
 
         #TODO: convert all os.system to subprocess.call or subprocess.Popen
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"exam.tex") )
-        os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOG,"exam.tex") )
+        #os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOGS,"exam.tex") )
+        #os.system("cd '%s'; pdflatex -interaction=nonstopmode %s 1> /dev/null" % (MEGUA_EXERCISE_CATALOGS,"exam.tex") )
+        os.system("pdflatex -interaction=nonstopmode %s 1> /dev/null" % "exam.tex" )
+        os.system("pdflatex -interaction=nonstopmode %s 1> /dev/null" % "exam.tex" )
 
 
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus
             if salvus:
+                print "Check exam PDF file:"
                 salvus.file(EXAM_PDF_PATHNAME,show=True,raw=True); print "\n"
+                print "Save tex file to your computer to improve the text at",EXAM_TEX_PATHNAME
                 salvus.file(EXAM_TEX_PATHNAME,show=True,raw=True); print "\n"
                 salvus.open_tab(EXAM_TEX_PATHNAME)
             else:
                 sys.path.append('/usr/local/lib/python2.7/dist-packages')
                 from smc_pyutil import smc_open
-                smc_open.process([CATALOG_TEX_PATHNAME])
+                smc_open.process([EXAM_TEX_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
             print "MegBook module say: evince ",EXAM_PDF_PATHNAME
             subprocess.Popen(["evince",EXAM_PDF_PATHNAME])

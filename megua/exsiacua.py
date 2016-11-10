@@ -691,15 +691,16 @@ class ExSiacua(ExerciseBase):
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         if send_dict["siacuatest"]:
             conn = httplib.HTTPConnection("siacuatest.web.ua.pt")
-        else:  
+        else:
             conn = httplib.HTTPConnection("siacua.web.ua.pt")
         conn.request("POST", "/MeguaInsert.aspx", params, headers)
         response = conn.getresponse()
         #TODO: improve message to user.
         if response.status==200:
+
             #print 'Sent to server:  "', send_dict["exname"], '" with ekey=', send_dict["ekey"] 
             #print response.status, response.reason
-        
+
             #TODO: format this output to extract only the <id> 3883 in siacua:
             #TODO: Resultado: <span id="resultado">Muito bem, melhorou o exercício, parabéns! id=3883</span>
             data = response.read()
@@ -712,15 +713,16 @@ class ExSiacua(ExerciseBase):
             match_iter = re.finditer(choice_pattern,data) 
             all_ids = [ "{} {}".format(akword,match.group(1)) for match in match_iter] #TODO: do this better
 
-                
         else:
+
             print "Could not send %s exercise to the server." % send_dict["exname"]
             print response.status, response.reason
 
         conn.close()
         
+        #TODO: improve this because it's only one sent!
         #It's only one exercise sent, each call of this function
-        if all_ids:
+        if response.status==200:
             return all_ids[0]
         else:
             return 'Not sent: ekey={}'.format(send_dict["ekey"])
