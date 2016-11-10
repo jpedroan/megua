@@ -1384,7 +1384,7 @@ class MegBook(MegSiacua):
         except:
             print "="*30
             print "megbook.py: file %s need to be edited." % (ofilename+'.tex')
-            print CATALOG_TEX_PATHNAME
+            print DOC_LATEX_PATHNAME
             print "="*30
             return
 
