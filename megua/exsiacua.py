@@ -230,6 +230,8 @@ from megua.megoptions import *
 
 class ExSiacua(ExerciseBase):    
 
+    def __init__(self,ekey=None, edict=None, rendermethod='imagefile',dimx=150,dimy=150,dpi=100):
+        ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
 
     def update(self,ekey=None,edict=None, render_method=None):
 
@@ -639,16 +641,39 @@ class ExSiacua(ExerciseBase):
         if all_answers:
             print all_answers
 
-    #TODO: tirar isto.
+
     def _send_images(self):
         """Send images to siacua: now is to put them in a drpobox public folder"""
         # AttributeError: MegBookWeb instance has no attribute 'image_list'
         #for fn in self.image_list:
         #    os.system("cp -uv _images/%s.png /home/nbuser/megua_images" % fn)
-        os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
-
+        #
+        #TUNE this:os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
+        import request
+        
 
     def _adjust_images_url(self, input_text):
+        """the url in problem() and answer() is <img src='_images/filename.png'>
+        Here we replace _images/ by the public dropbox folder"""
+
+        target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
+        img_pattern = re.compile(r"src='_images/", re.DOTALL|re.UNICODE)
+
+        (new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
+        #print "===> Replacement for %d url images." % number
+        return new_text
+
+
+
+    def _send_images_dropbox(self):
+        """Send images to siacua: now is to put them in a drpobox public folder"""
+        # AttributeError: MegBookWeb instance has no attribute 'image_list'
+        #for fn in self.image_list:
+        #    os.system("cp -uv _images/%s.png /home/nbuser/megua_images" % fn)
+        #
+        #TUNE this:os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
+
+    def _adjust_images_url_dropbox(self, input_text):
         """the url in problem() and answer() is <img src='_images/filename.png'>
         Here we replace _images/ by the public dropbox folder"""
 

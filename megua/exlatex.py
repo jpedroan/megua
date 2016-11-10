@@ -75,6 +75,8 @@ from megua.megoptions import *
 
 class ExLatex(ExerciseBase):
 
+    def __init__(self,ekey=None, edict=None, rendermethod='includegraphics',dimx=150,dimy=150,dpi=100):
+        ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
 
 
     def _latex_string(self):

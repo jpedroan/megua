@@ -41,7 +41,7 @@ Create or edit a database:
 Save a new or changed exercise:
 
 ::
-
+ qualquer 
    sage: meg.save(r'''
    ....: %Summary Primitives
    ....: Here one can write few words, keywords about the exercise.
@@ -1311,6 +1311,196 @@ class MegBook(MegSiacua):
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:
             print "megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py"
+
+
+
+
+    def latex_document(self, latexdocument, exercisetemplate=None, ofilename='latex_document.tex', ekey=None):
+        r"""
+        Create LaTeX documents. Exercises are obtained with  `{{ put_here(...) }}` commands.
+
+        INPUT:
+
+        - ``latexdocument``: (string) contains the LaTeX to be compiled. Each exercise is obtained from database with `{{ put_here(...) }}` commands.
+
+        - ``exercisetemplate``: (string) defines how and what is to be shown from each exercise.
+
+        - ``ofilename``: (string) output filename (without extension)
+
+        - ``ekey``: if `{{ put_here(...) }}`` commands do not mention ekey then generate ekeys setting this. 
+
+        EXAMPLE:
+
+            sage: ltdoc = r'''\documentclass{article} ....  {{ put_here("E12X34_soma_001",10) }} ....'''
+            sage: meg.latex_document(ltdoc)
+
+        NOTES:
+        
+            - Another possibility: {{ put_here("E65D05_forwarddifference_001",ekey=10,meg.SUMMARY|meg.PROBLEM|meg.ANSWER|meg.CODE) }}
+
+            - http://jinja.pocoo.org/docs/templates/#assignments
+
+        """
+
+
+        #Get unicode and make a jinja2 template
+        utxt = unicode(latexdocument,'utf-8')
+        latexdoc_template = jinja2.Template(utxt)
+
+        #Set seed
+        if ekey:
+            ur.start_at(ekey)
+
+        #Render output using the given template for each exercise.
+        #get a value for self.template_row
+        if exercisetemplate is None:
+            try:
+                self.template_row = templates.get_template("row_template.tex")
+            except jinja2.exceptions.TemplateNotFound:
+                return "megbook.py say: missing template %s"%filename
+        else:
+            #Check or convert rowtemplate to unicode
+            try:
+                self.rowtemplate = unicode(exercisetemplate,'utf-8')
+            except TypeError:
+                self.rowtemplate = exercisetemplate
+            self.template_row = jinja2.Template(exercisetemplate)
+
+
+        #Create a latex string s ready to compile.
+        doc_latex = latexdoc_template.render(put_here=self.put_here)
+
+        #Create new file and save string s.
+        #fp = open(ofilename,'w')
+        #fp.write( s.encode('utf-8') )
+        #res = fp.close()
+
+        DOC_LATEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,ofilename+'tex')
+        DOC_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,ofilename+'.pdf')
+
+
+        try:
+            pcompile(doc_latex, MEGUA_EXERCISE_CATALOGS, ofilename)
+        except:
+            print "="*30
+            print "megbook.py: file %s need to be edited." % (ofilename+'.tex')
+            print CATALOG_TEX_PATHNAME
+            print "="*30
+            return
+
+
+        if MEGUA_PLATFORM=='SMC':
+            from smc_sagews.sage_salvus import salvus
+            if salvus:
+                salvus.file(DOC_PDF_PATHNAME,show=True,raw=True); print "\n"
+                salvus.file(DOC_LATEX_PATHNAME,show=True,raw=True); print "\n"
+                salvus.open_tab(DOC_PDF_PATHNAME)
+            else:
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([DOC_PDF_PATHNAME])
+        elif MEGUA_PLATFORM=='DESKTOP':
+            print "MegBook module say: evince ",DOC_PDF_PATHNAME
+            subprocess.Popen(["evince",DOC_PDF_PATHNAME])
+        else:
+            print "megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py"
+
+
+
+    def put_here(self,unique_name, ekey=None, edict=None, elabel="NoLabel", em=True):
+        r"""
+        Create an instance based on a template with key=owner_keystring.
+        This routine is used on templates only.
+
+        INPUT:
+
+        - ``owner_keystring`` -- the exercise key.
+        - ``ekey`` -- random seed.
+        - ``edict`` -- dictionary to be used after random initialization of ex parameters.
+        - ``elabel`` -- to be used for "\label" or "\ref" in LaTeX.
+        - ``automc`` -- automatic multiple choice (chooses possibilities and prints them) (true ou false).
+
+        OUTPUT:
+            text string.
+
+        NOTES: to be used with `template_create`.
+
+        """
+
+        #Get summary, problem and answer and class_text
+        #Field row['class_text'] is needed to render the template. See below.
+        row = self.megbook_store.get_classrow(unique_name)        
+        if not row:
+            #TODO: passar a raise Error
+            print "%s cannot be accessed on database" % unique_name
+            return "\n\n\\vspace*{1cm}%s cannot be accessed on database.\n\n\\vspace*{1cm}\n\n" % latexunderscore(unique_name)
+
+           
+        #Get summary, problem and answer and class_text
+        ex = self.new(unique_name,ekey,edict,returninstance=True)
+        
+        if ExLatex in ex.__class__.__bases__:
+            #TODO: incluir tipo no template e na section acima
+            ex_str = self.template_row.render(
+                exformat="latex",
+                unique_name=unique_name,
+                unique_name_noslash = latexunderscore(unique_name),
+                summary = to_unicode(ex.summary()),
+                #section=section, #todo fields:
+                #subsection=subsection,
+                #subsubsection=subsubsection,
+                suggestive_name = ex.suggestive_name(),
+                problem = ex.problem(),
+                answer = ex.answer(),
+                #code                
+                problemtemplate = to_unicode( ex_instance._problem_text ), 
+                answertemplate  = to_unicode( ex_instance._answer_text ), 
+                codetxt =  to_unicode( row['class_text'] ), 
+                #what is this : elabel  =  elabel,
+                ekey = ekey
+            )
+        elif ExSiacua in ex.__class__.__bases__:
+            #TODO: incluir tipo no template e na section acima
+            ex_str = self.template_row.render(
+                exformat="siacua",
+                unique_name=unique_name,
+                unique_name_noslash = latexunderscore(unique_name),
+                summary = to_unicode(ex.summary()),
+                #section=section, #todo fields:
+                #subsection=subsection,
+                #subsubsection=subsubsection,
+                suggestive_name = ex.suggestive_name(),
+                problem = ExSiacua.to_latex(ex.problem()),  #u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
+                answer = ExSiacua.to_latex(ex.answer()),    #u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
+                #code                
+                problemtemplate = to_unicode( ex._problem_text ), 
+                answertemplate  = to_unicode( ex._answer_text ), 
+                codetxt =  to_unicode( row['class_text'] ), 
+                #what is this : elabel  =  elabel,
+                ekey = ekey
+            )
+        else:
+            #TODO: incluir tipo no template e na section acima
+            ex_str = self.template_row.render(
+                exformat="textual (exbase)",
+                unique_name=unique_name,
+                unique_name_noslash = latexunderscore(unique_name),
+                summary = to_unicode(ex.summary()),
+                #section=section,
+                #subsection=subsection,
+                #subsubsection=subsubsection,
+                suggestive_name = ex.suggestive_name(),
+                problem = u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
+                answer = u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n',
+                #code                
+                problemtemplate = to_unicode( ex._problem_text ), 
+                answertemplate  = to_unicode( ex._answer_text ), 
+                codetxt =  to_unicode( row['class_text'] ), 
+                #what is this : elabel  =  elabel,
+                ekey = ekey
+            )
+
+        return ex_str
 
 
 

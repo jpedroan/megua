@@ -200,6 +200,7 @@ class UnifiedGraphics:
         self.render_method(rendermethod)
         
         #default values
+        #TODO: specify units !!
         self.dimx = dimx
         self.dimy = dimy
         self.dpi = dpi
@@ -214,7 +215,7 @@ class UnifiedGraphics:
 
     #TODO: tirar este método
     def render_method(self,rendermethod=None):
-        if rendermethod in ['imagefile', 'base64', 'asciiart']:
+        if rendermethod in ['includegraphics','imagefile', 'base64', 'asciiart']:
             self._rendermethod = rendermethod
             return self._rendermethod
         elif not rendermethod:
@@ -273,6 +274,8 @@ class UnifiedGraphics:
 
         if self._rendermethod=='imagefile':
             return r"\n<img src='%s' alt='%s' height='%d' width='%d'></img>\n" % (pathname,gfilename+' graphic',dimx,dimy)
+        elif self._rendermethod=='includegraphics':
+            return "\n\\includegraphics[height=%din,width=%din]{%s}\n" % (dimy,dimx,pathname)
         elif self._rendermethod=='asciiart':
             print "ug.py say: 'asciiart' is not yet implemented"
             #screen = aalib.AsciiScreen(width=dimx, height=dimy)
