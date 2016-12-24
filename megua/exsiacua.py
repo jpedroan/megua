@@ -315,6 +315,8 @@ class ExSiacua(ExerciseBase):
 
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus
+            #SMC assumes relative pathnames (relative to home)
+            #html_string = re.sub(os.environ["HOME"]+'/',"../",html_string)
             salvus.html(html_string)
         elif MEGUA_PLATFORM=='DESKTOP':
             print "Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME

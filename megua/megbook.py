@@ -855,9 +855,12 @@ class MegBook(MegSiacua):
                     print '======= end of warning list =========='
 
         except SyntaxError as s:
-            print 'MegBook.py say: exercise "%s" causes a syntatical error and needs review! See below.' % row['unique_name']
-            print 'See line %d in file "%s".' % (s.lineno,cfilename)
-            display_syntaxerror(s,code_string)
+            print 'MegBook.py say: exercise "%s" causes a syntatical error and needs review! See below.\n' % row['unique_name']
+            if s.lineno:
+                print 'See line %d in file "%s".' % (s.lineno,cfilename)
+                display_syntaxerror(s,code_string)
+            else:
+                print 'See file "%s".' % (cfilename)                    
             raise s
         
         

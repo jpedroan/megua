@@ -12,7 +12,7 @@ DISCUSSION:
 
 Image sources are:
 
-- sage commands (plots, graphcs, etc)
+- sage commands (plots, graphs, etc)
 - R commands
 - Static images
 - Python Matplotlib and other python libs
@@ -27,6 +27,15 @@ Exporting them to:
 - folder of images for some exercise (for example, a latex document)
 - filesystem or database
 
+Render methods:
+
+image files are stored in 
+
+- 'includegraphics': 
+- 'imagefile'
+- 'base64'
+- 'asciiart'
+
 
 EXAMPLES:
 
@@ -37,10 +46,10 @@ Test examples using:
 
     sage -t ug.py
 
-    
+
 Defining a new exercise template:
-    
-::    
+
+::
 
     sage: from megua.exbase import ExerciseBase
     sage: class DrawSegment(ExerciseBase):
@@ -63,13 +72,13 @@ Defining a new exercise template:
 
 
 Plot using embed images with base64 and svg:
-       
+
 ::
-open /projects/69b82f4f-dc00-498d-817e-f3575041e14e/.local/lib/python2.7/site-packages/megua/ug.py
+
        sage: ex = DrawSegment(ekey=0)
        sage: #ex.print_instance() #render = base64, long textual answer
-       
-Plot using file and <img> tag:       
+
+Plot using file and <img> tag:
 
 ::
 
@@ -84,11 +93,11 @@ Plot using file and <img> tag:
        Draw the segment 1 + (-7)x for x in [-4,2].
        ==> Answer instance
        <p>\n<img src='_output/DrawSegment/DrawSegment-fig1-0.png' alt='DrawSegment-fig1-0.png graphic' height='50' width='50'></img>\n</p><p>\n<img src='_output/DrawSegment/sage-sticker-1x1_inch-small.png' alt='sage-sticker-1x1_inch-small.png graphic' height='50' width='50'></img>\n</p>
-       
+
 Plot using ascii art:
-       
+
 ::
-       
+
        sage: ex.update(ekey=0,render_method="asciiart") #must be called to update graphic links
        sage: #ex.print_instance() #long output
 
@@ -97,7 +106,7 @@ Using LaTeX to generate graphics or extractions from LaTeX:
 ::
 
        sage: class LaTexBasedImages(ExerciseBase):
-       ....:     #class variables   
+       ....:     #class variables
        ....:     _unique_name  = "LaTexBasedImages"
        ....:     _suggestive_name = "LaTex Based Images"
        ....:     _summary_text = "LaTex Based Images."
@@ -119,7 +128,7 @@ Example with an ascii art graphic:
 ::
 
        sage: class UnitCircle(ExerciseBase):
-       ....:     #class variables   
+       ....:     #class variables
        ....:     _unique_name  = "UnitCircle"
        ....:     _suggestive_name = "Draw a segment."
        ....:     _summary_text = "Plot a Circle"
@@ -129,7 +138,7 @@ Example with an ascii art graphic:
        ....:        c = circle( (0,0),1,thickness=2,fill=True,facecolor='black')
        ....:        c.axes(False)
        ....:        self.plot1 = self.sage_graphic(graphobj=c,varname="plot1",dimx=10,dimy=10)
-       sage: ex = UnitCircle(ekey=0,rendermethod="asciiart")   
+       sage: ex = UnitCircle(ekey=0,rendermethod="asciiart")
        sage: print ex.answer() #expected graphic in asciiart
        <BLANKLINE>
        QQQQ??4QQQ
@@ -144,9 +153,9 @@ Example with an ascii art graphic:
        QQga  _wQQ
        <BLANKLINE>
        sage: print ex.image_pathnames
-       ['_output/UnitCircle/UnitCircle-plot1-0.png']       
+       ['_output/UnitCircle/UnitCircle-plot1-0.png']
 
-       
+
 DEVELOPMENT:
 
 Install aalib insto SageMath using this:
@@ -198,18 +207,17 @@ class UnifiedGraphics:
 
         #embed images in html (or other source)
         self.render_method(rendermethod)
-        
+
         #default values
         #TODO: specify units !!
         self.dimx = dimx
         self.dimy = dimy
         self.dpi = dpi
-        
+
         assert(imagedirectory)
-        self.imagedirectory = imagedirectory        
+        self.imagedirectory = imagedirectory
         self.image_pathnames = []
-        
-        
+
 
 
 
@@ -228,7 +236,7 @@ class UnifiedGraphics:
         return "UnifiedGraphics"
 
 
-    def __repr__(self): 
+    def __repr__(self):
         return "UnifiedGraphics({0})".format(self.__dict__)
 
 
@@ -249,33 +257,40 @@ class UnifiedGraphics:
         - svg tag and a large base64 string
         - <img> tag pointing to a file on directory system
         - asciiart string.
-        
+
         This method also adds the gfilename to exericse own image list.
-        
+
         Dimensions the image to dimx and dimy!
         """
 
         assert(gfilename)
-        
+        #print "ug.py say: gfilename=",gfilename
         pathname  = os.path.join(self.imagedirectory,gfilename)
+        #print "ug.py say:",pathname
         self.image_pathnames.append(pathname) 
 
         #Get dimensions
         if dimsfromimage:
             (dimx,dimy) = PIL.Image.open(pathname).size
-            
+
         if not dimx:
-            dimx = self.dimx            
+            dimx = self.dimx
         if not dimy:
             dimy = self.dimy
         if not dpi:
-            dpi = self.dpi            
-            
+            dpi = self.dpi
+
 
         if self._rendermethod=='imagefile':
-            return r"\n<img src='%s' alt='%s' height='%d' width='%d'></img>\n" % (pathname,gfilename+' graphic',dimx,dimy)
+            #WARNING: before was "(pathname,gfilename+' graphic',dimx,dimy)" and now is "(gfilename,gfilename+' graphic',dimx,dimy)"
+            #Assuming that the image is in same directory has the html file.
+            rtxt = "\n"+r"<img src='%s' alt='%s' height='%d' width='%d'></img>" % (pathname,gfilename+' graphic',dimx,dimy) + "\n"
+            #print "ug.py say:",rtxt
+            return rtxt
         elif self._rendermethod=='includegraphics':
-            return "\n\\includegraphics[height=%din,width=%din]{%s}\n" % (dimy,dimx,pathname)
+            #WARNING: before was "(dimy,dimx,pathname)" and now is "(dimy,dimx,gfilename)"
+            #Assuming that the image is in same directory has the LaTeX file.
+            return "\n\\includegraphics[height=%din,width=%din]{%s}\n" % (dimy,dimx,gfilename)
         elif self._rendermethod=='asciiart':
             print "ug.py say: 'asciiart' is not yet implemented"
             #screen = aalib.AsciiScreen(width=dimx, height=dimy)
@@ -291,7 +306,7 @@ class UnifiedGraphics:
                                        dimy=dimy,
                                        base64=data_uri)
             return img_tag
-        else:    
+        else:
             raise("ug momdule: render method not implemented.")
 
 
@@ -335,19 +350,20 @@ class UnifiedGraphics:
 
         - `dimx` and `dimy`: size in centimeters.
 
-        """ 
+        """
 
-        gfilename = '%s-%s-%d.png'%(self.unique_name(),varname,self.get_ekey())
+        gfilename = '%s-%s-%d.svg'%(self.unique_name(),varname,self.get_ekey())
         #create if does not exist the "image" directory
         #os.system("mkdir -p images") #The "-p" ommits errors if it exists.
 
         #graphobj could be sage or matplotlib object.
 
         if type(graphobj)==sage.plot.graphics.Graphics:
-            graphobj.save(
-                os.path.join(self.imagedirectory,gfilename),
-                figsize=(dimx,dimy), #figsize=(dimx/2.54,dimy/2.54),
-                dpi=dpi)
+            #graphobj.save(
+            #    os.path.join(self.imagedirectory,gfilename),
+            #    figsize=(dimx,dimy), #figsize=(dimx/2.54,dimy/2.54),
+            #    dpi=dpi)
+            graphobj.save_image(os.path.join(self.imagedirectory,gfilename))
         else: #matplotlib assumed
             #http://stackoverflow.com/questions/9622163/matplotlib-save-plot-to-image-file-instead-of-displaying-it-so-can-be-used-in-b
             import matplotlib.pyplot as plt
@@ -355,7 +371,7 @@ class UnifiedGraphics:
             fig = plt.gcf() #Get Current Figure: gcf
             fig.set_size_inches(dimx,dimy) #(dimx/2.54,dimy/2.54)
             savefig(os.path.join(self.imagedirectory,gfilename)) #,figsize=(dimx/2.54,dimy/2.54),dpi=100)
-            
+
         return self._render(gfilename, dimx,dimy)
 
 
@@ -364,38 +380,38 @@ class UnifiedGraphics:
         * all tag pairs <latex percent%> ... </latex> that 
            are present in `input_text` are replaced by "images" created from 
            the LaTeX inside tag pairs and a `new_text` is returned.
-        
+
         INPUT:
-        
+
         - `input_text` -- some text (problem or answer) eventually with <latex percent%> ... </latex> tags.
-        
+
         OUTPUT:
-        
+
         - `string` -- with images created from latex inside tags
 
         NOTE:
-        
+
         - Dimensions are specifyed in each <latex tag> and not in dimx=150,dimy=150.
-        
+
         DEVELOPER NOTES:
-        
+
         - check LATEXIMG.PY
         - important \\ and \{
         - old pattern:
             - tikz_pattern = re.compile(r'\\begin\{tikzpicture\}(.+?)\\end\{tikzpicture\}', re.DOTALL|re.UNICODE)
-            
+
         Latex packages:
         - standalone: cuts "paper" around the tikzpicture (and other environments) 
         - adjustbox package: http://mirrors.fe.up.pt/pub/CTAN/macros/latex/contrib/adjustbox/adjustbox.pdf
 
         About the standalone package:
-        
+
         - \documentclass[varwidth=true, border=10pt, convert={density=100,outfile="gfilename.png"} ]{standalone}
         - the above command generates a gfilename.png but needs --shell_escape in pdflatex command.
 
         old way to convert latex/tikz to png:
 
-        ::        
+        ::
                 #The following is done by standalone package:
                 ##convert -density 600x600 pic.pdf -quality 90 -resize 800x600 pic.png
                 ##cmd = "cd _images;convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
@@ -404,9 +420,9 @@ class UnifiedGraphics:
                 #os.system(cmd)
                 #os.system("cp _images/%s.tex ." % gfilename)
 
-        
+
         """
-        
+
         #Organization of the tag pair:
         #print "Group 0:",match.group(0) #all
         #print "Group 1:",match.group(1) #scale (see http://www.imagemagick.org/script/command-line-processing.php#geometry)
@@ -424,26 +440,26 @@ class UnifiedGraphics:
             gfilename      = '%s-%d-%02d.png'%(self.unique_name(),self.get_ekey(),graphic_number)
 
             #Compile what is inside <latex>...</latex> to a image
-            latex_source = match.group(2) 
+            latex_source = match.group(2)
 
             try:
-                
-                latex_document = templates.render("standalone_latex.tex", 
-                                gfilename=gfilename, 
+
+                latex_document = templates.render("standalone_latex.tex",
+                                gfilename=gfilename,
                                 latex_source=latex_source)
                 pcompile(latex_document,self.imagedirectory,gfilename)
-            
+
                 cmd = "cd {2};convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
                     gfilename_base,match.group(1),self.imagedirectory)
 
-                    
+
                 #TODO: check that "convert" is installed
                 os.system(cmd)
 
                 graphic_number += 1
-                
+
             except subprocess.CalledProcessError as err:
-                
+
                 # ==============================
                 #TODO: modify this for standalone package:
                 # ==============================
@@ -489,12 +505,11 @@ class UnifiedGraphics:
             gfilename = '%s-%d-%02d.png'%(self.unique_name(),self.get_ekey(),gn)
             img_string = self._render(gfilename,dimsfromimage=True)
             (new_text,number) = latex_pattern.subn(img_string, new_text, count=1)
-            assert(number)    
-        
+            assert(number)
+
         return new_text
 
 
 
-    
+
 #end of ug.py
-    
