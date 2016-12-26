@@ -119,11 +119,28 @@ else: #MEGUA setup is in $HOME/.megua/conf.py
 # Check directories
 #===================
 
+STOP_MEGUA = False
 
-assert(path.isdir(MEGUA_EXERCISE_INPUT))
+if not path.isdir(MEGUA_EXERCISE_INPUT):
+    print "Directory MEGUA_EXERCISE_INPUT='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_INPUT)
+    STOP_MEGUA = True
+
 #TODO: the string for project database is ok but there is no databae YET
 # How to handle it? 
 #assert(path.isfile(PROJECT_DATABASE))
-assert(path.isdir(MEGUA_EXERCISE_CATALOGS))
-assert(path.isdir(MEGUA_EXERCISE_OUTPUT))
+
+if not path.isdir(MEGUA_EXERCISE_CATALOGS):
+    print "Directory MEGUA_EXERCISE_CATALOGS='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_CATALOGS)
+    STOP_MEGUA = True
+
+if not path.isdir(MEGUA_EXERCISE_OUTPUT):
+    print "Directory MEGUA_EXERCISE_OUTPUT='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_OUTPUT)
+    STOP_MEGUA = True
+
+if not 'SIACUA_WEBKEY' in locals() or not 'SIACUA_COURSENAME' in locals() or not 'SIACUA_USERNAME' in locals():
+    print "To configure for SIACUA please open ~/megua/conf.py"
+    
+if STOP_MEGUA:
+    print "Check configurable options in ~/.megua/conf.py"
+    exit(-1)
 
