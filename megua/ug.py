@@ -240,7 +240,8 @@ class UnifiedGraphics:
         raise NotImplementedError
 
 
-    def _render(self,gfilename,dimx=None,dimy=None,dpi=None,dimsfromimage=False):
+    #def _render(self,gfilename,dimx=None,dimy=None,dpi=None,dimsfromimage=False):
+    def _render(self,gfilename):
         r"""render  image `gfilename` using one of the methods:
         - base64 and svg tag
         - <img> and file
@@ -249,31 +250,29 @@ class UnifiedGraphics:
         - svg tag and a large base64 string
         - <img> tag pointing to a file on directory system
         - asciiart string.
-        
+
         This method also adds the gfilename to exericse own image list.
-        
-        Dimensions the image to dimx and dimy!
+
         """
 
         assert(gfilename)
-        
+
         pathname  = os.path.join(self.imagedirectory,gfilename)
-        self.image_pathnames.append(pathname) 
+        print "ug.py: self.imagedirectory=",self.imagedirectory
+        self.image_pathnames.append(pathname)
 
         #Get dimensions
-        if dimsfromimage:
-            (dimx,dimy) = PIL.Image.open(pathname).size
-            
+        (dimx,dimy) = PIL.Image.open(pathname).size
+
         if not dimx:
-            dimx = self.dimx            
+            dimx = self.dimx
         if not dimy:
             dimy = self.dimy
-        if not dpi:
-            dpi = self.dpi            
-            
 
+        print "ug.py for <img> tag: dimx=",dimx,"dimy=",dimy
+            
         if self._rendermethod=='imagefile':
-            return r"\n<img src='%s' alt='%s' height='%d' width='%d'></img>\n" % (pathname,gfilename+' graphic',dimx,dimy)
+            return r"<p>IMAGEM inicio:<br/><img src='%s' alt='%s' height='%d' width='%d'></img>IMAGEM fim<br/></p>" % (pathname,gfilename+' graphic',dimx,dimy) #
         elif self._rendermethod=='includegraphics':
             return "\n\\includegraphics[height=%din,width=%din]{%s}\n" % (dimy,dimx,pathname)
         elif self._rendermethod=='asciiart':
@@ -292,7 +291,7 @@ class UnifiedGraphics:
                                        base64=data_uri)
             return img_tag
         else:    
-            raise("ug momdule: render method not implemented.")
+            raise("ug.py module: render method not implemented.")
 
 
 
@@ -325,7 +324,7 @@ class UnifiedGraphics:
 
 
 
-    def sage_graphic(self,graphobj,varname,dimx=150,dimy=150,dpi=100):
+    def sage_graphic(self,graphobj,varname,dimx=15,dimy=15,dpi=100):
         """This function is to be called by the author in the make_random or solve part.
         INPUT:
 
@@ -343,20 +342,27 @@ class UnifiedGraphics:
 
         #graphobj could be sage or matplotlib object.
 
+        #print "ug.py: saving graphic in:", os.path.join(self.imagedirectory,gfilename)
+        #TODO: protect agains too big images.
         if type(graphobj)==sage.plot.graphics.Graphics:
             graphobj.save(
                 os.path.join(self.imagedirectory,gfilename),
-                figsize=(dimx,dimy), #figsize=(dimx/2.54,dimy/2.54),
+                #figsize=(dimx,dimy), 
+                figsize=(dimx/2.54,dimy/2.54),
                 dpi=dpi)
         else: #matplotlib assumed
             #http://stackoverflow.com/questions/9622163/matplotlib-save-plot-to-image-file-instead-of-displaying-it-so-can-be-used-in-b
             import matplotlib.pyplot as plt
             from pylab import savefig
             fig = plt.gcf() #Get Current Figure: gcf
-            fig.set_size_inches(dimx,dimy) #(dimx/2.54,dimy/2.54)
+            fig.set_size_inches(dimx/2.54,dimy/2.54) #(dimx/2.54,dimy/2.54)
             savefig(os.path.join(self.imagedirectory,gfilename)) #,figsize=(dimx/2.54,dimy/2.54),dpi=100)
             
-        return self._render(gfilename, dimx,dimy)
+        txt = self._render(gfilename)
+        #print "ug.py: ",txt
+        #exit(-1)
+        #ticket: https://sagemathcloud.zendesk.com/requests/2573
+        return txt
 
 
     def latex_render(self,input_text):

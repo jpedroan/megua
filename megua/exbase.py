@@ -71,9 +71,9 @@ Changing, randomly, the set of parameters:
        Calculate 2 + 10.
        sage: print adding_template.answer()
        Result is 2 + 10 = 12.
-       
+
 Changing randomly but setting one of them:
-        
+
 ::
 
        sage: adding_template.update(ekey=15,edict={'a1':99}) #another set of random parameters
@@ -81,7 +81,7 @@ Changing randomly but setting one of them:
        Calculate 99 + 10.
        sage: print adding_template.answer()
        Result is 99 + 10 = 109.
-    
+
        sage: adding_template.update(ekey=15,edict={'a2':-5}) #another set of random parameters
        sage: print adding_template.problem()
        Calculate 2 + (-5).
@@ -252,14 +252,14 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         r"""calls ex.update() but controls execution time.
         """
         self.has_instance = False
-        
-        #Check if class fields are in str or unicode        
+
+        #Check if class fields are in str or unicode
         self._summary_text    = to_unicode(self._summary_text)
         self._problem_text    = to_unicode(self._problem_text)
         self._answer_text     = to_unicode(self._answer_text)
         self._suggestive_name = to_unicode(self._suggestive_name)
 
-        
+
         try:
 
             #Keep author in control of max time in megbook.
@@ -267,9 +267,9 @@ class ExerciseBase(SageObject,UnifiedGraphics):
             #alarm: see import at top lines. 
             if not self._megbook:
                 alarm(60)
-            else:                
+            else:
                 alarm(self._megbook.max_computation_time)
-            
+
             self.update(ekey,edict,render_method)
 
         except AlarmInterrupt:
