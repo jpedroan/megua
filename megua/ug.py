@@ -194,26 +194,26 @@ import subprocess
 class UnifiedGraphics:
     """Class ``UnifiedGraphics``: a class to handle graphics and images."""
 
-    def __init__(self,imagedirectory,rendermethod='base64',dimx=150,dimy=150,dpi=100):
+    def __init__(self,imagedirectory,rendermethod='imagefile'):
 
         #embed images in html (or other source)
         self.render_method(rendermethod)
-        
+
+        #TODO: this values are not used yet.
         #default values
-        #TODO: specify units !!
-        self.dimx = dimx
-        self.dimy = dimy
-        self.dpi = dpi
-        
+        self.paperx_cm = 5 #cm
+        self.papery_cm = 5 #cm
+        self.screen_x = 100 #pixels
+        self.screen_y = 100 #pixels
+        self.dpi = 100
+
         assert(imagedirectory)
-        self.imagedirectory = imagedirectory        
+        self.imagedirectory = imagedirectory
         self.image_pathnames = []
-        
-        
 
 
 
-    #TODO: tirar este método
+    #TODO: tirar este método: WHY???
     def render_method(self,rendermethod=None):
         if rendermethod in ['includegraphics','imagefile', 'base64', 'asciiart']:
             self._rendermethod = rendermethod
@@ -240,41 +240,42 @@ class UnifiedGraphics:
         raise NotImplementedError
 
 
-    #def _render(self,gfilename,dimx=None,dimy=None,dpi=None,dimsfromimage=False):
-    def _render(self,gfilename):
-        r"""render  image `gfilename` using one of the methods:
+    def _render(self,gfilename,paper_cm,scr_pixels):
+        r"""Render  image `gfilename` using one of the methods:
         - base64 and svg tag
         - <img> and file
         - asciiart
-        and return a string with:
+        defined in self._rendermethod.
+
+        INPUT:
+
+        - `gfilename`: name of the file (with extension) that is stored in sekf.imagedirectory.
+        - `paper_cm`: pair (x,y) in cm
+        - `scr_pixels`: pair(x,y) in pixels
+
+        OUTPUT: return a string with:
+        
         - svg tag and a large base64 string
         - <img> tag pointing to a file on directory system
-        - asciiart string.
+        - asciiart string.(TODO: difficult to implement insice SMC)
 
         This method also adds the gfilename to exericse own image list.
 
+        INPUT:
+        
         """
 
         assert(gfilename)
 
         pathname  = os.path.join(self.imagedirectory,gfilename)
-        print "ug.py: self.imagedirectory=",self.imagedirectory
+        #print "ug.py: self.imagedirectory=",self.imagedirectory
         self.image_pathnames.append(pathname)
 
-        #Get dimensions
-        (dimx,dimy) = PIL.Image.open(pathname).size
-
-        if not dimx:
-            dimx = self.dimx
-        if not dimy:
-            dimy = self.dimy
-
-        print "ug.py for <img> tag: dimx=",dimx,"dimy=",dimy
             
         if self._rendermethod=='imagefile':
-            return r"<p>IMAGEM inicio:<br/><img src='%s' alt='%s' height='%d' width='%d'></img>IMAGEM fim<br/></p>" % (pathname,gfilename+' graphic',dimx,dimy) #
+            return r"<img src='%s' alt='%s' height='%d' width='%d'></img>" % (pathname,gfilename+' graphic',scr_pixels[1],scr_pixels[0]) #
         elif self._rendermethod=='includegraphics':
-            return "\n\\includegraphics[height=%din,width=%din]{%s}\n" % (dimy,dimx,pathname)
+            return "\n\\includegraphics[height=%dcm,width=%dcm]{%s}\n" % (paper_cm[0],papercm[1],pathname)
         elif self._rendermethod=='asciiart':
             print "ug.py say: 'asciiart' is not yet implemented"
             #screen = aalib.AsciiScreen(width=dimx, height=dimy)
@@ -286,26 +287,33 @@ class UnifiedGraphics:
             #'\n<img height="%d" width="%d" src="data:image/png;base64,{0}"></img>\n'.format(....)
             data_uri = open(pathname, 'rb').read().encode('base64').replace('\n', '')
             img_tag = templates.render("ug_svg.html",
-                                       dimx=dimx,
-                                       dimy=dimy,
+                                       dimx=scr_pixels[0],
+                                       dimy=scr_pixels[1],
                                        base64=data_uri)
             return img_tag
-        else:    
+        else:
             raise("ug.py module: render method not implemented.")
 
 
 
-    def static_image(self,imagefilename=None,url=None,dimx=150,dimy=150):
+    def static_image(self,
+                     imagefilename=None,
+                     url=None,
+                     paper_cm=None,
+                     scr_pixels=None):
         """This function is to be called by the author in the make_random or solve part.
 
         INPUT:
 
-        - `fullfilename`: full filename for the graphic or picture.
-        - `dimx` and `dimy`: display image in (dimx,dimy) pixels.
+        - `imagefilename`: full filename and path where the graphic or picture is stored in filesystem.
+        - `url`: full url (http://...) where image is stored.
+        - `paper_cm`: pair (x,y) in cm
+        - `scr_pixels`: pair(x,y) in pixels or None if size is to be read from image file.
+        - `kwargs`: other keyword=value pairs for sage or matlotlib savefig command.
 
         NOTES:
             - see also ``s.sage_graphic``.
-        """ 
+        """
         if url:
             #TODO: use this instead of "wget"
             #fp = io.BytesIO(urllib2.urlopen('https://www.python.org/static/favicon.ico').read())
@@ -314,55 +322,72 @@ class UnifiedGraphics:
             gfilename = os.path.split(url)[1]
 
         if imagefilename:
+            #Check if image does exist on target (user could copy image to the target directory)
+            #import os.path
+            #if not os.path.isfile(imagefilename):
+            #Copy allways: file could be changed.
             os.system('cp "{0}" "{1}"'.format(imagefilename,self.imagedirectory))
             gfilename = os.path.split(imagefilename)[1]
 
-        #print "gfilename=",gfilename
+        pathname  = os.path.join(self.imagedirectory,gfilename)
 
-        return self._render(gfilename, dimx,dimy)
+        if not scr_pixels:
+            #Get dimensions
+            with PIL.Image.open(pathname) as f:
+                scr_pixels = f.size
+
+        return self._render(gfilename, paper_cm, scr_pixels)
 
 
 
 
-    def sage_graphic(self,graphobj,varname,dimx=15,dimy=15,dpi=100):
+    def sage_graphic(self,
+                     graphic_object,
+                     varname,
+                     paper_cm=None,
+                     scr_pixels=None,
+                     gtype='svg',
+                     **kwargs):
         """This function is to be called by the author in the make_random or solve part.
         INPUT:
 
-        - `graphobj`: some graphic object.
-
+        - `graphic_object`: some graphic object.
         - `varname`: user supplied string that will be part of the filename.
+        - `paper_cm`: pair (x,y) with size in centimeters.
+        - `scr_pixels`: pair (x,y) with size in pixels.
+        - `gtype`: can be svg, png, "etc"
+        - `kwargs`: other keyword=value pairs for sage or matlotlib savefig command.
+        
+        The `graphic_object`could be a:
+        - sage.plot.graphics.Graphics
+        - matplotlib object
 
-        - `dimx` and `dimy`: size in centimeters.
+        Read more in:
+        - http://stackoverflow.com/questions/3396475/specifying-width-and-height-as-percentages-without-skewing-photo-proportions-in
+        
+        """
 
-        """ 
-
-        gfilename = '%s-%s-%d.png'%(self.unique_name(),varname,self.get_ekey())
+        gfilename = '%s-%s-%d.%s'%(self.unique_name(),varname,self.get_ekey(),gtype)
+        gpathname = os.path.join(self.imagedirectory,gfilename)
         #create if does not exist the "image" directory
         #os.system("mkdir -p images") #The "-p" ommits errors if it exists.
 
-        #graphobj could be sage or matplotlib object.
-
-        #print "ug.py: saving graphic in:", os.path.join(self.imagedirectory,gfilename)
         #TODO: protect agains too big images.
-        if type(graphobj)==sage.plot.graphics.Graphics:
-            graphobj.save(
-                os.path.join(self.imagedirectory,gfilename),
-                #figsize=(dimx,dimy), 
-                figsize=(dimx/2.54,dimy/2.54),
-                dpi=dpi)
+        if type(graphic_object)==sage.plot.graphics.Graphics:
+            graphic_object.save(
+                gpathname,
+                figsize=(paper_cm[0]/2.54,paper_cm[1]/2.54),
+                **kwargs)
         else: #matplotlib assumed
             #http://stackoverflow.com/questions/9622163/matplotlib-save-plot-to-image-file-instead-of-displaying-it-so-can-be-used-in-b
             import matplotlib.pyplot as plt
             from pylab import savefig
             fig = plt.gcf() #Get Current Figure: gcf
             fig.set_size_inches(dimx/2.54,dimy/2.54) #(dimx/2.54,dimy/2.54)
-            savefig(os.path.join(self.imagedirectory,gfilename)) #,figsize=(dimx/2.54,dimy/2.54),dpi=100)
-            
-        txt = self._render(gfilename)
-        #print "ug.py: ",txt
-        #exit(-1)
-        #ticket: https://sagemathcloud.zendesk.com/requests/2573
-        return txt
+            savefig(gpathname,figsize=(dimx/2.54,dimy/2.54),**kwargs)
+            #TODO: savefig is saving what graphic? What to do with graphic_object parameter?
+
+        return self._render(gfilename,paper_cm,scr_pixels,gtype,kwargs)
 
 
     def latex_render(self,input_text):

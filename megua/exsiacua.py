@@ -228,10 +228,11 @@ from megua.megoptions import *
 
 
 
-class ExSiacua(ExerciseBase):    
+class ExSiacua(ExerciseBase):
 
-    def __init__(self,ekey=None, edict=None, rendermethod='imagefile',dimx=150,dimy=150,dpi=100):
-        ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
+    #TODO: is needed?
+    #def __init__(self,ekey=None, edict=None):
+    #    ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
 
     def update(self,ekey=None,edict=None, render_method=None):
 

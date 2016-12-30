@@ -210,7 +210,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
     _suggestive_name = None
 
 
-    def __init__(self,ekey=None, edict=None, rendermethod='base64',dimx=150,dimy=150,dpi=100):
+    def __init__(self,ekey=None, edict=None):
         
         #Considered part of the class definition and not the instance.
         #TODO: should author write each filed ? Can he leave empty fields?
@@ -224,14 +224,8 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
 
-           
-        UnifiedGraphics.__init__(self,
-            imagedirectory=self.working_dir,
-            rendermethod=rendermethod,
-            dimx=dimx,
-            dimy=dimy,
-            dpi=dpi
-        )        
+
+        UnifiedGraphics.__init__(self, imagedirectory=self.working_dir)
 
         self.has_instance = False
         self._current_problem = None
@@ -289,13 +283,13 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         - set random seed in module `ur`
         - initialize this exercise local variables
         - call make_random passing `edict` for author control
-        
+
         It could be derive for other exercise base.
-        
+
         DEVELOPER NOTES:
-        
+
         - http://stackoverflow.com/questions/5268404/what-is-the-fastest-way-to-check-if-a-class-has-a-function-defined
-        
+
         """
 
 
@@ -306,8 +300,8 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         #Graphics
         if render_method:
             self.render_method(render_method)
-        
-        #Initialize all random generators.    
+
+        #Initialize all random generators.
         self.ekey = ur.start_at(ekey) #get new if ekey=None
 
         #Call user derived function to generate a set of random variables.
@@ -326,7 +320,8 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         #self.solve()
         solve = getattr(self, "solve", None)
         if callable(solve):
-            solve()
+            warnings.warn("exbase.py: 'def solve()' is deprecated. Use only 'def make_random(self,edict)' and configure ", DeprecationWarning) 
+            self.solve()
 
         #create current problem and answer
         self._current_problem = self.search_replace(self._problem_text)
@@ -341,10 +336,10 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         """
         - make_random() can call this if author decides.
         - update the state of the exercise by changing all 
-          or some parameters existing in edict.     
+          or some parameters existing in edict.
         """
         if edict:
-            self.__dict__.update(edict) 
+            self.__dict__.update(edict)
 
 
 
@@ -358,17 +353,18 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         self.update_dict(edict)
 
 
-    def solve(self):
-        """
-        Derive this function.
-        """    
-        warnings.warn("def solve() is deprecated. Use only def make_random(edict) and configure ", DeprecationWarning) 
-                
+    #See above: "def update()" method.
+    #def solve(self):
+    #    """
+    #    Derive this function.
+    #    """    
+    #    warnings.warn("exbase.py: 'def solve()' is deprecated. Use only 'def make_random(self,edict)' and configure ", DeprecationWarning) 
+
 
     def rewrite(self,text):
         """
         Derive this function and implement rewritting rules to change latex expressions for example.
-        
+
         Example::
 
            exp_pattern = re.compile(ur'e\^\{\\left\((.+?)\\right\)\}',re.U)
@@ -388,7 +384,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
         if not maxiter:
             maxiter = self._megbook.max_tried_instances
-            
+
         for ekey in range(start,start+maxiter):
             print "    Testing for random key: ekey=",ekey
             self.update_timed(ekey=ekey)
@@ -396,12 +392,12 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
     def get_ekey(self):
         return self.ekey
- 
+
     def unique_name(self):
         assert(self._unique_name)
         return self._unique_name
 
-   
+
     def summary(self):
         assert(self._summary_text)
         return self._summary_text
@@ -425,7 +421,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
             return self._suggestive_name #could be none or ""
         else:
             return u""
- 
+
 
     def search_replace(self,text_source):
         """Change this routine in derivations"""
