@@ -60,7 +60,7 @@ import shutil
 MEGUA_TEMPLATE_DIR = path.join( 
     path.dirname(path.abspath(__file__)),
     "template/pt_pt")
-    
+
 
 
 MEGUA_READ_ENV = False
@@ -80,11 +80,10 @@ if MEGUA_READ_ENV:
     MATHJAX_HEADER=environ["MATHJAX_HEADER"]
     # PROJECT CONFIGURATION
     MEGUA_EXERCISE_INPUT=environ["MEGUA_EXERCISE_INPUT"]
-    PROJECT_DATABASENAME=environ["PROJECT_DATABASENAME"]
-    PROJECT_DATABASE=environ["PROJECT_DATABASE"] #full path to database
+    PROJECT_DATABASE_NAME=environ["PROJECT_DATABASE_NAME"]
+    PROJECT_DATABASE_FULLPATH=environ["PROJECT_DATABASE_FULLPATH"]
     MEGUA_EXERCISE_CATALOGS=environ["MEGUA_EXERCISE_CATALOGS"]
-    MEGUA_EXERCISE_OUTPUT=environ["MEGUA_EXERCISE_OUTPUT"]
-    
+
     #optinal: siacua project
     try:
         SIACUA_WEBKEY=environ["SIACUA_WEBKEY"]
@@ -94,17 +93,17 @@ if MEGUA_READ_ENV:
         pass 
 
 else: #MEGUA setup is in $HOME/.megua/conf.py
-    
+
     PATH_CONF_PY = path.join(environ["HOME"],".megua","conf.py")
-    
+
     if not path.isfile(PATH_CONF_PY):
-        
+
         #1. create .megua
         try:
             mkdir(path.join(environ["HOME"],".megua"))
         except error as e: #error is os.error alias of exceptions.OSError
             print e.message
-        
+
         #2. get template of conf.py (conf_megua.py because there is conf.py for rest)
         source = path.join(MEGUA_TEMPLATE_DIR,"conf_megua.py")
         shutil.copyfile(source,PATH_CONF_PY)
@@ -112,12 +111,23 @@ else: #MEGUA setup is in $HOME/.megua/conf.py
     #load path variables to this module space
     execfile( PATH_CONF_PY )
 
-    
+
 #print "MEGUA_PLATFORM=",MEGUA_PLATFORM
-    
+
 #===================
 # Check directories
 #===================
+
+# Try to create them:
+if not os.path.exists(MEGUA_EXERCISE_INPUT):
+    os.makedirs(MEGUA_EXERCISE_INPUT)
+if not os.path.exists(MEGUA_EXERCISE_CATALOGS):
+    os.makedirs(MEGUA_EXERCISE_CATALOGS)
+if not os.path.exists(MEGUA_WORKDIR_FULLPATH):
+    os.makedirs(MEGUA_WORKDIR_FULLPATH)
+    shutil.copy(os.path.join(MEGUA_TEMPLATE_DIR,"megua_dog.png"), MEGUA_WORKDIR_FULLPATH)
+
+
 
 STOP_MEGUA = False
 
@@ -131,10 +141,6 @@ if not path.isdir(MEGUA_EXERCISE_INPUT):
 
 if not path.isdir(MEGUA_EXERCISE_CATALOGS):
     print "Directory MEGUA_EXERCISE_CATALOGS='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_CATALOGS)
-    STOP_MEGUA = True
-
-if not path.isdir(MEGUA_EXERCISE_OUTPUT):
-    print "Directory MEGUA_EXERCISE_OUTPUT='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_OUTPUT)
     STOP_MEGUA = True
 
 if not 'SIACUA_WEBKEY' in locals() or not 'SIACUA_COURSENAME' in locals() or not 'SIACUA_USERNAME' in locals():

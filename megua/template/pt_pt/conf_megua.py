@@ -57,18 +57,15 @@ MEGUA_EXERCISE_INPUT=os.path.join(os.environ["HOME"],"ENUNCIADOS")
 
 # Filename of the database where exercises are stored
 # The database file needs backups
-PROJECT_DATABASENAME=".MEGUA_DATABASE.sqlite"
-PROJECT_DATABASE=os.path.join(MEGUA_EXERCISE_INPUT,PROJECT_DATABASENAME) #full path to database
+PROJECT_DATABASE_NAME=".MEGUA_DATABASE.sqlite"
+PROJECT_DATABASE_FULLPATH=os.path.join(MEGUA_EXERCISE_INPUT,PROJECT_DATABASE_NAME) #full path to database
 
 # Directory for CATALOGS 
 # Is not important to make backups but could be useful
 MEGUA_EXERCISE_CATALOGS=os.path.join(os.environ["HOME"],"CATALOGOS")
 
-# Directory where graphics and instances of exercies are stored
-# This outputs need not a backup but could be consulted in the file system
-MEGUA_EXERCISE_OUTPUT=os.path.join(os.environ["HOME"],".megua",".output")
-
-
+MEGUA_WORKDIR  = ".OUTPUT"
+MEGUA_WORKDIR_FULLPATH = os.path.join(os.environ["HOME"],MEGUA_EXERCISE_INPUT,MEGUA_WORKDIR)
 
 """
 ####################

@@ -108,14 +108,13 @@ class ExAMC(ExerciseBase):
             answtxt=self.answer(),
          )
 
-        #copy amc.sty to the working_dir
-        shutil.copy(os.path.join(MEGUA_TEMPLATE_DIR,"amcpt.sty"),
-                        self.working_dir)
+        #copy amc.sty to the working dir:
+        shutil.copy(os.path.join(MEGUA_TEMPLATE_DIR,"amcpt.sty"), self.wd_fullpath)
         
-        pcompile(latex_string,self.working_dir,self.unique_name())
+        pcompile(latex_string,self.wd_fullpath,self.unique_name())
 
-        EXERCISE_TEX_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.tex')
-        EXERCISE_PDF_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.pdf')
+        EXERCISE_TEX_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.tex')
+        EXERCISE_PDF_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.pdf')
 
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus

@@ -63,13 +63,13 @@ Defining a new exercise template:
 
 
 Plot using embed images with base64 and svg:
-       
+
 ::
 open /projects/69b82f4f-dc00-498d-817e-f3575041e14e/.local/lib/python2.7/site-packages/megua/ug.py
        sage: ex = DrawSegment(ekey=0)
        sage: #ex.print_instance() #render = base64, long textual answer
-       
-Plot using file and <img> tag:       
+
+Plot using file and <img> tag:
 
 ::
 
@@ -84,11 +84,11 @@ Plot using file and <img> tag:
        Draw the segment 1 + (-7)x for x in [-4,2].
        ==> Answer instance
        <p>\n<img src='_output/DrawSegment/DrawSegment-fig1-0.png' alt='DrawSegment-fig1-0.png graphic' height='50' width='50'></img>\n</p><p>\n<img src='_output/DrawSegment/sage-sticker-1x1_inch-small.png' alt='sage-sticker-1x1_inch-small.png graphic' height='50' width='50'></img>\n</p>
-       
+
 Plot using ascii art:
-       
+
 ::
-       
+
        sage: ex.update(ekey=0,render_method="asciiart") #must be called to update graphic links
        sage: #ex.print_instance() #long output
 
@@ -194,7 +194,7 @@ import subprocess
 class UnifiedGraphics:
     """Class ``UnifiedGraphics``: a class to handle graphics and images."""
 
-    def __init__(self,imagedirectory,rendermethod='imagefile'):
+    def __init__(self,rendermethod='imagefile'):
 
         #embed images in html (or other source)
         self.render_method(rendermethod)
@@ -207,9 +207,12 @@ class UnifiedGraphics:
         self.screen_y = 100 #pixels
         self.dpi = 100
 
-        assert(imagedirectory)
-        self.imagedirectory = imagedirectory
-        self.image_pathnames = []
+        #Is the same as exbase.working_dir (different for each exercise):
+        assert(self.wd_relative)
+        assert(self.wd_fullpath)
+
+        #To avoid duplicated image names is used a set():
+        self.image_pathnames = set()
 
 
 
@@ -240,7 +243,7 @@ class UnifiedGraphics:
         raise NotImplementedError
 
 
-    def _render(self,gfilename,paper_cm,scr_pixels):
+    def _render(self,gfilename,paper_cm=None,scr_pixels=None):
         r"""Render  image `gfilename` using one of the methods:
         - base64 and svg tag
         - <img> and file
@@ -253,29 +256,28 @@ class UnifiedGraphics:
         - `paper_cm`: pair (x,y) in cm
         - `scr_pixels`: pair(x,y) in pixels
 
-        OUTPUT: return a string with:
-        
-        - svg tag and a large base64 string
-        - <img> tag pointing to a file on directory system
-        - asciiart string.(TODO: difficult to implement insice SMC)
+        OUTPUT:
+
+        - return a string with:
+
+            - svg tag and a large base64 string
+            - <img> tag pointing to a file on directory system
+            - asciiart string.(TODO: difficult to implement insice SMC)
 
         This method also adds the gfilename to exericse own image list.
 
-        INPUT:
-        
         """
 
         assert(gfilename)
 
-        pathname  = os.path.join(self.imagedirectory,gfilename)
-        #print "ug.py: self.imagedirectory=",self.imagedirectory
-        self.image_pathnames.append(pathname)
+        pathname  = os.path.join(self.wd_relative,gfilename)
 
-            
         if self._rendermethod=='imagefile':
-            return r"<img src='%s' alt='%s' height='%d' width='%d'></img>" % (pathname,gfilename+' graphic',scr_pixels[1],scr_pixels[0]) #
+            self.image_pathnames.add(pathname)
+            return r"<img src='%s' alt='%s' height='%d' width='%d'/>" % (pathname,gfilename+' graphic',scr_pixels[1],scr_pixels[0]) #
         elif self._rendermethod=='includegraphics':
-            return "\n\\includegraphics[height=%dcm,width=%dcm]{%s}\n" % (paper_cm[0],papercm[1],pathname)
+            self.image_pathnames.add(pathname)
+            return "\n\\includegraphics[height=%dcm,width=%dcm]{%s}\n" % (paper_cm[1],papercm[0],pathname)
         elif self._rendermethod=='asciiart':
             print "ug.py say: 'asciiart' is not yet implemented"
             #screen = aalib.AsciiScreen(width=dimx, height=dimy)
@@ -301,11 +303,11 @@ class UnifiedGraphics:
                      url=None,
                      paper_cm=None,
                      scr_pixels=None):
-        """This function is to be called by the author in the make_random or solve part.
+        """This function is to be called by the author in the make_random.
 
         INPUT:
 
-        - `imagefilename`: full filename and path where the graphic or picture is stored in filesystem.
+        - `imagefilename`: it is full path, or relative to MEGUA_EXERCISE_INPUT, filename where a graphic or picture is stored in filesystem.
         - `url`: full url (http://...) where image is stored.
         - `paper_cm`: pair (x,y) in cm
         - `scr_pixels`: pair(x,y) in pixels or None if size is to be read from image file.
@@ -318,7 +320,7 @@ class UnifiedGraphics:
             #TODO: use this instead of "wget"
             #fp = io.BytesIO(urllib2.urlopen('https://www.python.org/static/favicon.ico').read())
             #image = PIL.Image.open(fp).convert('L').resize(screen.virtual_size)
-            os.system(r"""cd {0}; wget -q '{1}'""".format(self.imagedirectory,url))
+            os.system(r"""cd {0}; wget -q '{1}'""".format(self.wd_fullpath,url))
             gfilename = os.path.split(url)[1]
 
         if imagefilename:
@@ -326,10 +328,10 @@ class UnifiedGraphics:
             #import os.path
             #if not os.path.isfile(imagefilename):
             #Copy allways: file could be changed.
-            os.system('cp "{0}" "{1}"'.format(imagefilename,self.imagedirectory))
+            os.system('cp "{0}" "{1}"'.format(imagefilename,self.wd_fullpath))
             gfilename = os.path.split(imagefilename)[1]
 
-        pathname  = os.path.join(self.imagedirectory,gfilename)
+        pathname  = os.path.join(self.wd_fullpath,gfilename)
 
         if not scr_pixels:
             #Get dimensions
@@ -368,7 +370,7 @@ class UnifiedGraphics:
         """
 
         gfilename = '%s-%s-%d.%s'%(self.unique_name(),varname,self.get_ekey(),gtype)
-        gpathname = os.path.join(self.imagedirectory,gfilename)
+        gpathname = os.path.join(self.wd_relative,gfilename)
         #create if does not exist the "image" directory
         #os.system("mkdir -p images") #The "-p" ommits errors if it exists.
 
@@ -395,38 +397,38 @@ class UnifiedGraphics:
         * all tag pairs <latex percent%> ... </latex> that 
            are present in `input_text` are replaced by "images" created from 
            the LaTeX inside tag pairs and a `new_text` is returned.
-        
+
         INPUT:
-        
+
         - `input_text` -- some text (problem or answer) eventually with <latex percent%> ... </latex> tags.
-        
+
         OUTPUT:
-        
+
         - `string` -- with images created from latex inside tags
 
         NOTE:
-        
+
         - Dimensions are specifyed in each <latex tag> and not in dimx=150,dimy=150.
-        
+
         DEVELOPER NOTES:
-        
+
         - check LATEXIMG.PY
         - important \\ and \{
         - old pattern:
             - tikz_pattern = re.compile(r'\\begin\{tikzpicture\}(.+?)\\end\{tikzpicture\}', re.DOTALL|re.UNICODE)
-            
+
         Latex packages:
         - standalone: cuts "paper" around the tikzpicture (and other environments) 
         - adjustbox package: http://mirrors.fe.up.pt/pub/CTAN/macros/latex/contrib/adjustbox/adjustbox.pdf
 
         About the standalone package:
-        
+
         - \documentclass[varwidth=true, border=10pt, convert={density=100,outfile="gfilename.png"} ]{standalone}
         - the above command generates a gfilename.png but needs --shell_escape in pdflatex command.
 
         old way to convert latex/tikz to png:
 
-        ::        
+        ::
                 #The following is done by standalone package:
                 ##convert -density 600x600 pic.pdf -quality 90 -resize 800x600 pic.png
                 ##cmd = "cd _images;convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
@@ -435,9 +437,9 @@ class UnifiedGraphics:
                 #os.system(cmd)
                 #os.system("cp _images/%s.tex ." % gfilename)
 
-        
+
         """
-        
+
         #Organization of the tag pair:
         #print "Group 0:",match.group(0) #all
         #print "Group 1:",match.group(1) #scale (see http://www.imagemagick.org/script/command-line-processing.php#geometry)
@@ -455,26 +457,26 @@ class UnifiedGraphics:
             gfilename      = '%s-%d-%02d.png'%(self.unique_name(),self.get_ekey(),graphic_number)
 
             #Compile what is inside <latex>...</latex> to a image
-            latex_source = match.group(2) 
+            latex_source = match.group(2)
 
             try:
-                
-                latex_document = templates.render("standalone_latex.tex", 
-                                gfilename=gfilename, 
-                                latex_source=latex_source)
-                pcompile(latex_document,self.imagedirectory,gfilename)
-            
-                cmd = "cd {2};convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
-                    gfilename_base,match.group(1),self.imagedirectory)
 
-                    
+                latex_document = templates.render("standalone_latex.tex",
+                                gfilename=gfilename,
+                                latex_source=latex_source)
+                pcompile(latex_document,self.wd_fullpath,gfilename)
+
+                cmd = "cd {2};convert -density 100x100 '{0}.pdf' -quality 95 -resize {1} '{0}.png' 2>/dev/null".format(
+                    gfilename_base,match.group(1),self.wd_fullpath)
+
+
                 #TODO: check that "convert" is installed
                 os.system(cmd)
 
                 graphic_number += 1
-                
+
             except subprocess.CalledProcessError as err:
-                
+
                 # ==============================
                 #TODO: modify this for standalone package:
                 # ==============================
@@ -518,14 +520,18 @@ class UnifiedGraphics:
         new_text = input_text
         for gn in range(graphic_number):
             gfilename = '%s-%d-%02d.png'%(self.unique_name(),self.get_ekey(),gn)
-            img_string = self._render(gfilename,dimsfromimage=True)
+            #Get image dimensions
+            pathname  = os.path.join(self.wd_fullpath,gfilename)
+            with PIL.Image.open(pathname) as f:
+                scr_pixels = f.size
+            img_string = self._render(gfilename,scr_pixels=scr_pixels)
             (new_text,number) = latex_pattern.subn(img_string, new_text, count=1)
-            assert(number)    
-        
+            assert(number)
+
         return new_text
 
-
-
     
+    
+######     def _render(self,gfilename,paper_cm,scr_pixels):
+
 #end of ug.py
-    

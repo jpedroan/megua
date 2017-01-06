@@ -29,9 +29,9 @@ class MegSiacua:
     MegSiacua -- Functions to work with one or a list of ExSiacua exercises.
 
     See also MegBook that an author uses as a front-end.
-    
+
     """
-        
+
 
     #TODO: rever isto tudo
     def siacua(self,unique_name=None,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
@@ -82,7 +82,7 @@ class MegSiacua:
         if not row:
             print "megsiacua module: %s cannot be accessed on database." % unique_name
             return
-        
+
         #Create an instance (ekey=0 because it needs one.)
         ex_instance = self.exerciseinstance(row=row, ekey=0)
 
@@ -91,7 +91,7 @@ class MegSiacua:
 
         #done
 
-    
+
     def siacuapreview(self,unique_name=None,ekeys=[]):
         r"""
 

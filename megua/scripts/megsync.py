@@ -33,7 +33,7 @@ import glob
 import codecs
 
 # MEGUA
-from megua.megoptions import PROJECT_DATABASE, MEGUA_EXERCISE_INPUT, MEGUA_PLATFORM
+from megua.megoptions import PROJECT_DATABASE_FULLPATH, MEGUA_EXERCISE_INPUT, MEGUA_PLATFORM
 from megua.parse_ex import parse_ex
 from megua.tounicode import to_unicode
 from megua.all import meg
@@ -180,7 +180,7 @@ def inputfiles_add():
             unique_name = row['unique_name']+"_siacua"
             try:
                 meg.megbook_store.rename(old_unique_name,unique_name,warn=False)
-                print "Exercise",row['unique_name'],"in",PROJECT_DATABASE,"is now", unique_name
+                print "Exercise",row['unique_name'],"in",PROJECT_DATABASE_FULLPATH,"is now", unique_name
             except:
                 pass
 

@@ -187,8 +187,6 @@ def init():
 
     if not path.isdir(MEGUA_EXERCISE_INPUT):
         makedirs(MEGUA_EXERCISE_INPUT)
-    if not path.isdir(MEGUA_EXERCISE_OUTPUT):
-        makedirs(MEGUA_EXERCISE_OUTPUT)
     if not path.isdir(MEGUA_EXERCISE_CATALOGS):
         makedirs(MEGUA_EXERCISE_CATALOGS)
     

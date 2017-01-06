@@ -166,7 +166,7 @@ from megua.megoptions import *
 
 
 
-        
+
 class ExerciseBase(SageObject,UnifiedGraphics):
     """Class ``ExerciseBase`` is the base class for an exercise.
 
@@ -181,7 +181,6 @@ class ExerciseBase(SageObject,UnifiedGraphics):
     * Generate an exercise dictionary from a given set of parameters
     * Give a textual (semi-latex) representation of the dictionary (question and full, non pedagogical, answer).
     * Give a textual description of the template.
-    
 
     """
 
@@ -197,8 +196,8 @@ class ExerciseBase(SageObject,UnifiedGraphics):
     #They are set in MegBook.save()
 
     # This is set in MegBook
-    _megbook = None 
-    
+    _megbook = None
+
     # This are set in MegBook
     # by MegBook.exerciseclass() and 
     #   MegBook.exerciseinstance()
@@ -211,7 +210,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
 
     def __init__(self,ekey=None, edict=None):
-        
+
         #Considered part of the class definition and not the instance.
         #TODO: should author write each filed ? Can he leave empty fields?
         assert(self._unique_name)
@@ -219,17 +218,14 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         assert(self._problem_text)
         assert(self._answer_text)
 
-        #Create if not exist: exercise working directory (images, latex,...)
-        self.working_dir = os.path.join(MEGUA_EXERCISE_OUTPUT,self._unique_name)
-        if not os.path.exists(self.working_dir):
-            os.makedirs(self.working_dir)
+        self.wd_relative = os.path.join(MEGUA_WORKDIR,self._unique_name)
+        self.wd_fullpath = os.path.join(MEGUA_WORKDIR_FULLPATH,self._unique_name)
 
-
-        UnifiedGraphics.__init__(self, imagedirectory=self.working_dir)
+        UnifiedGraphics.__init__(self)
 
         self.has_instance = False
         self._current_problem = None
-        self._current_answer = None   
+        self._current_answer = None
         self.update_timed(ekey,edict)
 
 
@@ -292,10 +288,12 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
         """
 
-
-
+        #TODO: is this flag is being used ?
         self.has_instance = False
 
+        #Each update produce a new set of filenames for images.
+        #See ug.py
+        self.image_pathnames = set()
 
         #Graphics
         if render_method:

@@ -41,20 +41,20 @@ Create or edit a database:
 Save a new or changed exercise:
 
 ::
- qualquer 
+
    sage: meg.save(r'''
    ....: %Summary Primitives
    ....: Here one can write few words, keywords about the exercise.
    ....: For example, the subject, MSC code, and so on.
-   ....:   
+   ....:
    ....: %Problem
    ....: What is the primitive of ap x + bp@() ?
-   ....: 
+   ....:
    ....: %Answer
    ....: prim1
-   ....: 
+   ....:
    ....: class E28E28_pdirect_001(ExerciseBase):
-   ....: 
+   ....:
    ....:     def make_random(self,edict=None):
    ....:         self.ap = ZZ.random_element(-4,4)
    ....:         self.bp = self.ap + QQ.random_element(1,4)
@@ -339,8 +339,7 @@ class MegBook(MegSiacua):
         """
 
         if not filename:
-            #filename = os.path.join(environ["MEGUA_EXERCISE_INPUT"],environ["PROJECT_DATABASE"])
-            filename = PROJECT_DATABASE
+            filename = PROJECT_DATABASE_FULLPATH
     
         #Create or open the database
         try:
@@ -468,10 +467,10 @@ class MegBook(MegSiacua):
             print ""
             print "========================"
             raise IOError
-                
+
         #To be used in all megbook commands
         self._current_unique_name = unique_name
-        
+
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus
             salvus.html("<h4>{}</h4>".format(unique_name))
@@ -485,33 +484,33 @@ class MegBook(MegSiacua):
     def new_exercise(self,filename):
         r"""
         Create a new file.
-        
+
         INPUT:
         - `filename`: a name in form E12X34_SomeName_001_latex ou _siacua or _moodle and related extension *.sagews or *.sage.
 
 
         FUTURE IDEAS:
-        
+
         Argument has two possibilities:
-        
+
         - a "basename" of an existent file: in this case, an existent \
         filename is searched and a new filename with increased counter is created. 
         - a full filename, including extension and type.
-        
+
         Type is:
-        
+
            - fullname (com MSC, com número inicial, com _latex, _siacua): 
            procura existentes, adiciona a contagem, vai buscar um modelo baseado no anterior
 
            - args[0]: basename  (sem MSC e sem número final)
            - args[1]: sagews, sage, ...  #extraído do .megua/mconfig.sh MEGUA_EXERCISE_DEFAULTEXT
            - args[2]: latex, siacua, moodle #extraído do .megua/mconfig.sh MEGUA_EXERCISE_DESTINY
-        
+
         Automatic Process:
-        
+
             - megua check all | <some exercise> 
             - command meg.save() could try to adjust filename?
-        
+
         """
 
         # Directory where exercises are stored
@@ -521,7 +520,7 @@ class MegBook(MegSiacua):
         fullpath = os.path.join(
             MEGUA_EXERCISE_INPUT,
             filename)
-        
+
         if os.path.isfile(fullpath) :
             print "Megbook.py say: '%s' already exists. Choose another name" % filename
             return
@@ -537,12 +536,12 @@ class MegBook(MegSiacua):
             # =====
 
             if '_latex' in filename:
-                
+
                 htmlstr = u'<h4>%s (Latex)</h4>' % filename[0:-7]
-                
+
                 e_string = templates.render("megbook_exlatex.sagews",
                     unique_name=filename[0:-7],
-                    megbookfilename=PROJECT_DATABASENAME, #self.local_store_filename,
+                    megbookfilename=PROJECT_DATABASE_NAME, #self.local_store_filename,
                     uuid1=uuid(),
                     uuid2=uuid(),
                     uuid3=uuid(),
@@ -557,12 +556,12 @@ class MegBook(MegSiacua):
                     f.write(e_string)
 
             elif '_amc' in filename:
-                
+
                 htmlstr = u'<h4>%s (Latex for AMC)</h4>' % filename[0:-7]
-                
+
                 e_string = templates.render("megbook_examc.sagews",
                     unique_name=filename[0:-7],
-                    megbookfilename=PROJECT_DATABASENAME, #self.local_store_filename,
+                    megbookfilename=PROJECT_DATABASE_NAME, #self.local_store_filename,
                     uuid1=uuid(),
                     uuid2=uuid(),
                     uuid3=uuid(),
@@ -577,12 +576,12 @@ class MegBook(MegSiacua):
                     f.write(e_string)
 
             elif '_siacua' in filename:
-                
+
                 htmlstr = u'<h4>%s (Siacua)</h4>' % filename[0:-7]
-                
+
                 e_string = templates.render("megbook_exsiacua.sagews",
                     unique_name=filename[0:-7],
-                    megbookfilename=PROJECT_DATABASENAME, 
+                    megbookfilename=PROJECT_DATABASE_NAME, 
                     uuid1=uuid(),
                     uuid2=uuid(),
                     uuid3=uuid(),
@@ -603,7 +602,7 @@ class MegBook(MegSiacua):
                     f.write(e_string)
 
             else:
-                
+
                 print templates.render("megbook_new_exercise_usage.txt")
                 return
                 
@@ -830,7 +829,7 @@ class MegBook(MegSiacua):
          )
 
         #Create if not exist: exercise working directory (images, latex,...)
-        working_dir = os.path.join(MEGUA_EXERCISE_OUTPUT,row["unique_name"])
+        working_dir = os.path.join(MEGUA_WORKDIR_FULLPATH,row["unique_name"])
         if not os.path.exists(working_dir):
             os.makedirs(working_dir)
 
@@ -1574,9 +1573,9 @@ class MegBook(MegSiacua):
             print "Megbook.py say: exstate parameter must be a string with only 'vhn' chars."
 
         send_dict = { 
-            "course": course, 
-            "concept_id": concept_id, 
-            "num_questions": num_questions * 2, #requests more exercises because some 
+            "course": course,
+            "concept_id": concept_id,
+            "num_questions": num_questions * 2, #requests more exercises because some
                                                 #of them could be in siacua but on in database
             "siacua_key": SIACUA_WEBKEY,
             "siacuatest": siacuatest,

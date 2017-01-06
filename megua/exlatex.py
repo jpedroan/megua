@@ -75,8 +75,8 @@ from megua.megoptions import *
 
 class ExLatex(ExerciseBase):
 
-    def __init__(self,ekey=None, edict=None, rendermethod='includegraphics',dimx=150,dimy=150,dpi=100):
-        ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
+    #def __init__(self,ekey=None, edict=None):
+    #    ExerciseBase.__init__(self,ekey, edict)
 
 
     def _latex_string(self):
@@ -84,8 +84,8 @@ class ExLatex(ExerciseBase):
         lts = templates.render("exlatex_print_instance.tex",
             unique_name=self.unique_name(),
             ekey = self.ekey,
-            summtxt=self.summary(), 
-            probtxt=self.problem(), 
+            summtxt=self.summary(),
+            probtxt=self.problem(),
             answtxt=self.answer()
          )
 
@@ -103,10 +103,10 @@ class ExLatex(ExerciseBase):
         #Use jinja2 template to generate LaTeX.
         latex_string = self._latex_string()
 
-        pcompile(latex_string,self.working_dir,self.unique_name())
+        pcompile(latex_string,self.wd_fullpath,self.unique_name())
 
-        EXERCISE_TEX_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.tex')
-        EXERCISE_PDF_PATHNAME = os.path.join(self.working_dir, self.unique_name()+'.pdf')
+        EXERCISE_TEX_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.tex')
+        EXERCISE_PDF_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.pdf')
 
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus

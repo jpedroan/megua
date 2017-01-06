@@ -308,7 +308,7 @@ class ExSiacua(ExerciseBase):
 
         #print html_string
 
-        EXERCISE_HTML_PATHNAME = os.path.join(self.working_dir,uname+'.html')
+        EXERCISE_HTML_PATHNAME = os.path.join(self.wd_fullpath,uname+'.html')
         f = codecs.open(EXERCISE_HTML_PATHNAME, mode='w', encoding='utf-8')
         f.write(html_string)
         f.close()
@@ -521,18 +521,20 @@ class ExSiacua(ExerciseBase):
 
 
         #write all to an html file.
-        html_filename = os.path.join(self.working_dir,self.unique_name()+'_siacuapreview.html')
-        f = codecs.open(html_filename, mode='w', encoding='utf-8')
+        html_full_path     = os.path.join(self.wd_fullpath,self.unique_name()+'_siacuapreview.html')
+        f = codecs.open(html_full_path, mode='w', encoding='utf-8')
         f.write(html_string)
         f.close()
 
 
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus
-            salvus.html(html_string)
+            print "exsiacua.py: using salvus.link:"
+            html_relative_path = os.path.join(self.wd_relative,self.unique_name()+'_siacuapreview.html')
+            salvus.link(html_relative_path)
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "exsiacua.py module say: firefox ",html_filename,"in the browser and press F5."
-            subprocess.Popen(["firefox","-new-tab", html_filename])
+            print "exsiacua.py: opening firefox ",html_full_path,"in the browser and press F5."
+            subprocess.Popen(["firefox","-new-tab", html_full_path])
         else:
             print "exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
 
@@ -543,8 +545,8 @@ class ExSiacua(ExerciseBase):
         """
         assert(self.has_instance)
         return self._remove_multiplechoicetag(self.problem())
-        
-        
+
+
     def _answer_whitoutmc(self):
         """
         The answer text without multiple choice tag.
@@ -570,7 +572,7 @@ class ExSiacua(ExerciseBase):
         - ``grid2x2``: write user options in multiplechoice in a 2x2 grid (useful for graphics) values in {0,1}.
 
         - ``siacuatest``: send data to a test machine.
-        
+
         OUTPUT:
 
         - this command prints the list of sended exercises for the siacua system.
@@ -589,6 +591,7 @@ class ExSiacua(ExerciseBase):
             1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
 
         TESTS:
+
             ~/Dropbox/all/megua/archive$ sage jsontest.sage
 
         """
@@ -596,29 +599,24 @@ class ExSiacua(ExerciseBase):
         if usernamesiacua=="":
             print "Please do 'meg.siacua?' in a cell for usage details."
             return
-        
+
         all_answers = []
-        
+
         for e_number in ekeys:
 
             #Create exercise instance
             self.update_timed(ekey=e_number)
 
 
-            # OLD OLD OLD OLD 
             ##Adapt for appropriate URL for images
-            #if ex_instance.image_list != []:
-            #    problem = self._adjust_images_url(self.problem())
-            #    answer = self._adjust_images_url(self.answer())
-            #    self._send_images()
-    
+            if self.image_pathnames != []:
+                problem = self._adjust_images_url(self.problem())
+                answer = self._adjust_images_url(self.answer())
+                self._send_images()
 
+            continue
+                
             assert(self.has_multiplechoicetag)
-            # OLD OLD OLD OLD OLD
-            #if self.image_pathnames != []:
-            #    answer_list = [self._adjust_images_url(choicetxt) for choicetxt in ex_instance.collect_options_and_answer()]
-            #else:
-            #   answer_list = ex_instance.collect_options_and_answer()
             answer_list = self._collect_options_and_answer()
 
 
@@ -651,19 +649,23 @@ class ExSiacua(ExerciseBase):
         #    os.system("cp -uv _images/%s.png /home/nbuser/megua_images" % fn)
         #
         #TUNE this:os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
-        import request
+        #import request
+        print "exsiacua.py: _send_images(): This are the images to be sent:"
+        print self.image_pathnames
+        print "end"
         
 
     def _adjust_images_url(self, input_text):
         """the url in problem() and answer() is <img src='_images/filename.png'>
         Here we replace _images/ by the public dropbox folder"""
 
-        target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
-        img_pattern = re.compile(r"src='_images/", re.DOTALL|re.UNICODE)
+        #target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
+        #img_pattern = re.compile(r"src='_images/", re.DOTALL|re.UNICODE)
 
-        (new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
+        #(new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
         #print "===> Replacement for %d url images." % number
-        return new_text
+        #return new_text
+        return input_text
 
 
 
@@ -770,7 +772,7 @@ class ExSiacua(ExerciseBase):
             "course": course,
             "exname": exname, 
             "ekey": str(e_number), 
-            "problem":  problem.strip().encode("utf-8"), 
+            "problem":  problem.strip().encode("utf-8"),
             "answer":   answer_list[-1].strip().encode("utf-8"),
             "rv":       answer_list[0].strip().encode("utf-8"),
             "nre": len(answer_list) - 2
@@ -946,13 +948,13 @@ class ExSiacua(ExerciseBase):
         - the (simple) html used is converted to latex (html2latex procedure)
         - <multiplechoice> tag is converted to \begin{itemize}
         - <choice> is converted to macro \\singleoption  (an \item)
-        
+
         INPUT:
-        
+
         - ``txt``: siacua problem or answer problem.
-        
+
         EXAMPLE::
-        
+
         sage: from megua.exsiacua import ExSiacua
         sage: txt = ur'''
         ....: <center>CENTERED</center>

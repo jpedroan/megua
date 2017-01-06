@@ -79,16 +79,16 @@ def pcompile(latex_text, workdir, filename):
     r"""
 
     INPUT:
-    
+
     - ``latex_text'': source LaTeX *text* in `utf8` or `str` type.
     - ``workdir'': directory where compilation is going to occur.
     - ``filename'': where to store the latex_text (with or without extension .tex).
-    
+
     OUTPUT:
-    
+
     - No output.
 
-    It compiles and in case of bad compilation the managment is left to 
+    It compiles and in case of bad compilation the managment is left to
     calling procedure.
 
     """
