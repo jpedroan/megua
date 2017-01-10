@@ -274,7 +274,7 @@ class UnifiedGraphics:
 
         if self._rendermethod=='imagefile':
             self.image_pathnames.add(pathname)
-            return r"<img src='%s' alt='%s' height='%d' width='%d'/>" % (pathname,gfilename+' graphic',scr_pixels[1],scr_pixels[0]) #
+            return r"<img src='%s' alt='%s' height='%d' width='%d' style='background-color:white;'/>" % (pathname,gfilename+' graphic',scr_pixels[1],scr_pixels[0]) #
         elif self._rendermethod=='includegraphics':
             self.image_pathnames.add(pathname)
             return "\n\\includegraphics[height=%dcm,width=%dcm]{%s}\n" % (paper_cm[1],papercm[0],pathname)

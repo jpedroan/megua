@@ -207,6 +207,7 @@ import os
 import re
 import codecs
 import subprocess
+import requests #TODO: passar tudo da web para este módulo
 
 #import json
 #Warnings
@@ -504,11 +505,23 @@ class ExSiacua(ExerciseBase):
             
             all_options += u'</table>\n'
 
+              
+            
+
+
+
+            #TODO: it's not working (see also templates/pt_pt/exsiacua_previewheader.html and exsiacua_previewoption.html)
+            rendered_problem = "\n" + r"""<section class="bg-white txt-grey txt-left"><div class="container"><div class="question"><span id="LabelQuestao">%s</span></div>""" % problem + "\n"
+            
             ex_text = u'<h3>Random {} with ekey={}</h3>'.format(self.unique_name(),e_number)
-            ex_text += problem + u'<br/><hr /><br />'
-            ex_text += all_options 
+            ex_text += rendered_problem + u'<br/><hr /><br />'
+            ex_text += all_options  + r"""</div></section>"""
             ex_text += u'\n<h4>Answer</h4>\n' + answer_list[-1]
 
+            
+            
+                
+                
             #Add one more instance with ekey
             allexercises += ex_text
 
@@ -519,7 +532,9 @@ class ExSiacua(ExerciseBase):
                 mathjax_header=MATHJAX_HEADER
         )
 
+        (html_string,number) = re.subn(r"\.OUTPUT/\w+/(\w+)", r"\1", html_string, re.DOTALL|re.UNICODE)  #, count=1)
 
+        
         #write all to an html file.
         html_full_path     = os.path.join(self.wd_fullpath,self.unique_name()+'_siacuapreview.html')
         f = codecs.open(html_full_path, mode='w', encoding='utf-8')
@@ -529,9 +544,9 @@ class ExSiacua(ExerciseBase):
 
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus
-            print "exsiacua.py: using salvus.link:"
+            #print "exsiacua.py: using salvus.link:"
             html_relative_path = os.path.join(self.wd_relative,self.unique_name()+'_siacuapreview.html')
-            salvus.link(html_relative_path)
+            salvus.file(html_relative_path,raw=True)
         elif MEGUA_PLATFORM=='DESKTOP':
             print "exsiacua.py: opening firefox ",html_full_path,"in the browser and press F5."
             subprocess.Popen(["firefox","-new-tab", html_full_path])
@@ -607,23 +622,8 @@ class ExSiacua(ExerciseBase):
             #Create exercise instance
             self.update_timed(ekey=e_number)
 
-
-            ##Adapt for appropriate URL for images
-            if self.image_pathnames != []:
-                problem = self._adjust_images_url(self.problem())
-                answer = self._adjust_images_url(self.answer())
-                self._send_images()
-
-            continue
-                
             assert(self.has_multiplechoicetag)
             answer_list = self._collect_options_and_answer()
-
-
-            #Create images for graphics (if they exist) 
-                #for problem
-                #for each answer
-                #collect consecutive image numbers.
 
             #build json string
             send_dict =  self._siacua_json(course, self.unique_name(), e_number, self._problem_whitoutmc(), answer_list, self.siacua_concepts)
@@ -634,7 +634,10 @@ class ExSiacua(ExerciseBase):
             if sendpost:
                 send_dict.update(dict({'usernamesiacua': usernamesiacua}))
                 print "exsiacua.py: send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
-                all_answers.append( self._siacua_send(send_dict) )
+                send_result = self._siacua_send(send_dict)
+                all_answers.append( send_result )
+                if self.image_pathnames != []: #TODO: check how to avoid send images without exercise
+                    self._send_images(siacuatest)
             else:
                 print "Not sending to siacua. Dictionary is", send_dict
 
@@ -642,8 +645,8 @@ class ExSiacua(ExerciseBase):
             print all_answers
 
 
-    def _send_images(self):
-        """Send images to siacua: now is to put them in a drpobox public folder"""
+    def _send_images(self,siacuatest):
+        """Send images to siacua: now is to put them in a drpobox public folder
         # AttributeError: MegBookWeb instance has no attribute 'image_list'
         #for fn in self.image_list:
         #    os.system("cp -uv _images/%s.png /home/nbuser/megua_images" % fn)
@@ -653,40 +656,67 @@ class ExSiacua(ExerciseBase):
         print "exsiacua.py: _send_images(): This are the images to be sent:"
         print self.image_pathnames
         print "end"
-        
+        """
+        import requests
+
+        if siacuatest:
+            url = 'http://siacuatest.web.ua.pt/MeguaInsert2.aspx'
+        else:
+            url = 'http://siacua.web.ua.pt/MeguaInsert2.aspx'
+
+        for f in self.image_pathnames:
+            print "Sending:",f
+            files = {'file': (os.path.basename(f), open(f, 'rb')) }
+            r = requests.post(url, files=files)
+            print "exsiacua.py: r.ok=",r.ok
+
+        print "exsiacua.py: done, sending images."
 
     def _adjust_images_url(self, input_text):
         """the url in problem() and answer() is <img src='_images/filename.png'>
-        Here we replace _images/ by the public dropbox folder"""
+        Here we replace _images/ by the public dropbox folder
 
+        OLD Dropbox code:
         #target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
         #img_pattern = re.compile(r"src='_images/", re.DOTALL|re.UNICODE)
 
         #(new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
         #print "===> Replacement for %d url images." % number
         #return new_text
-        return input_text
 
+        #TODO: adicionar o unique_name caso 
+        # - E12X34_Teste_001-E12X34_Teste_001-00.png  (case 1)
+        # - E12X34_Teste_001-1.png   (case 2)
+        #For case 1: remove exceeding header name
+        #(new_text,number) = re.subn("%s-(%s)"%(self.unique_name,self.unique_name), r"\1", new_text, re.DOTALL|re.UNICODE)  #, count=1)
+        """
 
+        (new_text,number) = re.subn(r"\.OUTPUT/\w+/(\w+)", r"../imagens/\1", input_text, re.DOTALL|re.UNICODE)  #, count=1)
 
-    def _send_images_dropbox(self):
-        """Send images to siacua: now is to put them in a drpobox public folder"""
-        # AttributeError: MegBookWeb instance has no attribute 'image_list'
-        #for fn in self.image_list:
-        #    os.system("cp -uv _images/%s.png /home/nbuser/megua_images" % fn)
-        #
-        #TUNE this:os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
-
-    def _adjust_images_url_dropbox(self, input_text):
-        """the url in problem() and answer() is <img src='_images/filename.png'>
-        Here we replace _images/ by the public dropbox folder"""
-
-        target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
-        img_pattern = re.compile(r"src='_images/", re.DOTALL|re.UNICODE)
-
-        (new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
-        #print "===> Replacement for %d url images." % number
+        #print "exsiacua.py ===> Replacement for %d url images." % number
+        #print new_text
         return new_text
+
+
+
+    #def _send_images_dropbox(self):
+    #    """Send images to siacua: now is to put them in a drpobox public folder"""
+    #    # AttributeError: MegBookWeb instance has no attribute 'image_list'
+    #    #for fn in self.image_list:
+    #    #    os.system("cp -uv _images/%s.png /home/nbuser/megua_images" % fn)
+    #    #
+    #    #TUNE this:os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
+
+    #def _adjust_images_url_dropbox(self, input_text):
+    #    """the url in problem() and answer() is <img src='_images/filename.png'>
+    #    Here we replace _images/ by the public dropbox folder"""
+    #
+    #    target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
+    #    img_pattern = re.compile(r"src='_images/", re.DOTALL|re.UNICODE)
+    #
+    #    (new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
+    #    #print "===> Replacement for %d url images." % number
+    #    return new_text
 
 
 
@@ -723,7 +753,7 @@ class ExSiacua(ExerciseBase):
             print response.status, response.reason
 
         conn.close()
-        
+
         #TODO: improve this because it's only one sent!
         #It's only one exercise sent, each call of this function
         if response.status==200:
@@ -766,6 +796,11 @@ class ExSiacua(ExerciseBase):
         #    "rv":       json.dumps(answer_list[0].strip(), encoding="utf-8"),
         #    "nre": len(answer_list) - 2
         #    } )
+
+        #Adapt for appropriate URL for images
+        if self.image_pathnames != []:
+            problem = self._adjust_images_url(problem)
+            answer_list = [self._adjust_images_url(a) for a in answer_list]
 
         d.update( {
             "siacua_key": SIACUA_WEBKEY,

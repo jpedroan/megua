@@ -676,6 +676,189 @@ class MegBook(MegSiacua):
             print "megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
 
 
+    def replicate_exercise(self,filename):
+        r"""
+        
+        TODO TODO TODO: esta rotina não foi acabada. Muitos detalhes.
+        
+        Replicate contents of filename and only change the number, increasing it.
+
+        INPUT:
+        - `filename`: a name in form E12X34_SomeName_001_latex ou _siacua or _moodle and related extension *.sagews or *.sage.
+
+
+        See def new_exercise() above.
+
+        """
+
+        # Directory where exercises are stored
+
+        #print "megbook.py, new_exercise:",filename
+
+        fullpath = os.path.join(
+            MEGUA_EXERCISE_INPUT,
+            filename)
+
+        if not os.path.isfile(fullpath) :
+            print "Megbook.py say: '%s' does not exist. Choose another name to replicate" % filename
+            return
+
+        # =====
+        # decision by file type
+        # =====
+
+        if filename[-7:] == '.sagews':
+
+            # =====
+            # decision by exercise type
+            # =====
+
+            if '_latex' in filename:
+
+                print "megbook.py, replicate_exercise: not implemented for this case."
+                return
+
+                htmlstr = u'<h4>%s (Latex)</h4>' % filename[0:-7]
+
+                e_string = templates.render("megbook_exlatex.sagews",
+                    unique_name=filename[0:-7],
+                    megbookfilename=PROJECT_DATABASE_NAME, #self.local_store_filename,
+                    uuid1=uuid(),
+                    uuid2=uuid(),
+                    uuid3=uuid(),
+                    uuid4=uuid(),
+                    marker_cell=MARKERS["cell"],
+                    marker_output=MARKERS["output"],
+                    html=htmlstr,
+                    json_html=json.dumps({'html':htmlstr})
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            elif '_amc' in filename:
+
+                print "megbook.py, replicate_exercise: not implemented for this case."
+                return
+                htmlstr = u'<h4>%s (Latex for AMC)</h4>' % filename[0:-7]
+
+                e_string = templates.render("megbook_examc.sagews",
+                    unique_name=filename[0:-7],
+                    megbookfilename=PROJECT_DATABASE_NAME, #self.local_store_filename,
+                    uuid1=uuid(),
+                    uuid2=uuid(),
+                    uuid3=uuid(),
+                    uuid4=uuid(),
+                    marker_cell=MARKERS["cell"],
+                    marker_output=MARKERS["output"],
+                    html=htmlstr,
+                    json_html=json.dumps({'html':htmlstr})
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            elif '_siacua' in filename:
+
+                # "_" is on -14:  '_siacua.sagews':
+                # "0" is on -17:  '001_siacua.sagews':
+
+                print filename
+                #invert the string
+                i_filename = filename[-15::-1]; print i_filename
+                #find next "_"
+                pos = i_filename.index("_")
+                #get number
+                nums = i_filename[0:pos][::-1]; print nums
+                #get value
+                value = int(nums)+1; print value
+                newnums = "%03d" % value; print newnums
+                #TODO: i'm here
+                new_filename = filename[:-17] + newnums + "_siacua.sagews"; print new_filename
+
+                fullpath_new = os.path.join( MEGUA_EXERCISE_INPUT, new_filename)
+
+                shutil.copy(fullpath,fullpath_new)
+                
+            else:
+
+                print templates.render("megbook_new_exercise_usage.txt")
+                return
+                
+            
+        elif filename[-5:] == '.sage':
+
+            print "megbook.py, replicate_exercise: not implemented for this case."
+            return
+
+            # =====
+            # decision by exercise type
+            # =====
+
+            #TODO: improve this
+
+            if '_latex' in filename:
+                
+                e_string = templates.render("megbook_exlatex.sage",
+                    unique_name=filename[0:-5],
+                    megbookfilename=self.local_store_filename,
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            elif '_amc' in filename:
+                
+                e_string = templates.render("megbook_examc.sage",
+                    unique_name=filename[0:-5],
+                    megbookfilename=self.local_store_filename,
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            elif '_siacua' in filename:
+                
+                e_string = templates.render("megbook_exsiacua.sage",
+                    unique_name=filename[0:-5],
+                    megbookfilename=self.local_store_filename,
+                )
+
+                with codecs.open(fullpath, mode='w', encoding='utf-8') as f:
+                    f.write(e_string)
+
+            else:
+                
+                print templates.render("megbook_new_exercise_usage.txt")
+                return
+            
+            
+        else:
+
+            print templates.render("megbook_new_exercise_usage.txt")
+            #print "Megbook.py say: filename must be " 
+            #    "a name in form E12X34_SomeName_001_latex ou "
+            #    "_siacua or _moodle and related extension *.sagews or *.sage."
+            return
+
+
+        if MEGUA_PLATFORM=='SMC':
+            from smc_sagews.sage_salvus import salvus
+            if salvus:
+                #salvus.file(fullpath_new,show=True,raw=True); print "\n"
+                print fullpath_new
+                print "salvus.open_tab(fullpath_new)"
+            else:
+                sys.path.append('/usr/local/lib/python2.7/dist-packages')
+                from smc_pyutil import smc_open
+                smc_open.process([fullpath_new])
+        elif MEGUA_PLATFORM=='DESKTOP':
+            print "MegBook module say: gvim ",fullpath
+            subprocess.Popen(["gvim",fullpath])
+        else:
+            print "megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+
+
         
         
     def save(self,uexercise):
