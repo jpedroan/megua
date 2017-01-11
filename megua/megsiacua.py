@@ -92,7 +92,7 @@ class MegSiacua:
         #done
 
 
-    def siacuapreview(self,unique_name=None,ekeys=[]):
+    def siacuapreview(self,ekeys,unique_name=None):
         r"""
 
         INPUT:
@@ -118,9 +118,12 @@ class MegSiacua:
             1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
 
         """
+        
         if not unique_name:
             unique_name = self._current_unique_name
 
+            
+            
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
         if not row:

@@ -348,6 +348,7 @@ class UnifiedGraphics:
                      varname,
                      paper_cm=None,
                      scr_pixels=None,
+                     dimx=400,dimy=400,
                      gtype='svg',
                      **kwargs):
         """This function is to be called by the author in the make_random or solve part.
@@ -357,6 +358,7 @@ class UnifiedGraphics:
         - `varname`: user supplied string that will be part of the filename.
         - `paper_cm`: pair (x,y) with size in centimeters.
         - `scr_pixels`: pair (x,y) with size in pixels.
+        - `dimx,dimy`: for compatibility.
         - `gtype`: can be svg, png, "etc"
         - `kwargs`: other keyword=value pairs for sage or matlotlib savefig command.
         
@@ -375,21 +377,28 @@ class UnifiedGraphics:
         #os.system("mkdir -p images") #The "-p" ommits errors if it exists.
 
         #TODO: protect agains too big images.
+        if paper_cm:
+            fsize = (paper_cm[0]/2.54,paper_cm[1]/2.54)
+        elif scr_pixels:
+            fsize = (scr_pixels[0]/100,scr_pixels[1]/100) #assume dpi=100
+        else:
+            fsize = (dimx/2.54,dimy/2.54) #old behaviour
+
         if type(graphic_object)==sage.plot.graphics.Graphics:
             graphic_object.save(
-                gpathname,
-                figsize=(paper_cm[0]/2.54,paper_cm[1]/2.54),
-                **kwargs)
+                    gpathname,
+                    figsize=fsize,
+                    **kwargs)
         else: #matplotlib assumed
             #http://stackoverflow.com/questions/9622163/matplotlib-save-plot-to-image-file-instead-of-displaying-it-so-can-be-used-in-b
             import matplotlib.pyplot as plt
             from pylab import savefig
             fig = plt.gcf() #Get Current Figure: gcf
-            fig.set_size_inches(dimx/2.54,dimy/2.54) #(dimx/2.54,dimy/2.54)
-            savefig(gpathname,figsize=(dimx/2.54,dimy/2.54),**kwargs)
+            fig.set_size_inches(paper_cm[0]/2.54,paper_cm[1]/2.54) #(dimx/2.54,dimy/2.54)
+            savefig(gpathname,figsize=(paper_cm[0]/2.54,paper_cm[1]/2.54),**kwargs)
             #TODO: savefig is saving what graphic? What to do with graphic_object parameter?
 
-        return self._render(gfilename,paper_cm,scr_pixels,gtype,kwargs)
+        return self._render(gfilename,paper_cm,scr_pixels)
 
 
     def latex_render(self,input_text):
