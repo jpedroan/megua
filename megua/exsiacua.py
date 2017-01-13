@@ -242,8 +242,12 @@ class ExSiacua(ExerciseBase):
         self.all_choices = []
         self.has_multiplechoicetag = None #Don't know yet.
 
-        #Extract, from summary, details about baysian network
-        self._siacua_extractparameters()
+        #Extract, from summary, details about bayesian network
+        #TODO: old mode of extracting bayesian parameters
+        if 'SIACUAstart' in self._summary_text:
+            print "exsiacua.py: please remove SIACUAStart...SIACUAend from %SUMMARY."
+            print "exsiacua.py: Add those lines, separated by commas ',' to meg.siacua(....) commmand."
+            self._siacua_extractparameters()
 
         #Call user derived function to generate a set of random variables.
         ExerciseBase.update(self,ekey,edict)
@@ -329,7 +333,7 @@ class ExSiacua(ExerciseBase):
     def _update_multiplechoice(self,input_text,where):
         """
         Called by ExSiacua.update()
-        
+
         Parses <multiplechoice>...</multiplecoice> and puts each option 
         in exercise fields: 
 
@@ -355,7 +359,7 @@ class ExSiacua(ExerciseBase):
         choices_match = re.search(r'<\s*multiplechoice\s*>(.+?)<\s*/multiplechoice\s*>', input_text, re.DOTALL|re.UNICODE)
         #print "group 0=",choices_match.group(0)
         #print "group 1=",choices_match.group(1)
-        
+
         if choices_match is None:
             raise SyntaxError("exsiacua module: problem should have <multiplechoice>...</multiplechoice> tags.")
 
@@ -371,7 +375,7 @@ class ExSiacua(ExerciseBase):
         #print "=========================="
         #print "exsiacua.py module say:", self.all_choices
         #print "=========================="
-        
+
         siacuaoption_template = templates.get_template("exsiacua_previewoption.html")
 
         all_options = u'<table style="width:100%;">\n'
@@ -379,14 +383,14 @@ class ExSiacua(ExerciseBase):
         for option in self.all_choices:
             option_html = siacuaoption_template.render(optiontext=option)
             all_options += option_html
-            
+
         all_options += u'</table>\n'
         #For sending it's important to know where options are stored.
         self.has_multiplechoicetag = True
 
         return all_options
 
-            
+
 
 
 
@@ -490,8 +494,8 @@ class ExSiacua(ExerciseBase):
     
             #Adapt for appropriate URL for images
             #if ex_instance.image_list != []:
-            #    problem = self._adjust_images_url(problem)
-            #    answer = self._adjust_images_url(answer)
+            #    problem = self._adjust_images_url(problem,course)
+            #    answer = self._adjust_images_url(answer,course)
             #    self.send_images()
     
             assert(self.has_multiplechoicetag)
@@ -502,26 +506,21 @@ class ExSiacua(ExerciseBase):
             for a in answer_list[:-1]:
                 option_html = siacuaoption_template.render(optiontext=a)
                 all_options += option_html
-            
-            all_options += u'</table>\n'
 
-              
-            
+            all_options += u'</table>\n'
 
 
 
             #TODO: it's not working (see also templates/pt_pt/exsiacua_previewheader.html and exsiacua_previewoption.html)
             rendered_problem = "\n" + r"""<section class="bg-white txt-grey txt-left"><div class="container"><div class="question"><span id="LabelQuestao">%s</span></div>""" % problem + "\n"
-            
+
             ex_text = u'<h3>Random {} with ekey={}</h3>'.format(self.unique_name(),e_number)
             ex_text += rendered_problem + u'<br/><hr /><br />'
             ex_text += all_options  + r"""</div></section>"""
             ex_text += u'\n<h4>Answer</h4>\n' + answer_list[-1]
 
-            
-            
-                
-                
+
+
             #Add one more instance with ekey
             allexercises += ex_text
 
@@ -571,22 +570,44 @@ class ExSiacua(ExerciseBase):
 
 
 
-    def siacua(self,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
+    def siacua(self,
+               ekeys=[],
+               course="calculo3",
+               usernamesiacua="(no username)",
+               level=1,
+               slip=0.05,
+               guess=0.25,
+               discr=0.5,
+               concepts = [ (0,  1) ],
+               grid2x2=False,
+               siacuatest=False,
+               sendpost=True
+              ):
         r"""
 
         INPUT:
 
         - ``ekeys``: list of numbers that generate the same problem instance.
 
-        - ``sendpost``: if True send information to siacua, otherwise simulates.
-
         - ``course``: Right now could be "calculo3", "calculo2". Ask siacua administrator for more.
 
         - ``usernamesiacua``: username used by the author in the siacua system.
 
-        - ``grid2x2``: write user options in multiplechoice in a 2x2 grid (useful for graphics) values in {0,1}.
+        - ``level``: (usually 1) I don't know what does this mean but it's an small integer number.
 
-        - ``siacuatest``: send data to a test machine.
+        - ``slip``: (0,...,1) The probability of knowing how to answer, commit a mistake.
+
+        - ``guess``: (usually 0.25) The probability of guessing the right option.
+
+        - ``discr``: (0,...,1) Parameter `discr` is the probability that a student knows how to select the right answer.
+
+        - ``concepts``: a list like [(110, 0.3),(135, 0.7)] where 0.3+0.7 = 1 and 110 and 135 are codes of concepts.
+
+        - ``grid2x2``: (usually False) Write exercise answering options in a 2x2 grid (useful for graphics).
+
+        - ``siacuatest``: (usually False) If True, send data to a test machine.
+
+        - ``sendpost``: (usually True) If True send information to siacua, otherwise simulates to check problems.
 
         OUTPUT:
 
@@ -611,16 +632,17 @@ class ExSiacua(ExerciseBase):
 
         """
 
-        if usernamesiacua=="":
-            print "Please do 'meg.siacua?' in a cell for usage details."
-            return
-
         all_answers = []
 
         for e_number in ekeys:
 
             #Create exercise instance
             self.update_timed(ekey=e_number)
+
+            #NOTE: inside self.update (many lines above) there is
+            #extract parameters (old mode). This is the new mode:
+            self.siacua_parameters = dict(level=level, slip=slip, guess=guess,discr=discr)
+            self.siacua_concepts = concepts
 
             assert(self.has_multiplechoicetag)
             answer_list = self._collect_options_and_answer()
@@ -637,15 +659,21 @@ class ExSiacua(ExerciseBase):
                 send_result = self._siacua_send(send_dict)
                 all_answers.append( send_result )
                 if self.image_pathnames != []: #TODO: check how to avoid send images without exercise
-                    self._send_images(siacuatest)
+                    self._send_images(siacuatest,course=course)
             else:
                 print "Not sending to siacua. Dictionary is", send_dict
 
         if all_answers:
             print all_answers
+            if sendpost:
+                if siacuatest:
+                    print "Abrir http://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+                else:
+                    print "Abrir http://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+        #end
 
 
-    def _send_images(self,siacuatest):
+    def _send_images(self,siacuatest,course):
         """Send images to siacua: now is to put them in a drpobox public folder
         # AttributeError: MegBookWeb instance has no attribute 'image_list'
         #for fn in self.image_list:
@@ -666,13 +694,13 @@ class ExSiacua(ExerciseBase):
 
         for f in self.image_pathnames:
             print "Sending:",f
-            files = {'file': (os.path.basename(f), open(f, 'rb')) }
+            files = {'file': (course+"_"+os.path.basename(f), open(f, 'rb')) }
             r = requests.post(url, files=files)
             print "exsiacua.py: r.ok=",r.ok
 
         print "exsiacua.py: done, sending images."
 
-    def _adjust_images_url(self, input_text):
+    def _adjust_images_url(self, input_text, course):
         """the url in problem() and answer() is <img src='_images/filename.png'>
         Here we replace _images/ by the public dropbox folder
 
@@ -691,7 +719,7 @@ class ExSiacua(ExerciseBase):
         #(new_text,number) = re.subn("%s-(%s)"%(self.unique_name,self.unique_name), r"\1", new_text, re.DOTALL|re.UNICODE)  #, count=1)
         """
 
-        (new_text,number) = re.subn(r"\.OUTPUT/\w+/(\w+)", r"../imagens/\1", input_text, re.DOTALL|re.UNICODE)  #, count=1)
+        (new_text,number) = re.subn(r"\.OUTPUT/\w+/(\w+)", r"../imagens/%s_\1"%course, input_text, re.DOTALL|re.UNICODE)  #, count=1)
 
         #print "exsiacua.py ===> Replacement for %d url images." % number
         #print new_text
@@ -766,7 +794,7 @@ class ExSiacua(ExerciseBase):
         r"""From ekeys or many build a range of ekeys."""
 
         if ekeys is None or len(ekeys)==0:
-            
+
             #generate incresing sequence of keys
             #start = random.randint(1,100000)
             start = ZZ.random_element(1,100000)
@@ -799,8 +827,8 @@ class ExSiacua(ExerciseBase):
 
         #Adapt for appropriate URL for images
         if self.image_pathnames != []:
-            problem = self._adjust_images_url(problem)
-            answer_list = [self._adjust_images_url(a) for a in answer_list]
+            problem = self._adjust_images_url(problem,course)
+            answer_list = [self._adjust_images_url(a,course) for a in answer_list]
 
         d.update( {
             "siacua_key": SIACUA_WEBKEY,
@@ -957,12 +985,7 @@ class ExSiacua(ExerciseBase):
             #print "GROUP 1=", concepts_match.group(1)
             exec concepts_match.group(1)
             #[assert( w in globals()) for w in ['guess', 'slip', 'guess', 'discr', 'concepts'] ]
-        else:
-            print "For the siacua system %SUMMARY needs the following lines:\nSIACUAstart\nguess=2;  slip= 0.2; guess=0.25; discr=0.3;\nconcepts = [(1221, 0.5),(1222, 1)]\nSIACUAend\n"
-            raise ValueError
-
-        self.siacua_parameters = dict(level=level, slip=slip, guess=guess,discr=discr)
-        self.siacua_concepts = concepts
+            print "Add this to meg.siacua: level=%d,slip=%f,guess=%f,discr=%f,concepts=%s" % (level, slip, guess, discr, concepts)
 
 
 

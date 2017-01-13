@@ -34,22 +34,44 @@ class MegSiacua:
 
 
     #TODO: rever isto tudo
-    def siacua(self,unique_name=None,ekeys=[],sendpost=False,course="calculo3",usernamesiacua="",grid2x2=0,siacuatest=False):
+    def siacua(self,
+               ekeys=[],
+               course="calculo3",
+               usernamesiacua="(no username)",
+               level=1,
+               slip=0.05,
+               guess=0.25,
+               discr=0.5,
+               concepts = [ (0,  1) ],
+               grid2x2=False,
+               siacuatest=False,
+               sendpost=True
+              ):
         r"""
 
         INPUT:
 
-        - ``unique_name``: unique exercise name (name in "class E12X34_something_001(Exercise):").
-
         - ``ekeys``: list of numbers that generate the same problem instance.
-
-        - ``sendpost``: if True send information to siacua.
 
         - ``course``: Right now could be "calculo3", "calculo2". Ask siacua administrator for more.
 
         - ``usernamesiacua``: username used by the author in the siacua system.
 
-        - ``grid2x2``: write user options in multiplechoice in a 2x2 grid (useful for graphics) values in {0,1}.
+        - ``level``: (usually 1) I don't know what does this mean but it's an small integer number.
+
+        - ``slip``: (0,...,1) The probability of knowing how to answer, commit a mistake.
+
+        - ``guess``: (usually 0.25) The probability of guessing the right option.
+
+        - ``discr``: (0,...,1) Parameter `discr` is the probability that a student knows how to select the right answer.
+
+        - ``concepts``: a list like [(110, 0.3),(135, 0.7)] where 0.3+0.7 = 1 and 110 and 135 are codes of concepts.
+
+        - ``grid2x2``: (usually False) Write exercise answering options in a 2x2 grid (useful for graphics).
+
+        - ``siacuatest``: (usually False) If True, send data to a test machine.
+
+        - ``sendpost``: (usually True) If True send information to siacua, otherwise simulates to check problems.
 
         OUTPUT:
 
@@ -59,10 +81,7 @@ class MegSiacua:
 
         - you can export between 3 and 6 wrong options and 1 right.
 
-        EXAMPLE:
-
-            sage: meg.siacua(exname="E97K50_Laplace_001_siacua",ekeys=[1,2,5],sendpost=False,course="calculo2",usernamesiacua="jeremias")
-
+        TODO: securitykey: implemenent in a megua-server configuration file.
 
         LINKS:
             http://docs.python.org/2/library/json.html
@@ -71,14 +90,14 @@ class MegSiacua:
         Algorithm:
             1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
 
+        TESTS:
+
+            ~/Dropbox/all/megua/archive$ sage jsontest.sage
 
         """
 
-        if not unique_name:
-            unique_name = self._current_unique_name
-
         #Get summary, problem and answer and class_text
-        row = self.megbook_store.get_classrow(unique_name)
+        row = self.megbook_store.get_classrow(self._current_unique_name)
         if not row:
             print "megsiacua module: %s cannot be accessed on database." % unique_name
             return
@@ -87,10 +106,10 @@ class MegSiacua:
         ex_instance = self.exerciseinstance(row=row, ekey=0)
 
         #exercise instance will sent instances to siacua
-        ex_instance.siacua(ekeys,sendpost,course,usernamesiacua,grid2x2,siacuatest)
+        ex_instance.siacua(ekeys,course,usernamesiacua,level,slip,guess,discr,concepts,grid2x2,siacuatest,sendpost)
 
         #done
-
+            
 
     def siacuapreview(self,ekeys,unique_name=None):
         r"""
@@ -118,25 +137,19 @@ class MegSiacua:
             1. Read from "%ANSWER" until "</generalfeedback>" and parse this xml string.
 
         """
-        
+
         if not unique_name:
             unique_name = self._current_unique_name
 
-            
-            
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
         if not row:
             print "megsiacua module: %s cannot be accessed on database." % unique_name
             return
-        
         #Create an instance (ekey=0 because it needs one.)
         ex_instance = self.exerciseinstance(row=row, ekey=0)
 
         #exercise instance will sent instances to siacua
         ex_instance.siacuapreview(ekeys)
 
-        
 #end class MegSiacua
-        
-        
