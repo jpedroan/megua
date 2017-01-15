@@ -473,7 +473,11 @@ class MegBook(MegSiacua):
 
         if MEGUA_PLATFORM=='SMC':
             from smc_sagews.sage_salvus import salvus
-            salvus.html("<h4>{}&nbsp;&nbsp;{}</h4>".format(unique_name,'<img src="https://cloud.sagemath.com/4531e156-82ac-4387-8f19-b066e940b28b/raw/stationary/small_megua_dog.png"/>'))
+            salvus.html("<h4>{}&nbsp;&nbsp;{}</h4><p>{}</p>".format(
+                    unique_name,
+                    '<img src="https://cloud.sagemath.com/4531e156-82ac-4387-8f19-b066e940b28b/raw/stationary/small_megua_dog.png"/>',
+                    '<a href="https://github.com/jpedroan/megua/wiki" target=_blank>MEGUA wiki for help</a> or email to dmat-siacua@ua.pt.'
+                ))
         elif MEGUA_PLATFORM=='DESKTOP':
             print "Exercise {}".format(unique_name)
         else:
