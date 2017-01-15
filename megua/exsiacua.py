@@ -657,14 +657,14 @@ class ExSiacua(ExerciseBase):
                 send_dict.update(dict({'usernamesiacua': usernamesiacua}))
                 print "exsiacua.py: send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
                 send_result = self._siacua_send(send_dict)
-                all_answers.append( send_result )
+                all_answers += send_result
                 if self.image_pathnames != []: #TODO: check how to avoid send images without exercise
                     self._send_images(siacuatest,course=course)
             else:
                 print "Not sending to siacua. Dictionary is", send_dict
 
         if all_answers:
-            print all_answers
+            print 'Exercícios a consultar no SIACUA: ' + ', '.join(all_answers) + '.'
             if sendpost:
                 if siacuatest:
                     print "Abrir http://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
@@ -693,10 +693,10 @@ class ExSiacua(ExerciseBase):
             url = 'http://siacua.web.ua.pt/MeguaInsert2.aspx'
 
         for f in self.image_pathnames:
-            print "Sending:",f
+            #print "Sending:",f
             files = {'file': (course+"_"+os.path.basename(f), open(f, 'rb')) }
             r = requests.post(url, files=files)
-            print "exsiacua.py: r.ok=",r.ok
+            #print "exsiacua.py: r.ok=",r.ok
 
         print "exsiacua.py: done, sending images."
 
@@ -767,11 +767,13 @@ class ExSiacua(ExerciseBase):
             #TODO: Resultado: <span id="resultado">Muito bem, melhorou o exercício, parabéns! id=3883</span>
             data = response.read()
             if "Muito bem, melhorou" in data:
-                akword = "Ex. improved:"
+                akword = "Improved:"
+                choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
             else:
-                akword = "New ex.:"
+                choice_pattern = re.compile(r'id = (\d+)', re.DOTALL|re.UNICODE)
+                akword = "New:"
 
-            choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
+            #print "exsiacua.py: data=",data
             match_iter = re.finditer(choice_pattern,data) 
             all_ids = [ "{} {}".format(akword,match.group(1)) for match in match_iter] #TODO: do this better
 
@@ -785,7 +787,7 @@ class ExSiacua(ExerciseBase):
         #TODO: improve this because it's only one sent!
         #It's only one exercise sent, each call of this function
         if response.status==200:
-            return str(all_ids)
+            return all_ids
         else:
             return 'Not sent: ekey={}'.format(send_dict["ekey"])
 
