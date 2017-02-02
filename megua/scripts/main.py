@@ -79,9 +79,12 @@ def usage(argv):
         print "Arguments:"
         print "  help <cmd>          -- calls help on command <cmd>"  
         print "  new <filename>      -- make new exercise file"  
+        print "  replicate <filename>-- make new exercise file"  
         print "  catalog             -- produce a catalog based on exercises database"  
+        print "Advanced:"
         print "  status              -- show unsyncronized worksheet exercise files"  
         print "  add                 -- add unsyncronized worksheet exercise files"  
+    #TODO: are the following lines useful?
     elif len(argv)==2 and not sys.argv[1] in ['catalog','new','status','add']:
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
@@ -94,6 +97,7 @@ def usage(argv):
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
         print "megua catalog         -- produces a pdf file with an instance with all exercises."
+        print "                         Many of them have \\verbatim commands when compilation is not possible."
     elif len(argv)>=3 and sys.argv[1]=='help' and sys.argv[2]=='status':
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
@@ -110,8 +114,8 @@ def usage(argv):
     elif len(argv)==3 and sys.argv[1]=='help' and sys.argv[2]=='new':
         usage_new()
     else:
-        usage([])        
-        
+        usage([])
+
     usage_show_options()
 
 
@@ -138,6 +142,22 @@ def usage_show_options():
 def valid_filename(filename):
     #check meg.new_exercise: maybe this is not needed.
     return ("_siacua" in filename or "_latex" in filename) and ( filename[-7:] == '.sagews' or filename[-5:] == '.sage')
+
+
+def replicate_exercise(filename):
+    """Replicate an exercise and save contents in
+    a new file with increased counter.
+
+    INPUT:
+
+    - `filename': just the name of the file containing the exercise.
+
+    OUTPUT:
+
+    - non yet!
+
+    """
+        
 
 
 
@@ -244,6 +264,13 @@ def main():
         inputfiles_status()
     elif sys.argv[1] == 'add':
         inputfiles_add()
+    elif sys.argv[1] == 'replicate':
+        if len(sys.argv)<3: # or (len(sys.argv)==3 and not valid_filename(sys.argv[2])):
+            usage(sys.argv)
+            return 0
+        if len(sys.argv)>3:
+            print "megua replicate <filename>, only; other arguments were ignored."
+        replicate_exercise(sys.argv[2])
     elif sys.argv[1] == 'new':
         if len(sys.argv)<3: # or (len(sys.argv)==3 and not valid_filename(sys.argv[2])):
             usage(sys.argv)
@@ -279,7 +306,7 @@ print "HOME=",environ["HOME"]  # and if is root?
 ######################
 INSIDE_SMC = False
 try:
-    from smc_sagews.sage_salvus import salvus
+    <F12>from smc_sagews.sage_salvus import salvus
 except ImportError as e:
     INSIDE_SMC = e.message == "No module named smc_sagews.sage_salvus"
 

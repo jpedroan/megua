@@ -1,5 +1,6 @@
 # coding=utf-8
 
+
 r"""
 Converter from some megua.sqlite to *.sagews files.
 
@@ -7,13 +8,15 @@ Converter from some megua.sqlite to *.sagews files.
 AUTHORS:
 
 - Pedro Cruz (2016-03): First version (refactoring old "megua" for SMC).
+- Pedro Cruz (2017-02): Reading ekeys from siacua file because they were not stored in DB. Using Python3.
 
 
 DISCUSSION:
 
-Each project has is own sqlite database.
-Those databases are to be re-used in SMC but a new version of each exercise, 
-each file for each exercise, is to be created in SMC.
+Each project 2012-2015 has is own sqlite database.
+
+Those databases are to be re-used in SMC but a new version of each exercise
+(meaning, each file for each exercise) is to be created in SMC.
 
 
 HOW TO CONVERT:
@@ -27,22 +30,27 @@ In the following, consider variations of this names:
 - megua_siacua.sqlite.sage: contains all text from exercises from old database.
 
 
-The, follow the steps:
+The follow the steps:
 
 1. Extract exercises from the latex sqlite database, megua 5.2, to 
 individual *.sagews files, individual *.sage files, and 
-one large *.sage file containing all exercises. This file will be used to recreate the new database.
+one large *.sage file containing all exercises. 
+
+This file will be used to recreate the new database.
 
 
 ::
 
-   sage -python $HOME/megua/megua/c_meg2smc.py latex megua_latex.sqlite .newfile.sqlite 
+   sage -python $HOME/megua/megua/script/megua2smc.py latex megua_latex.sqlite .newfile.sqlite 
 
 2. Do the same but for the web sqlite old database format with:
 
 ::
 
-   sage -python $HOME/megua/megua/c_meg2smc.py web megua_siacua.sqlite .newfile.sqlite
+   sage -python $HOME/megua/megua/script/megua2smc.py web megua_siacua.sqlite .newfile.sqlite course username
+
+where "course" could be "calculo2" and "username" could be f123".
+
 
 3. After using the first two forms, it is necessary to run a large file using
 
@@ -51,7 +59,9 @@ one large *.sage file containing all exercises. This file will be used to recrea
    sage <megua.sqlite.sage>
    
 for the appropriate database name, to recreate the new database with 
-all exercises in the new format. Errors will appear so:
+all exercises in the new format. 
+
+Errors will appear so:
 
 - correct <exercise>.sage file and after corretion, delete the 
 exercise from megua_xxxx.sqlite.sage.
@@ -61,10 +71,12 @@ exercise from megua_xxxx.sqlite.sage.
 4. Do this for both latex and siacua web exercises, in order them to be 
 saved to the same database .newfile.sqlite.
 
-5. All individual *.sage files are now correct and have been stores to .newfile.sqlite. 
-Now, run the follwoing to create individual *.sagews files.
 
-   sage -python $HOME/megua/megua/c_meg2smc.py mix .newfile.sqlite .newfile.sqlite
+5. All individual *.sage files are now correct and have been stored to .newfile.sqlite. 
+
+Now, run the following to create individual *.sagews files.
+
+   sage -python $HOME/megua/megua/megua2smc.py mix .newfile.sqlite .newfile.sqlite
 
 
 6. Then, export all *.sagews and .newfile.sqlite to SMC.
@@ -133,7 +145,36 @@ MARKERS = {'cell':u"\uFE20", 'output':u"\uFE21"}
 re_class = re.compile(ur'^class[ \t]+(E([a-zA-Z0-9]+)_\w+_\d+\w*)\(\w+\):\s*',re.U)
 
 
-def meg2smc(instyle,sqlitefilename,newmegbookfilename):
+SEND_SIACUA = ( 
+        "meg.siacua(\n"
+        "  ekeys={0},\n"
+        "  course={1},\n"
+        "  username={2},\n"
+        "  level=1,\n"     
+        "  slip=0.05,\n"
+        "  guess=0.25,\n"
+        "  discr=0.3,\n"
+        "  concepts= {3}\n"
+        "  grid2x2=False,\n"
+        "  siacuatest=False)\n"
+)
+
+
+#meg.siacua(
+#  ekeys=[0,10],  # Cada inteiro gera um exercício diferente.
+#  course='{{course}}',  # Pode alterar o curso. Consulte o administrador do siacua.
+#  usernamesiacua='{{usernamesiacua}}',  # Pode alterar o username.
+#  level=1,     # I don't know what does this mean but it's an small integer number.
+#  slip=0.05,   # The probability of knowing how to answer, commit a mistake.
+#  guess=0.25,  # The probability of guessing the right option without any study.
+#  discr=0.5,   # Parameter `discr` is the probability that a student knows how to find the right answer.
+#  concepts= [ (0,   1)], # Uma lista como [(110, 0.3),(135, 0.7)] onde 0.3+0.7 = 1 e 110 e 135 são 3 dígitos (Assunto, Tema, Conceito).
+#  grid2x2=False,  # Write exercise answering options in a 2x2 grid (useful for graphics).
+#  siacuatest=False )  # If True, send data to a test machine.
+
+
+
+def meg2smc(instyle,sqlitefilename,newmegbookfilename,course="",usernamesiacua=""):
     r"""
     Reads a sqlite file from megua5.2 (latex or web styles) and generated a *.sagews file
     for each exercise and a *.sage file.
@@ -152,6 +193,8 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename):
     - ``instyle``: latex or web (megua5.2 styles) or mix (for smc style)
     - ``sqlitefilename``: existent sqlite file
     - ``newmegbookfilename``: this will be part of each new *.sagews file and *.sage
+    - ``course``: could be calculo2 (no \")
+    - ``username``: could be f123 (no \")
 
     OUTPUT:
     
@@ -172,9 +215,12 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename):
     newsagefile.write(u'#meg = MegBook("%s")\n\n' % newmegbookfilename)
     newsagefile.write(u'''print "Open file %s and replace all 'Exercise.' by 'ExLatex.' or 'ExSiacua.';"\n\n''')
 
-
+    exdict = read_ekeys(course)
 
     for row in ExIter(lstore):
+
+
+        #print row.keys()
 
         #Change in exercise class name
         lines = row["class_text"].splitlines(True) #including \n
@@ -190,7 +236,8 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename):
             htmlstr = u'<h4>%s</h4>' % new_unique_name
         elif instyle == "web":    
             #siacua system does not have "_siacua" in their names
-            new_unique_name = row['unique_name'] + '_siacua' 
+            #new_unique_name = row['unique_name'] + '_siacua' 
+            new_unique_name = row['owner_key'] + '_siacua' 
             new_codetext = u'class {0}(ExSiacua):\n'.format(new_unique_name)
             htmlstr = u'<h4>%s (Siacua)</h4>' % new_unique_name
         else: #mix style
@@ -216,25 +263,66 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename):
         else:
             (problemtext,answertext) = (row['problem_text'],row['answer_text'])
 
-        #save this ex to its own file.
-        exstr1 = templates.render("megua2smc.sagews",
-                    megbookfilename=newmegbookfilename,
-                    unique_name=new_unique_name,
-                    summary=row["summary_text"],
-                    sections=row['sections_text'],
-                    problem_name=row['suggestive_name'],
-                    problem=problemtext,
-                    answer=answertext,
-                    code=new_codetext,
-                    uuid1=uuid(),
-                    uuid2=uuid(),
-                    uuid3=uuid(),
-                    uuid4=uuid(),
-                    marker_cell=MARKERS["cell"],
-                    marker_output=MARKERS["output"],
-                    html=htmlstr,
-                    json_html=json.dumps({'html':htmlstr})
-        )
+
+        if "_siacua" in new_unique_name:
+            #Build send_siacua_string
+
+            for k in exdict.keys():
+
+                #print(exdict[k][0],"\n") 
+                #print(list( set(exdict[k][0]) ),"\n")
+                exdict[k] = ( list( set(exdict[k][0]) ) , list( set(exdict[k][1]) ) )
+
+            #print("\n",ts.format(exdict[k][0],exdict[k][1],k) ,"\n")
+            send_siacua_string = SEND_SIACUA.format(exdict[k][0],exdict[k][1],k)
+
+            #save this ex to its own file.
+            exstr1 = templates.render("megua2smc.sagews",
+                        megbookfilename=newmegbookfilename,
+                        unique_name=new_unique_name,
+                        course=course,
+                        usernamesiacua=usernamesiacua,
+                        send_siacua=send_siacua_string,
+                        summary=row["summary_text"],
+                        sections=row['sections_text'],
+                        problem_name=row['suggestive_name'],
+                        problem=problemtext,
+                        answer=answertext,
+                        code=new_codetext,
+                        uuid1=uuid(),
+                        uuid2=uuid(),
+                        uuid3=uuid(),
+                        uuid4=uuid(),
+                        uuid5=uuid(),
+                        uuid6=uuid(),
+                        marker_cell=MARKERS["cell"],
+                        marker_output=MARKERS["output"],
+                        html=htmlstr,
+                        json_html=json.dumps({'html':htmlstr})
+            )
+        else:
+            #save this ex to its own file.
+            exstr1 = templates.render("megua2smc.sagews",
+                        megbookfilename=newmegbookfilename,
+                        unique_name=new_unique_name,
+                        summary=row["summary_text"],
+                        sections=row['sections_text'],
+                        problem_name=row['suggestive_name'],
+                        problem=problemtext,
+                        answer=answertext,
+                        code=new_codetext,
+                        uuid1=uuid(),
+                        uuid2=uuid(),
+                        uuid3=uuid(),
+                        uuid4=uuid(),
+                        uuid5=uuid(),
+                        uuid6=uuid(),
+                        marker_cell=MARKERS["cell"],
+                        marker_output=MARKERS["output"],
+                        html=htmlstr,
+                        json_html=json.dumps({'html':htmlstr})
+            )
+            
         open(new_unique_name+".sagews","w").write(exstr1.encode("utf8"))
 
 
@@ -297,8 +385,64 @@ def _CDATA_parser(row):
         options[l] = "".join(["<choice>",options[l],"</choice>\n\n"])
     
     options_text = u'\n<multiplechoice>\n\n' + ''.join(options[0:-1]) + u'\n</multiplechoice>\n'
-   
+
     return (row['problem_text'] + u'\n\n' + options_text,options[-1])
+
+
+
+def read_ekeys(COURSE=None):
+
+    assert(COURSE)
+
+    # Python 3.4
+    # https://docs.python.org/3.4/library/csv.html
+
+
+    import csv 
+
+    try:
+        newsagefile = codecs.open('ekeys.csv', 'r', 'utf-8')
+    except:
+        print("Cannot open file ekeys.csv.This file shoube be in current directory and was obtained from siacua db.\n")
+        return None
+
+    #Com Dictreader, o header fica logo lido e as row são dicts.
+    leitor = csv.DictReader(csvfile) 
+
+    exdict = dict()
+
+    i = 0
+    for row in leitor:
+        
+        #print(row)
+        #{'conceptid': '211', 'ekey': '1111', 'peso': '1', 'exid': '4', 'Course': 'calculo3', 'Description': 'Domínios de funções escalares', 'exname': 'dominios1'}
+
+        # "exname": ( [ ekey, ekeys,....] , [ (concp_id,peso), ...] )
+
+        exname = row['exname']
+
+        if row["Course"] != COURSE:
+            continue
+
+        try:
+            if exname in exdict.keys():
+                exdict[exname][0].append( int(row['ekey']) )
+                exdict[exname][1].append( ( int(row['conceptid']), float(row['peso'])) )
+            else:
+                exdict[exname] = ( [ int(row['ekey']) ] , [(int(row['conceptid']), float(row['peso']))] )
+        except:
+            print("\n\n\n","Problema com:",exname,"\n\n")
+            del exdict[exname]
+
+
+        i = i + 1
+        if i > 20:
+            break
+
+        print("read_ekeys: Numero de exercicios em c3:",len(exdict))
+        return exdict
+
+
 
 
 if __name__=='__main__':
@@ -318,11 +462,11 @@ if __name__=='__main__':
         ##### "1.......................26..................................................78
         #####  |.....................--.|...................................................|
         print "Open old sqlite db and change owner_key to unique_name."
-        print "See more details in c_meg2smc.py file."
+        print "See more details in megua2smc.py file."
         print "Usage examples:"
-        print "[1] sage -python $HOME/megua/megua/c_meg2smc.py latex megua_latex.sqlite .newfile.sqlite" 
-        print "[2] sage -python $HOME/megua/megua/c_meg2smc.py web megua_siacua.sqlite .newfile.sqlite"
-        print "[3] sage -python $HOME/megua/megua/c_meg2smc.py mix .newfile.sqlite .newfile.sqlite"
+        print "[1] sage -python $HOME/megua/megua/megua2smc.py latex megua_latex.sqlite .newfile.sqlite" 
+        print "[2] sage -python $HOME/megua/megua/megua2smc.py web megua_siacua.sqlite .newfile.sqlite course username"
+        print "[3] sage -python $HOME/megua/megua/megua2smc.py mix .newfile.sqlite .newfile.sqlite"
         exit()
         
     print "Producing *.sagews files from '%s' for %s...." % (sys.argv[2],sys.argv[1])
@@ -332,6 +476,12 @@ if __name__=='__main__':
     if not os.path.isfile(sys.argv[2]):
         print "...filename does not exist."
         exit()
-    meg2smc(sys.argv[1],sys.argv[2],sys.argv[3])
+    if len(sys.argv)==4:
+        meg2smc(sys.argv[1],sys.argv[2],sys.argv[3])
+    else:
+        meg2smc(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5])
+
+
+
 
 
