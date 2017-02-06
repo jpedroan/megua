@@ -33,7 +33,7 @@ import glob
 import codecs
 
 # MEGUA
-from megua.megoptions import PROJECT_DATABASE_FULLPATH, MEGUA_EXERCISE_INPUT, MEGUA_PLATFORM
+from megua.megoptions import PROJECT_DATABASE_NAME,PROJECT_DATABASE_FULLPATH, MEGUA_EXERCISE_INPUT, MEGUA_PLATFORM
 from megua.parse_ex import parse_ex
 from megua.tounicode import to_unicode
 from megua.all import meg
@@ -91,7 +91,7 @@ def inputfiles_status():
             #print row["unique_name"]
             
             if not meg.megbook_store.get_classrow(row["unique_name"]):
-                print row["unique_name"],"is not in",PROJECT_DATABASE
+                print row["unique_name"],"is not in",PROJECT_DATABASE_NAME
                 
         else:
             print "\n",fn,"does not have 'save' command (it seems it does not have an exercise).\n"
