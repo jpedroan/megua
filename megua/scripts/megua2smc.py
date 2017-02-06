@@ -148,8 +148,8 @@ re_class = re.compile(ur'^class[ \t]+(E([a-zA-Z0-9]+)_\w+_\d+\w*)\(\w+\):\s*',re
 SEND_SIACUA = ( 
         "meg.siacua(\n"
         "  ekeys={0},\n"
-        "  course={1},\n"
-        "  username={2},\n"
+        "  course='{1}',\n"
+        "  username='{2}',\n"
         "  level=1,\n"     
         "  slip=0.05,\n"
         "  guess=0.25,\n"
@@ -236,8 +236,7 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename,course="",usernamesiacua="
             htmlstr = u'<h4>%s</h4>' % new_unique_name
         elif instyle == "web":    
             #siacua system does not have "_siacua" in their names
-            #new_unique_name = row['unique_name'] + '_siacua' 
-            new_unique_name = row['owner_key'] + '_siacua' 
+            new_unique_name = row['unique_name'] + '_siacua' 
             new_codetext = u'class {0}(ExSiacua):\n'.format(new_unique_name)
             htmlstr = u'<h4>%s (Siacua)</h4>' % new_unique_name
         else: #mix style
@@ -265,16 +264,15 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename,course="",usernamesiacua="
 
 
         if "_siacua" in new_unique_name:
-            #Build send_siacua_string
 
-            for k in exdict.keys():
+            uname = row['unique_name']
+            try:
+                print "{0}, {1}, {2}, {3}\n".format(exdict[uname][0],course,usernamesiacua,exdict[uname][1]) 
+                send_siacua_string = SEND_SIACUA.format(exdict[uname][0],course,usernamesiacua,exdict[uname][1])
+            except:
+                print "unique_name=",uname,"has no ekey data."
+                send_siacua_string = SEND_SIACUA
 
-                #print(exdict[k][0],"\n") 
-                #print(list( set(exdict[k][0]) ),"\n")
-                exdict[k] = ( list( set(exdict[k][0]) ) , list( set(exdict[k][1]) ) )
-
-            #print("\n",ts.format(exdict[k][0],exdict[k][1],k) ,"\n")
-            send_siacua_string = SEND_SIACUA.format(exdict[k][0],exdict[k][1],k)
 
             #save this ex to its own file.
             exstr1 = templates.render("megua2smc.sagews",
@@ -401,17 +399,18 @@ def read_ekeys(COURSE=None):
     import csv 
 
     try:
-        newsagefile = codecs.open('ekeys.csv', 'r', 'utf-8')
+        #csvfile = codecs.open('ekeys.csv', 'r', 'utf-8')
+        csvfile = open('ekeys_latin1.csv','r') # codecs.open('ekeys_latin1.csv', 'r', 'latin1')
     except:
-        print("Cannot open file ekeys.csv.This file shoube be in current directory and was obtained from siacua db.\n")
-        return None
+        print "megua2smc.py: Cannot open file ekeys.csv. This file shoube be in current directory and was obtained from siacua db.\n"
+        exit(-1)
 
     #Com Dictreader, o header fica logo lido e as row são dicts.
     leitor = csv.DictReader(csvfile) 
 
     exdict = dict()
 
-    i = 0
+    #i = 0
     for row in leitor:
         
         #print(row)
@@ -421,8 +420,8 @@ def read_ekeys(COURSE=None):
 
         exname = row['exname']
 
-        if row["Course"] != COURSE:
-            continue
+        #if row["Course"] != COURSE:
+        #    continue
 
         try:
             if exname in exdict.keys():
@@ -435,12 +434,19 @@ def read_ekeys(COURSE=None):
             del exdict[exname]
 
 
-        i = i + 1
-        if i > 20:
-            break
+        #i = i + 1
+        #if i > 20000:
+        #    break
 
-        print("read_ekeys: Numero de exercicios em c3:",len(exdict))
-        return exdict
+    for k in exdict.keys():
+        #print(exdict[k][0],"\n") 
+        #print(list( set(exdict[k][0]) ),"\n")
+        exdict[k] = ( list( set(exdict[k][0]) ) , list( set(exdict[k][1]) ) )
+        #print "unique_name=",k,"com",exdict[k][0],"e",exdict[k][1]
+
+    
+    print("read_ekeys: Numero de exercicios em", COURSE,len(exdict))
+    return exdict
 
 
 
@@ -457,8 +463,10 @@ if __name__=='__main__':
     """
 
     import sys
-    assert(sys.argv[1] in ["latex","web", "mix","help"])
-    if sys.argv[1]=="help":
+
+    #print len(sys.argv)
+
+    if len(sys.argv)==1 or sys.argv[1]=="help":
         ##### "1.......................26..................................................78
         #####  |.....................--.|...................................................|
         print "Open old sqlite db and change owner_key to unique_name."
@@ -469,6 +477,8 @@ if __name__=='__main__':
         print "[3] sage -python $HOME/megua/megua/megua2smc.py mix .newfile.sqlite .newfile.sqlite"
         exit()
         
+    assert(sys.argv[1] in ["latex","web", "mix","help"])
+
     print "Producing *.sagews files from '%s' for %s...." % (sys.argv[2],sys.argv[1])
     #print 'Number of arguments:', len(sys.argv), 'arguments.'
     #print 'Argument List:', str(sys.argv)

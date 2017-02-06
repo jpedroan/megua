@@ -144,7 +144,7 @@ if not path.isdir(MEGUA_EXERCISE_CATALOGS):
     STOP_MEGUA = True
 
 if not 'SIACUA_WEBKEY' in locals() or not 'SIACUA_COURSENAME' in locals() or not 'SIACUA_USERNAME' in locals():
-    print "To configure for SIACUA please open ~/megua/conf.py"
+    print "To configure for SIACUA please edit ~/.megua/conf.py."
     
 if STOP_MEGUA:
     print "Check configurable options in ~/.megua/conf.py"
