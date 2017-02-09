@@ -213,10 +213,23 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
         #Considered part of the class definition and not the instance.
         #TODO: should author write each filed ? Can he leave empty fields?
-        assert(self._unique_name)
-        assert(self._summary_text)
-        assert(self._problem_text)
-        assert(self._answer_text)
+        #TODO: assert or exit() ?
+        if not self._unique_name:
+            print "exbase.py: exercise should have a 'unique_name' stated in the class part."
+            #assert(self._unique_name)
+            exit()
+        if not self._summary_text:
+            print "exbase.py: exercise '%s' should have a '%%summary' tag and text in it should not be empty." % self._unique_name
+            #assert(self._summary_text)
+            exit()
+        if not self._problem_text:
+            print "exbase.py: exercise '%s' should have a '%%problem' tag and text in it should not be empty." % self._unique_name
+            #assert(self._problem_text)
+            exit()
+        if not self._answer_text:
+            print "exbase.py: exercise '%s' should have an '%%answer' tag and text in it should not be empty." % self._unique_name
+            #assert(self._answer_text)
+            exit()
 
         self.wd_relative = os.path.join(MEGUA_WORKDIR,self._unique_name)
         self.wd_fullpath = os.path.join(MEGUA_WORKDIR_FULLPATH,self._unique_name)
@@ -288,6 +301,9 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
         """
 
+        #For debug:
+        print self.unique_name()
+
         #TODO: is this flag is being used ?
         self.has_instance = False
 
@@ -325,7 +341,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         self._current_problem = self.search_replace(self._problem_text)
         self._current_answer = self.search_replace(self._answer_text)
 
-
+        
         self.has_instance = True
 
 

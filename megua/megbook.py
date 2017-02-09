@@ -129,21 +129,21 @@ Testing a warning error:
 Long computation? Two examples follow:
 
 ::
-   
-   sage: try:    
+
+   sage: try:
    ....:     meg.save(r'''
    ....: %Summary Long Computations Section; Example 1
    ....: Testing the production of exercises with long computations.
-   ....:   
+   ....:
    ....: %Problem Long Computation Problem
    ....: What is the long primitive of ap x + bp@() ?
-   ....:  
+   ....:
    ....: %Answer
-   ....:  
+   ....:
    ....: prim1
-   ....:  
+   ....:
    ....: class E28E28_pdirect_001(ExerciseBase):
-   ....: 
+   ....:
    ....:     def make_random(self,edict=None):
    ....:         #suppose a 15 seconds computation here
    ....:         #maximum by default is 10 (see MegBook)
@@ -161,23 +161,23 @@ Long computation? Two examples follow:
    sage: meg.save(r'''
    ....: %Summary Long Computations Section; Example 2
    ....: Changing maximum length of computation time.
-   ....:    
+   ....:
    ....: %Problem Long Computation Problem
    ....: What is the long primitive of ap x + bp@() ?
-   ....:  
+   ....:
    ....: %Answer
-   ....:  
+   ....:
    ....: prim1
-   ....:  
+   ....:
    ....: class E28E28_pdirect_001(ExerciseBase):
-   ....:  
+   ....:
    ....:     def make_random(self,edict=None):
    ....:         #suppose a 15 seconds computation here
    ....:         #maximum by default is 10 (see MegBook)
    ....:         #sleep(5)  #remove # for tests
-   ....:         #do something else.   
-   ....:         pass   
-   ....: ''') 
+   ....:         #do something else.
+   ....:         pass
+   ....: ''')
    -------------------------------
    Instance of: E28E28_pdirect_001
    -------------------------------
@@ -316,12 +316,12 @@ from megua.platex import pcompile, latexunderscore
 class MegBook(MegSiacua):
     r"""
     A book of exercises of several markup languages.
-    
+
     Implements:
-    
+
     - MegSiacua: functions only for Siacua
     - MegLatex: (not yet) functions only for Latex
-    
+
     """
 
     #TODO 1: increase docstring examples.
@@ -333,14 +333,14 @@ class MegBook(MegSiacua):
         r"""
 
         INPUT:
-        
+
         - ``filename`` -- filename where the sqlite database is stored.
 
         """
 
         if not filename:
             filename = PROJECT_DATABASE_FULLPATH
-    
+
         #Create or open the database
         try:
             self.megbook_store = LocalStore(filename=filename,natlang=natlang,markuplang=markuplang)
@@ -376,25 +376,24 @@ class MegBook(MegSiacua):
         """Receives a pathname. This pathname points to a file that
         contains an exercise. This routine extracts the filename and extension
         and produce the unique_name.
-        
+
         INPUT:
-        
+
         - ``pathname`` --  pathname to the exercise 
-        
+
         Typical, this command must be called using
             meg.set_current_exercise(_file__)
         so argument pathname points to the file in execution.
-        
-        
+
         DEVELOPMENT NOTES:
-        
+
             >>> os.path.splitext("ola.lko")
             ('ola', '.lko')
             >>> os.path.splitext(".lko")
             ('.lko', '')
 
         Parse file contents:
-        
+
         1. find "class" line
         2. if "class" line contains the same name unique_name (see below) do nothing
         3. if "class" line contains a different name other than unique_name:
@@ -404,7 +403,7 @@ class MegBook(MegSiacua):
 
 
         TESTING "set_current_exercise" on bash:
-        
+
               * pasta all/sandbox/megua
              $  gvim teste_current_unique.sage
              $  sage teste_current_unique.sage 
@@ -414,19 +413,18 @@ class MegBook(MegSiacua):
 
         TODO:
             When file does not exist, capture the "IOError" and produce a message.
-            
+
         """
-        
+
         (edir,filename) = os.path.split(pathname)
         (unique_name,ext) = os.path.splitext(filename)
-        
+
         if ext == '.py':
             (unique_name,ext) = os.path.splitext(unique_name)
             assert(ext=='.sage')
             pathname = os.path.join(edir,unique_name+'.sage')
             #print "megbook.py: Corrected",pathname
-        
-        
+
         assert(ext) #See DEVEL notes above: ext<>''
         self._current_unique_name = None
 
@@ -434,7 +432,6 @@ class MegBook(MegSiacua):
             print "Megbook.py: Filename is not a valid Python identifier."
             usage_new()
             raise SyntaxError
-        
 
 
         #get file contents 
@@ -447,7 +444,7 @@ class MegBook(MegSiacua):
             if re_class_match:
                 old_unique_name = re_class_match.group(1)
                 unique_name_changed = old_unique_name != unique_name
-                    
+
         if unique_name_changed:
             #Try to rename, first in the database:
             # the new unique_name could already exist
@@ -893,10 +890,10 @@ class MegBook(MegSiacua):
         
         if not row:
             raise
-            
+
         ex_instance = self.exerciseinstance(row,ekey=0)
 
-            
+
         #Second check: syntatic and runtime  ("python/sagemath" script)
         ######
         #Third check: create contens (latex compilation, for example)
@@ -904,11 +901,11 @@ class MegBook(MegSiacua):
 
 #       except:
 #           print "Exercise was not saved."
-        
-        
-        #After all that, save it on database:                        
+
+
+        #After all that, save it on database:
         self.megbook_store.insertchange(row)
-        
+
 
 
     def new(self, unique_name=None, ekey=None, edict=None, returninstance=False):
@@ -927,42 +924,39 @@ class MegBook(MegSiacua):
         if ``unique_name`` is None then self._current_unique_name is used. 
 
         """
-        
+
         if not unique_name:
             unique_name = self._current_unique_name
-            
+
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
         if not row:
             print "%s cannot be accessed on database" % unique_name
             return
-        
+
         #Create and print the instance
         ex_instance = self.exerciseinstance(row, ekey, edict)
-        
+
         if returninstance:
             return ex_instance
 
         ex_instance.print_instance()
 
-    
-
-    
     def exerciseinstance(self, row, ekey=None, edict=None):
         r"""
         This function creates an instance of a class named in parameter row["unique_name"]. 
-    
+
         INPUT:
-    
+
          - ``row``-- a dictionary containing fields: 'summary_text', 'problem_text',  'answer_text'.
          - ``ekey`` -- the parameteres will be generated for this random seed.
          - ``edict`` --  after random generation of parameters some of them could be replaced by the ones in this dict.
-    
+
         OUTPUT:
             An instance of class named ``unique_namestring``.
-    
+
         FIELDS in row:
-    
+
         - row['unique_name']
         - row['sections_text']
         - row['suggestive_name']
@@ -972,7 +966,7 @@ class MegBook(MegSiacua):
         - row['class_text']
 
         DEVELOP:
-    
+
         - http://docs.python.org/library/exceptions.html#exceptions.Exception
         - Note on python warnings: SageMath calls reset.... so use of warnings.filterwarnings('error') does not work with try...except.
 
@@ -986,7 +980,7 @@ class MegBook(MegSiacua):
                  , errors="ignore"
                  warning: ur''' \underline{....} ''' generates an unicode error!
                  , errors='backslashreplace'
-                
+
                 <python> x = ur'\underline'
                   File "<stdin>", line 1
                 SyntaxError: (unicode error) 'rawunicodeescape' codec can't decode bytes in position 0-1: truncated \uXXXX
@@ -1003,7 +997,7 @@ class MegBook(MegSiacua):
                 #The ExBase.update must then convert to unicode again!
 
         """
-        
+
         code_string = templates.render("megbook_instance_new.sage",
             unique_name=row["unique_name"],
             class_text=row["class_text"],
@@ -1029,7 +1023,7 @@ class MegBook(MegSiacua):
             with warnings.catch_warnings(record=True) as wlist:
                 #See important notes about coding the contents of cfilename.
                 load(cfilename) #sagemath load command
-                
+
                 if len(wlist)>0:
                     print 'MegBook.py say: exercise "%s" needs review! See below:' % row['unique_name']
                 for w in wlist:
@@ -1042,15 +1036,16 @@ class MegBook(MegSiacua):
 
         except SyntaxError as s:
             print 'MegBook.py say: exercise "%s" causes a syntatical error and needs review! See below.' % row['unique_name']
-            print 'See line %d in file "%s".' % (s.lineno,cfilename)
-            display_syntaxerror(s,code_string)
+            if s.lineno is not None:
+                print 'See line %d in file "%s".' % (s.lineno,cfilename)
+                display_syntaxerror(s,code_string)
             raise s
-        
-        
-        
+
+
+
         return ex_instance #the value of ex_instance is created in load()
-    
-    
+
+
 
 
 
@@ -1405,48 +1400,53 @@ class MegBook(MegSiacua):
             lts += u'\n\nThis section has {0} exercises.\n\n'.format(len(s.exercises)) # {{ => }
             for unique_name in s.exercises:
                 print "megbook.py say: producing %s" % unique_name
-                ex = self.new(unique_name,ekey=0,returninstance=True)
-                if ExLatex in ex.__class__.__bases__:
-                    #TODO: incluir tipo no template e na section acima
-                    ex_str = templates.render("megbook_catalog_instance.tex",
-                                exformat="latex",
-                                unique_name=unique_name,
-                                unique_name_noslash = latexunderscore(unique_name),
-                                summary = ex.summary(),
-                                section=section,
-                                subsection=subsection,
-                                subsubsection=subsubsection,
-                                suggestive_name = ex.suggestive_name(),
-                                problem = ex.problem(),
-                                answer = ex.answer()
-                    )
-                elif ExSiacua in ex.__class__.__bases__:
-                    #TODO: incluir tipo no template e na section acima
-                    ex_str = templates.render("megbook_catalog_instance.tex",
-                                exformat="siacua",
-                                unique_name=unique_name,
-                                unique_name_noslash = latexunderscore(unique_name),
-                                summary = ex.summary(),
-                                section=section,
-                                subsection=subsection,
-                                subsubsection=subsubsection,
-                                suggestive_name = ex.suggestive_name(),
-                                problem = ExSiacua.to_latex(ex.problem()), #u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
-                                answer = ExSiacua.to_latex(ex.answer()) #u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
-                    )
-                else:
-                    #TODO: incluir tipo no template e na section acima
-                    ex_str = templates.render("megbook_catalog_instance.tex",
-                                exformat="textual (exbase)",
-                                unique_name_noslash = latexunderscore(unique_name),
-                                summary = ex.summary(),
-                                section=section,
-                                subsection=subsection,
-                                subsubsection=subsubsection,
-                                suggestive_name = ex.suggestive_name(),
-                                problem = u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
-                                answer = u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
-                    )
+                try:
+                    ex = self.new(unique_name,ekey=0,returninstance=True)
+                    if ExLatex in ex.__class__.__bases__:
+                        #TODO: incluir tipo no template e na section acima
+                        ex_str = templates.render("megbook_catalog_instance.tex",
+                                    exformat="latex",
+                                    unique_name=unique_name,
+                                    unique_name_noslash = latexunderscore(unique_name),
+                                    summary = ex.summary(),
+                                    section=section,
+                                    subsection=subsection,
+                                    subsubsection=subsubsection,
+                                    suggestive_name = ex.suggestive_name(),
+                                    problem = ex.problem(),
+                                    answer = ex.answer()
+                        )
+                    elif ExSiacua in ex.__class__.__bases__:
+                        #TODO: incluir tipo no template e na section acima
+                        ex_str = templates.render("megbook_catalog_instance.tex",
+                                    exformat="siacua",
+                                    unique_name=unique_name,
+                                    unique_name_noslash = latexunderscore(unique_name),
+                                    summary = ex.summary(),
+                                    section=section,
+                                    subsection=subsection,
+                                    subsubsection=subsubsection,
+                                    suggestive_name = ex.suggestive_name(),
+                                    problem = ExSiacua.to_latex(ex.problem()), #u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
+                                    answer = ExSiacua.to_latex(ex.answer()) #u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
+                        )
+                    else:
+                        #TODO: incluir tipo no template e na section acima
+                        ex_str = templates.render("megbook_catalog_instance.tex",
+                                    exformat="textual (exbase)",
+                                    unique_name_noslash = latexunderscore(unique_name),
+                                    summary = ex.summary(),
+                                    section=section,
+                                    subsection=subsection,
+                                    subsubsection=subsubsection,
+                                    suggestive_name = ex.suggestive_name(),
+                                    problem = u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
+                                    answer = u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
+                        )
+                except:
+                    ex_str = "Check problem with %s. It was not generated." % unique_name
+                    print "megbook.py: exercise %s was not generated for catalog. Please check it." % unique_name
+
 
                 lts += ex_str
 
@@ -1923,7 +1923,7 @@ def display_warning(w,code_string):
 
 def display_syntaxerror(s,code_string):
     print s.msg #specific error description
-    print s.message #code where error is
+    #TODO: print s.message #code where error is
 
     if '(unicode error)' in s.msg:
         print "Localte with" 

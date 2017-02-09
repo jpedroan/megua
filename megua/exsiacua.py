@@ -245,8 +245,8 @@ class ExSiacua(ExerciseBase):
         #Extract, from summary, details about bayesian network
         #TODO: old mode of extracting bayesian parameters
         if 'SIACUAstart' in self._summary_text:
-            print "exsiacua.py: please remove SIACUAStart...SIACUAend from %SUMMARY."
-            print "exsiacua.py: Add those lines, separated by commas ',' to meg.siacua(....) commmand."
+            print "exsiacua.py: please remove SIACUAStart...SIACUAend from %SUMMARY in ",self.unique_name()
+            print "             and add those lines, separated by commas ',' to meg.siacua(....) commmand."
             self._siacua_extractparameters()
 
         #Call user derived function to generate a set of random variables.

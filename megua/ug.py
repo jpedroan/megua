@@ -37,10 +37,10 @@ Test examples using:
 
     sage -t ug.py
 
-    
 Defining a new exercise template:
-    
-::    
+
+
+::
 
     sage: from megua.exbase import ExerciseBase
     sage: class DrawSegment(ExerciseBase):
@@ -65,7 +65,7 @@ Defining a new exercise template:
 Plot using embed images with base64 and svg:
 
 ::
-open /projects/69b82f4f-dc00-498d-817e-f3575041e14e/.local/lib/python2.7/site-packages/megua/ug.py
+
        sage: ex = DrawSegment(ekey=0)
        sage: #ex.print_instance() #render = base64, long textual answer
 
@@ -181,6 +181,7 @@ from megua.platex import pcompile
 #import io
 #import urllib2
 import os
+
 
 #TODO: postponed because of problems with python setup.py install
 #import aalib
@@ -361,28 +362,35 @@ class UnifiedGraphics:
         - `dimx,dimy`: for compatibility.
         - `gtype`: can be svg, png, "etc"
         - `kwargs`: other keyword=value pairs for sage or matlotlib savefig command.
-        
+
         The `graphic_object`could be a:
         - sage.plot.graphics.Graphics
         - matplotlib object
 
         Read more in:
         - http://stackoverflow.com/questions/3396475/specifying-width-and-height-as-percentages-without-skewing-photo-proportions-in
-        
+
         """
 
         gfilename = '%s-%s-%d.%s'%(self.unique_name(),varname,self.get_ekey(),gtype)
-        gpathname = os.path.join(self.wd_relative,gfilename)
+        if os.path.exists(self.wd_relative):
+            gpathname = os.path.join(self.wd_relative,gfilename)
+        else:
+            gpathname = os.path.join(self.wd_fullpath,gfilename)
+
         #create if does not exist the "image" directory
         #os.system("mkdir -p images") #The "-p" ommits errors if it exists.
 
         #TODO: protect agains too big images.
         if paper_cm:
+            #convert to inches
             fsize = (paper_cm[0]/2.54,paper_cm[1]/2.54)
         elif scr_pixels:
+            #convert to inches
             fsize = (scr_pixels[0]/100,scr_pixels[1]/100) #assume dpi=100
         else:
             fsize = (dimx/2.54,dimy/2.54) #old behaviour
+
 
         if type(graphic_object)==sage.plot.graphics.Graphics:
             graphic_object.save(
@@ -394,9 +402,15 @@ class UnifiedGraphics:
             import matplotlib.pyplot as plt
             from pylab import savefig
             fig = plt.gcf() #Get Current Figure: gcf
-            fig.set_size_inches(paper_cm[0]/2.54,paper_cm[1]/2.54) #(dimx/2.54,dimy/2.54)
-            savefig(gpathname,figsize=(paper_cm[0]/2.54,paper_cm[1]/2.54),**kwargs)
+            #old: fig.set_size_inches(paper_cm[0]/2.54,paper_cm[1]/2.54) #(dimx/2.54,dimy/2.54)
+            #old: savefig(gpathname,figsize=(paper_cm[0]/2.54,paper_cm[1]/2.54),**kwargs)
+            savefig(gpathname,figsize=fsize,**kwargs)
             #TODO: savefig is saving what graphic? What to do with graphic_object parameter?
+
+        if not paper_cm:
+            paper_cm = (fsize[0]/2.54,fsize[1]/2.54)
+        if not scr_pixels:
+            scr_pixels = (fsize[0]*100,fsize[1]*100)
 
         return self._render(gfilename,paper_cm,scr_pixels)
 
