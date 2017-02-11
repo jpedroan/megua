@@ -1402,6 +1402,11 @@ class MegBook(MegSiacua):
                 print "megbook.py say: producing %s" % unique_name
                 try:
                     ex = self.new(unique_name,ekey=0,returninstance=True)
+
+                    #Copy images to CATALOG/IMG directory
+                    for fp in ex.image_fullpathnames:
+                        shutil.copy(fp,os.path.join(MEGUA_EXERCISE_CATALOGS,"IMG")) #TODO: autom. create IMG
+
                     if ExLatex in ex.__class__.__bases__:
                         #TODO: incluir tipo no template e na section acima
                         ex_str = templates.render("megbook_catalog_instance.tex",
