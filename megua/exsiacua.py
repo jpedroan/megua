@@ -294,7 +294,7 @@ class ExSiacua(ExerciseBase):
         TODO: this view should be almost equal to view the exercise in siacua
         """
 
-        summtxt =  self.summary()   
+        summtxt =  self.summary()
         probtxt =  self.problem()
         answtxt =  self.answer()
         uname   =  self.unique_name()
@@ -581,7 +581,8 @@ class ExSiacua(ExerciseBase):
                concepts = [ (0,  1) ],
                grid2x2=False,
                siacuatest=False,
-               sendpost=True
+               sendpost=True,
+               verbose=False
               ):
         r"""
 
@@ -609,6 +610,8 @@ class ExSiacua(ExerciseBase):
 
         - ``sendpost``: (usually True) If True send information to siacua, otherwise simulates to check problems.
 
+        - ``verbose``: (usually False) print the message received by siacua.
+
         OUTPUT:
 
         - this command prints the list of sended exercises for the siacua system.
@@ -631,7 +634,10 @@ class ExSiacua(ExerciseBase):
             ~/Dropbox/all/megua/archive$ sage jsontest.sage
 
         """
-
+        
+        #Other functions might require this.
+        self.verbose = verbose
+        
         all_answers = []
 
         for e_number in ekeys:
@@ -655,11 +661,11 @@ class ExSiacua(ExerciseBase):
             #Call siacua for store.
             if sendpost:
                 send_dict.update(dict({'usernamesiacua': usernamesiacua}))
-                print "exsiacua.py: send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
+                if self.verbose:
+                    print "exsiacua.py: is going to send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
                 send_result = self._siacua_send(send_dict)
                 all_answers += send_result
-                if self.image_pathnames != []: #TODO: check how to avoid send images without exercise
-                    self._send_images(siacuatest,course=course)
+                self._send_images(siacuatest,course=course)
             else:
                 print "Not sending to siacua. Dictionary is", send_dict
 
@@ -682,7 +688,6 @@ class ExSiacua(ExerciseBase):
         #TUNE this:os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
         #import request
         print "exsiacua.py: _send_images(): This are the images to be sent:"
-        print self.image_pathnames
         print "end"
         """
         import requests
@@ -692,13 +697,18 @@ class ExSiacua(ExerciseBase):
         else:
             url = 'http://siacua.web.ua.pt/MeguaInsert2.aspx'
 
-        for f in self.image_pathnames:
-            #print "Sending:",f
+        if self.verbose:
+            print "exsiacua.py: self.image_fullpathnames", self.image_fullpathnames
+            print "exsiacua.py: self.image_relativepathnames", self.image_relativepathnames
+            
+        for f in self.image_fullpathnames:
+            if self.verbose:
+                print "exsiacua.py: is going to send:",f
             files = {'file': (course+"_"+os.path.basename(f), open(f, 'rb')) }
             r = requests.post(url, files=files)
-            #print "exsiacua.py: r.ok=",r.ok
-
-        print "exsiacua.py: done, sending images."
+            if self.verbose:
+                print "exsiacua.py: request response is =",r.ok
+                print "exsiacua.py: done, sending images."
 
     def _adjust_images_url(self, input_text, course):
         """the url in problem() and answer() is <img src='_images/filename.png'>
@@ -757,6 +767,9 @@ class ExSiacua(ExerciseBase):
             conn = httplib.HTTPConnection("siacua.web.ua.pt")
         conn.request("POST", "/MeguaInsert.aspx", params, headers)
         response = conn.getresponse()
+        if self.verbose:
+            print "exsiacua.py: response status from post",response.status
+            print "exsiacua.py: response from post",response
         #TODO: improve message to user.
         if response.status==200:
 
@@ -766,6 +779,8 @@ class ExSiacua(ExerciseBase):
             #TODO: format this output to extract only the <id> 3883 in siacua:
             #TODO: Resultado: <span id="resultado">Muito bem, melhorou o exercício, parabéns! id=3883</span>
             data = response.read()
+            if self.verbose:
+                print "exsiacua.py: data read from response", data
             if "Muito bem, melhorou" in data:
                 akword = "Improved:"
                 choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
@@ -828,7 +843,7 @@ class ExSiacua(ExerciseBase):
         #    } )
 
         #Adapt for appropriate URL for images
-        if self.image_pathnames != []:
+        if self.image_relativepathnames:
             problem = self._adjust_images_url(problem,course)
             answer_list = [self._adjust_images_url(a,course) for a in answer_list]
 

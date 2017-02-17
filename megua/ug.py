@@ -143,7 +143,7 @@ Example with an ascii art graphic:
        Q6      _Q
        QQga  _wQQ
        <BLANKLINE>
-       sage: print ex.image_pathnames
+       sage: print ex.image_relativepathnames
        ['_output/UnitCircle/UnitCircle-plot1-0.png']       
 
        
