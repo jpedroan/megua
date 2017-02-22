@@ -781,9 +781,14 @@ class ExSiacua(ExerciseBase):
             data = response.read()
             if self.verbose:
                 print "exsiacua.py: data read from response", data
+
             if "Muito bem, melhorou" in data:
                 akword = "Improved:"
                 choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
+            elif "A chave não é válida" in data:
+                print "exsiacua.py: A chave MEGUA/SIACUA não é válida."
+                conn.close()
+                return "Invalid key megua/siacua" #TODO: do this with raise exception.
             else:
                 choice_pattern = re.compile(r'id = (\d+)', re.DOTALL|re.UNICODE)
                 akword = "New:"
