@@ -3,9 +3,42 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Tutorial do MEGUA 0.2
-=====================
+Tutorial do MEGUA
+=================
 
+
+MEGUA é um pacote de software para o `SageMath <sagemath>`_ que permite criar exercícios parametrizados:
+
+* recorrendo à linguagem Python
+* à linguagem LaTeX e HTML dependendo do destino do exercício
+* às bibliotecas de matemática do SageMath
+* trabalho colaborativo no SageMath Cloud (SMC).
+
+Os exercícios parametrizados podem fazer parte de:
+
+* brochuras de exercícios em LaTeX para documentos PDF
+* exercícios para o sistema online `siacua <http://siacua.web.ua.pt>`_
+* destinos como Moodle e AMC estão previstos.
+
+O exemplo seguinte ilustra os exercícios parametrizados para LaTeX e documento em PDF (ver `papel <papel>`_):
+
+.. code-block:: python
+
+   meg.save(r'''
+   %summary 
+
+
+   %problem 
+
+   %answer
+
+   class E12X34__(ExLatex):
+
+       def make_random(s,edict=None):
+
+
+
+   ''')
 
 
 Conteúdo:
@@ -24,6 +57,10 @@ Conteúdo:
 
 
 Atualizações:
+
+**2016/agosto/19**
+
+* o MEGUA foi adaptado ao SMC e por conseguinte este guida teve que ser ajustado.
 
 **2013/novembro/13**
 

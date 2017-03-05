@@ -6,41 +6,29 @@
 Sage Mathematics
 ================
 
-Aquilo a que chamamos de "MEGUA" é um pacote de software que permite criar exercícios parametrizados recorrendo ao ambiente Sage Mathematics, sistema este que se descreve de seguida.
+MEGUA é um pacote de software para o `SageMath <https://www.sagemath.org>`_ em máquinas linux e `SageMath Cloud <https://cloud.sagemath.com>`_  (sigla SMC) através da net ("cloud") que permite criar exercícios parametrizados recorrendo à linguagem Python e às bibliotecas de matemática do SageMath, sistema este que se descreve de seguida.
 
-O Sage Mathematics é uma enorme biblioteca e também um sistema de acesso a bibliotecas de matemáticas já existentes. Grande parte dstas bibliotecas matemáticas foi desenvolvida para o sistema Linux pelo que a sua disponibilização em Windows ainda está em desenvolvimento. Se usa um computador Linux (distribuição Ubuntu, por exemplo), então é bastante fácil instalar e usar o Sage.
+O Sage Mathematics (SageMath) usa a linguagem Python para aceder a uma enorme biblioteca de matemática. Grande parte dstas bibliotecas matemáticas foi desenvolvida para o sistema Linux. Se usa um computador Linux (distribuição Ubuntu, por exemplo), então é bastante fácil instalar e usar o SageMath. A sua disponibilização em Windows ainda está em desenvolvimento. 
 
+As vantagens do uso do `SageMath Cloud <https://cloud.sagemath.com>`_  (SMC) são:
 
-Porque, nos tempos atuais:
+* a maioria usa computadores com Windows sendo difícil a instalação do SageMath;
+* o uso tablets aponta no sentido da cloud;
+* já existem hábitos de programação na nuvem;
+* lógica de "projetos" com utilizadores -- em cada instante podem ser adicionados ou removidos utilizadores do projeto.
+* um exercício será uma "worksheet" nesse projeto a que os participantes no projeto podem aceder
 
-* a maioria usa computadores com Windows
-* tablets
-* e já existem hábitos de programação na nuvem (Cloud Computing and Archive)
+SMC "Worksheets"
+----------------
 
-então houve necessidade de criar o :ref:`Sage Notebook <sagenotebook>` que usamos no 
-projeto MEGUA para de criação e reutilizaçao de exercícios parametrizados.
+As *Worksheets* (ficheiros de extensão *.sagews) são usadas para criar os exercícios parametrizados com a vantagem de ver os resultados imediatamente e poder partilhar com os colegas ou outros autores.
 
-Já no decurso deste projeto surgiu uma versão muito modernizada e com filosofia de 
-segurança e sistema de partilha de projetos diferente do notebook: 
-chama-se `Sage Mathematics Cloud <https:cloud.sagemath.org>`_  (sigla SMC). Pode criar uma conta 
-nesse sistema e usar as capacidades do Sage na nuvem, convidando os seus estudantes a fazer o mesmo. 
+Uma *worksheets* serve, normalmente, para cálculo e exibição de resultados gráficos. Antes de começar um novo exercício pode usar esta potencialidade para testar comandos, ver gráficos, etc.
 
-NOTA: o pacote MEGUA ainda não está disponível para esse sistema.
+As linhas visíveis são chamadas de **células** e permitem a introdução de comandos.  
+Estes comandos são "calculados/executados" com **shift+enter**. 
 
-
-.. _sagenotebook:
-
-Sage Notebook
--------------
-
-O *Notebook* é a ferramenta que está a ser usada para criar os exercícios parametrizados com a vantagem de ver os resultados imediatamente e poder partilhar com os colegas ou outros autores.
-
-O *notebook*, normalmente, serve para cálculo e exibição de resultados gráficos. Antes de começar um novo exercício pode usar esta potencialidade para testar comandos, ver gráficos, etc.
-
-As caixas visíveis são chamadas de **células** e permitem a introdução de comandos.  
-Estes comandos são "calculados" com **shift+enter**. 
-
-Para  apagar uma caixa, apaga-se primeiro todo o seu conteúdo e depois usar o **backspace** no seu teclado.
+Para  apagar uma caixa, apaga-se primeiro todo o seu conteúdo.
 
 Exemplos (onde está "sage:" é como se fosse uma célula):
 
@@ -59,15 +47,15 @@ ou podemos criar um gráfico com::
 Pesquisa via google
 -------------------
 
-Se pretende encontrar uma solução que acha que deve existir ou simplesmente averiguar se já gluém explorou um dado tema deve procurar via google (claro que normalmente lembramo-nos de realizar esta tarefa mas curiosamente nem sempre recordamos isto para temas que são novos, como pode ser o caso de programação em Python ou LaTeX).
+Se pretende encontrar uma solução que acha que deve existir ou simplesmente averiguar se já agluém explorou um dado tema deve procurar via google (claro que normalmente lembramo-nos de realizar esta tarefa mas curiosamente nem sempre recordamos isto para temas que são novos, como pode ser o caso de programação em Python ou LaTeX).
 
-Assim, recomenda-se a pesquisa de termos em inglês começando por "sage math" seguido de outros termos. 
+Assim, recomenda-se a pesquisa de termos em inglês começando por "sagemath" seguido de outros termos. 
 Seguem-se exemplos:
 
 * `sage math plot axes <https://www.google.pt/search?q=sage+math+plot+axes>`_ para informação sobre gráficos e eixos coordenados.
 * `sage math integration <https://www.google.pt/search?q=sage+math+integration>`_
 
-Em resumo, este tutorial é um guia para produzir exercícios parametrizados que contem descrições muito resumido das largas capacidades do Sage Mathematics. A **pesquisa** de como realizar tarefas
-de programação ou LaTeX **é um ato do dia a dia** do utilizador do Sage.
+Em resumo, este tutorial é um guia para produzir exercícios parametrizados que contem descrições muito resumidas das largas capacidades do Sage Mathematics. A **pesquisa** de como realizar tarefas
+de programação ou LaTeX **é um ato do dia a dia** do utilizador do SageMath.
 
 

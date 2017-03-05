@@ -1,8 +1,7 @@
 
 
-Guia Curto
-==========
-
+Guia Rápido
+===========
 
 Apresentamos um guia para as etapas principais da construção de um exercício `parametrizado <http://www.priberam.pt/dlpo/parametrizado>`_.
 

@@ -143,8 +143,15 @@ if not path.isdir(MEGUA_EXERCISE_CATALOGS):
     print "Directory MEGUA_EXERCISE_CATALOGS='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_CATALOGS)
     STOP_MEGUA = True
 
-if not 'SIACUA_WEBKEY' in locals() or not 'SIACUA_COURSENAME' in locals() or not 'SIACUA_USERNAME' in locals():
-    print "To configure for SIACUA please edit ~/.megua/conf.py."
+if not 'SIACUA_WEBKEY' in locals():
+    print "To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_WEBKEY='somestring'"
+    STOP_MEGUA = True
+if not 'SIACUA_COURSENAME':
+    print "To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_COURSENAME='somestring'"
+    STOP_MEGUA = True
+if not 'SIACUA_USERNAME' in locals():
+    print "To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_USERNAME='somestring'"
+    STOP_MEGUA = True
     
 if STOP_MEGUA:
     print "Check configurable options in ~/.megua/conf.py"

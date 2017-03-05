@@ -58,7 +58,7 @@ def inputfiles_status():
     if MEGUA_PLATFORM=="SMC":
         search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sagews")
     else:
-        search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sage")
+        search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sagews") #TODO: ideias correct this: it should be *.sage, only
 
 
     print "="*23+"\n"
@@ -132,7 +132,7 @@ def inputfiles_add():
     if MEGUA_PLATFORM=="SMC":
         search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sagews")
     else:
-        search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sage")
+        search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sagews") #TODO: ideias correct this: it should be *.sage, only
 
 
     #to search exercise code
