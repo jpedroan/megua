@@ -284,8 +284,8 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
         #Turn off alarm because make has been done in time.
         #cancel_alarm is from sage.misc.misc
-        cancel_alarm()             
-        
+        cancel_alarm()
+
 
     def update(self,ekey=None,edict=None, render_method=None):
         r"""Does this:
@@ -309,7 +309,9 @@ class ExerciseBase(SageObject,UnifiedGraphics):
 
         #Each update produce a new set of filenames for images.
         #See ug.py
-        self.image_pathnames = set()
+        #To avoid duplicated image names is used a set():
+        self.image_relativepathnames = set()
+        self.image_fullpathnames = set()
 
         #Graphics
         if render_method:

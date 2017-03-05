@@ -143,7 +143,7 @@ Example with an ascii art graphic:
        Q6      _Q
        QQga  _wQQ
        <BLANKLINE>
-       sage: print ex.image_pathnames
+       sage: print ex.image_relativepathnames
        ['_output/UnitCircle/UnitCircle-plot1-0.png']       
 
        
@@ -213,7 +213,8 @@ class UnifiedGraphics:
         assert(self.wd_fullpath)
 
         #To avoid duplicated image names is used a set():
-        self.image_pathnames = set()
+        self.image_relativepathnames = set()
+        self.image_fullpathnames = set()
 
 
 
@@ -271,14 +272,17 @@ class UnifiedGraphics:
 
         assert(gfilename)
 
-        pathname  = os.path.join(self.wd_relative,gfilename)
+        relative_pathname  = os.path.join(self.wd_relative,gfilename)
+        full_pathname  = os.path.join(self.wd_fullpath,gfilename)
 
         if self._rendermethod=='imagefile':
-            self.image_pathnames.add(pathname)
-            return r"<img src='%s' alt='%s' height='%d' width='%d' style='background-color:white;'/>" % (pathname,gfilename+' graphic',scr_pixels[1],scr_pixels[0]) #
+            self.image_relativepathnames.add(relative_pathname)
+            self.image_fullpathnames.add(full_pathname)
+            return r"<img src='%s' alt='%s' height='%d' width='%d' style='background-color:white;'/>" % (relative_pathname,gfilename+' graphic',scr_pixels[1],scr_pixels[0]) #
         elif self._rendermethod=='includegraphics':
-            self.image_pathnames.add(pathname)
-            return "\n\\includegraphics[height=%dcm,width=%dcm]{%s}\n" % (paper_cm[1],papercm[0],pathname)
+            self.image_relativepathnames.add(relative_pathname)
+            self.image_fullpathnames.add(full_pathname)
+            return "\n\\includegraphics[height=%dcm,width=%dcm]{%s}\n" % (paper_cm[1],papercm[0],full_pathname)
         elif self._rendermethod=='asciiart':
             print "ug.py say: 'asciiart' is not yet implemented"
             #screen = aalib.AsciiScreen(width=dimx, height=dimy)

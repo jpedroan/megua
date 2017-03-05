@@ -1,5 +1,5 @@
 """
-platex -- routines to compile MegUA generated tex files with pdflatex.
+platex -- routines to compile MegUA generated tex files with pdflatex and make html to latex conversions.
 
 
 AUTHORS:
@@ -10,6 +10,10 @@ AUTHORS:
 
 
 DEVELOPMENT:
+
+- Convert HTML to PDF: https://www.cyberciti.biz/open-source/html-to-pdf-freeware-linux-osx-windows-software/
+
+- Include PDF result as pages using the same as JJ thesis.
 
 - see in "old_code" the old file platex.py.
 
@@ -39,7 +43,7 @@ DEVELOPMENT:
         #Conversion for ISO-8859-1 http://pt.wikipedia.org/wiki/ISO_8859-1
         latexstr_latin1 = latexstr.encode('latin1')
         latexstr_latin1.replace("utf8","latin1")
-        
+
         #Store latexstr in filename
         fullpath = os.path.join(workdir, 'windows-'+filename+'.tex')
         f = open(fullpath,'w')
@@ -59,7 +63,7 @@ DEVELOPMENT:
 #*****************************************************************************
 
 
-# PYTHON modules  
+# PYTHON modules
 import re
 import os
 import subprocess
@@ -112,11 +116,11 @@ def pcompile(latex_text, workdir, filename):
     fullpath = os.path.join(workdir, filename)
     with codecs.open(fullpath,encoding='utf-8', mode='w+') as f:
         f.write(latex_text)
-        
+
     lt = ['pdflatex', '-interaction', 'nonstopmode', filename]
     try:
         output = subprocess.check_output(lt,cwd=workdir) #return output in a string
-        
+
         # rerun?
         # http://tex.stackexchange.com/questions/265744/how-to-know-if-a-latex-file-needs-another-compilation-pass
         if "LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right." in output:
@@ -172,7 +176,7 @@ def pcompile(latex_text, workdir, filename):
         if match:
             #print LaTeX error style "l.9 ........"
             print match.group(0) 
-            
+
         print "\n"
         raise UserWarning("Check exercise for LaTeX errors")
 
@@ -197,12 +201,14 @@ HTML2LATEX = [  (ur'(\d)%', ur'\1\%'),  # 3% --> 3\%
             (ur'</ul>', u'\\end{itemize}'),
             (ur'<ol>', u'\\begin{enumerate}'),
             (ur'</ol>', u'\\end{enumerate}'),
-            (ur'<li>', u'\\item '),    
-            (ur'</li>', u'\n\n'),    
+            (ur'<li>', u'\\item '),
+            (ur'</li>', u'\n\n'),
             (ur'<center>', '\n'+r'\\begin{center}'+'\n'),
             (ur'</center>', u'\\end{center}\n'),
             (ur'<style>(.*?)</style>', u'\n'),
             ("\\^'","^\\prime"),
+            (ur'<figure>',u'\n'),
+            (ur'</figure>',u'\n'),
             (ur'<pre>(.*?)</pre>',ur'\n%Falta colocar linhas vazias em baixo\n\\begin{alltt}\n\1\n\\end{alltt}\n\n'), 
         ]
 
@@ -223,7 +229,10 @@ def html2latex(htmltext):
 
     #Convert from <table> to \begin{tabular}
     newtext = table2tabular(newtext)
-    
+
+
+    #Convert from <img .... > to \includegraphics{...}
+    newtext = img2includegraphics(newtext)
 
     #Removing spaces and lots of blank lines.
     nr = 1
@@ -233,38 +242,63 @@ def html2latex(htmltext):
 
     return newtext
 
-HTML2TABULAR = [
+
+
+
+
+
+def table2tabular(text):
+    r"""Convert <table>...</table> to \begin{tabular} ... \end{tabular}"""
+
+    HTML2TABULAR = [
             (u'<table(.*?)>', u'\n\n\\begin{tabular}{...}\n'),
             (u'</table>', u'\n\end{tabular}\n'),
             (u'<tr(.*?)>', u'\n'),
             (u'</tr>', u' \\\\ \hline\n'), 
             (u'<td(.*?)>', u' '),
             (u'</td>', u' & '),
-        ]
-
-
-def table2tabular(text):
-    r"""Convert <table>...</table> to \begin{tabular} ... \end{tabular}"""
+    ]
 
     newtext = text
     for pr in HTML2TABULAR:
         (newtext, nr) = re.subn(pr[0], pr[1], newtext, count=0, flags=re.DOTALL|re.UNICODE)
-    
+
     return newtext
+
 
 def latexcommentthis(txt):
     """Put % signs in each line"""
     txt += u'\n' #assure last line has "\n"
     tlist = re.findall('(.*?)\n', txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)
     return u'\n'.join( [ '%'+t for t in tlist] ) + u'\n'
-        
+
 
 
 def latexunderscore(txt):
-    """Put \_  in each underscore"""
+    r"""Put \_  in each underscore"""
     return re.subn("_","\_",txt,flags=re.UNICODE)[0]
 
+
 def equation2display(txt):
-    """Put \displaystyle\$  in each $$"""
+    r"""Put \displaystyle\$  in each $$"""
     return re.subn(r"\$\$(.*?)\$\$",r"$\displaystyle \1$",txt, re.DOTALL | re.MULTILINE | re.IGNORECASE | re.UNICODE)[0]
-        
+
+
+def img2includegraphics(text):
+    r"""Transform <img ...> tag in \includegraphics
+
+    Example:
+
+    - <img src='.OUTPUT/E12X34_NomeInteressante_001_siacua/40anos.png' alt='40anos.png graphic' height='114' width='222' style='background-color:white;'/>
+
+    """
+    inpattern = ur"<img src='.OUTPUT/.+?/(.+?)' alt='.+?' height='(.+?)' width='(.+?)' style='background-color:white;'/>"
+    outpattern = ur"\includegraphics[width=\3pt,height=\2pt]{IMG/\1}\n"
+    (newtext, nr) = re.subn(inpattern, outpattern, text, count=0, flags=re.DOTALL|re.UNICODE)
+    print "platex.py: includegraphics conversions:", nr
+
+    return newtext
+
+
+
+

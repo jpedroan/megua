@@ -45,7 +45,8 @@ class MegSiacua:
                concepts = [ (0,  1) ],
                grid2x2=False,
                siacuatest=False,
-               sendpost=True
+               sendpost=True,
+               verbose=False
               ):
         r"""
 
@@ -73,6 +74,8 @@ class MegSiacua:
 
         - ``sendpost``: (usually True) If True send information to siacua, otherwise simulates to check problems.
 
+        - ``verbose``: (usually False) print the message received by siacua.
+
         OUTPUT:
 
         - this command prints the list of sended exercises for the siacua system.
@@ -99,14 +102,14 @@ class MegSiacua:
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(self._current_unique_name)
         if not row:
-            print "megsiacua module: %s cannot be accessed on database." % unique_name
+            print "megsiacua module: %s cannot be accessed on database." % self._current_unique_name
             return
 
         #Create an instance (ekey=0 because it needs one.)
         ex_instance = self.exerciseinstance(row=row, ekey=0)
 
         #exercise instance will sent instances to siacua
-        ex_instance.siacua(ekeys,course,usernamesiacua,level,slip,guess,discr,concepts,grid2x2,siacuatest,sendpost)
+        ex_instance.siacua(ekeys,course,usernamesiacua,level,slip,guess,discr,concepts,grid2x2,siacuatest,sendpost,verbose)
 
         #done
             

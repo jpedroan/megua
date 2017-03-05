@@ -161,7 +161,7 @@ DEFAULT_OUTPUT_METHOD = EXPR2LATEX
 
 
 #Avoid this members in exercise
-AVOID_KEYWORDS = ['self', 'imagedirectory', 'image_pathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir']
+AVOID_KEYWORDS = ['self', 'imagedirectory', 'image_relativepathnames', 'image_fullpathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir']
 
 
 
