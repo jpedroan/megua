@@ -17,9 +17,9 @@ Development state: `alpha version <https://en.wikipedia.org/wiki/Software_releas
 
 
 
-SageMath Cloud (SMC) is `<https://cloud.sagemath.com>`_
+Sage Math Cloud (SMC) is `<https://cloud.sagemath.com>`_
 
-.. contents:: Contents and Instalation procedures
+.. contents:: Contents and Installation procedures
     :depth: 2
 
 
@@ -250,8 +250,8 @@ With this type of account it is necessary to turn "internet access" in Setting a
 
 
  
-Install Ubuntu/linux desktop
-----------------------------
+Install on Ubuntu/linux desktop
+-------------------------------
 
 1. Download and install `SageMath <http://www.sagemath.org/>`_
 ::
@@ -259,8 +259,9 @@ Install Ubuntu/linux desktop
 
 2. In a terminal do:
 ::
-
-    $ sage -pip install  --user git+https://github.com/jpedroan/megua
+    $ sage -sh
+    $ pip install  --user git+https://github.com/jpedroan/megua
+    $ pip install requests
 
 
 3. Run for initialization:
@@ -273,10 +274,10 @@ Install Ubuntu/linux desktop
 
     $ open ~/.megua/conf.py
 
-5. Create the first exercise targeting LaTeX (a worksheet will open)
+5. Create the first exercise targeting a LaTeX exercise
 ::
 
-    $ megua new E12X34_AddTwoNumbers_001_latex.sagews
+    $ megua new E12X34_AddTwoNumbers_001_latex.sage  
 
 
 6. Create a catalog of all exercises:
