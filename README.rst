@@ -260,8 +260,8 @@ Install on Ubuntu/linux desktop
 2. In a terminal do:
 ::
     $ sage -sh
-    $ pip install  --user git+https://github.com/jpedroan/megua
-    $ pip install requests
+    $ pip install --user git+https://github.com/jpedroan/megua
+    $ pip install --user requests
 
 
 3. Run for initialization:
@@ -299,9 +299,10 @@ Install on Ubuntu/linux desktop
 Memória (português)
 -------------------
 
-Começou em 2010, num almoço no Snack, uma das principais protagonistas do `PMate <http://pmate.ua.pt>`_ e a conversa era sobre resoluções paranetrizadas em LaTeX (na altura ainda não disponíveis no sistema pmate). O SageMath estava na pré-adolescência e pensou-se: porque não juntar os dois temas.
+Começou em 2010, num almoço com uma das principais protagonistas do `PMate <http://pmate.ua.pt>`_. A conversa surgiu sobre  "resoluções" parametrizadas em LaTeX (na altura ainda não disponíveis no sistema pmate). 
+O SageMath estava na arranque e pensou-se: porque não juntar as duas abordagens?
 
-Em 2011 surgiu uma primeira abordagem e uma nova colega veio dar força ao projeto MEGUA. Este projeto, até agora tem sido uma  biblioteca externa que depende do SageMath, linguagem Python e LaTeX para criar exercícios parametrizados para LaTeX. Entretanto, a chegada do SIACUA (siacua.web.ua.pt) fez com que durante um ano a produção se concentrasse apenas para HTML+MathJAX com a ajuda de mais dois colegas tendo o desenvolvimento em LaTeX/PDF ficado mais parado. 
+Em 2011 surgiu uma primeira versão e logo uma nova colega veio dar força ao projeto MEGUA. Este projeto, até agora tem sido uma  biblioteca externa que depende do SageMath, linguagem Python e LaTeX para criar exercícios parametrizados para LaTeX. Entretanto, a chegada do SIACUA (siacua.web.ua.pt) fez com que durante um ano a produção se concentrasse apenas para HTML+MathJAX com a ajuda de mais dois colegas tendo o desenvolvimento em LaTeX/PDF ficado mais parado. 
 
 - `Página Institucional do MEGUA <http://cms.ua.pt/megua>`_: people, works, seminars, and related things.
 - `Tutorial em portuguê <http://megua.readthedocs.org/pt/latest/>`_: conceitos e prática.
