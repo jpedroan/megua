@@ -259,11 +259,27 @@ Install on Ubuntu/linux desktop
 
 2. In a terminal do:
 ::
-    $ sage -sh
+
     $ pip install --user git+https://github.com/jpedroan/megua
     $ pip install --user requests
+    Enter <sage dir>:
+    $ ./sage -sh
+    $ cd local/lib/python2.7/site-packages 
+    $ ln -s /home/<user>/.local/lib/python2.7/site-packages/megua
+    $ ln -s /home/<user>/.local/lib/python2.7/site-packages/megua-0.2.dev50+g1c43d5a-py2.7.egg-info
+    (Adapt the last filename, please.)
+    Exit sage shell CRTL-D
 
 
+2a. Enter:
+::
+
+    $ cd /home/<user>/.local/bin
+    $ edit megua
+    Change the first line to something like:
+    #!/usr/bin/env /<path-to-sage>/sage
+    
+    
 3. Run for initialization:
 ::
 
