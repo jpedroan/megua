@@ -261,9 +261,9 @@ Install on Ubuntu/linux desktop
 ::
 
     $ pip install --user git+https://github.com/jpedroan/megua
-    $ pip install --user requests
     Enter <sage dir>:
     $ ./sage -sh
+    $ pip install requests
     $ cd local/lib/python2.7/site-packages 
     $ ln -s /home/<user>/.local/lib/python2.7/site-packages/megua
     $ ln -s /home/<user>/.local/lib/python2.7/site-packages/megua-0.2.dev50+g1c43d5a-py2.7.egg-info
