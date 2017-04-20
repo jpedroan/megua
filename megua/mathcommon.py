@@ -220,6 +220,20 @@ def svg_pie_chart(valueslist, chartid="chart1", title="Chart", width=400, height
 
     return r
 
+#=======================
+# cis for "high school"
+#=======================
+
+def CIS_latex(fun,x):
+    return r'\text{cis}\left(%s\right)' % latex(x)
+
+
+x,b=SR.var('x,b')
+FORMALCIS = function('cis',nargs=1, print_latex_func=CIS_latex)
+
+def cis(x):
+    return FORMALCIS(x)
+
 
 
 
