@@ -279,7 +279,8 @@ class ExSiacua(ExerciseBase):
 
         #Other transformations
         text = self.latex_render(text) #ver UnifiedGraphics
-        text = self.show_one(text)
+        #TODO: moving line below to exbase search_replace function.
+        #text = self.show_one(text)
         text = _old_html(text)
 
         return text

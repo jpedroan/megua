@@ -445,7 +445,11 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         text2 = self.rewrite(text1)
         if text2 is None: 
             raise NameError('rewrite(s,text) function is not working.')
-        return text2    
+
+        #TODO: check if this is ok here
+        text3 = self.show_one(text2)
+
+        return text3
 
 
     def print_instance(self):
@@ -482,6 +486,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         match_iter = re.finditer(showone_pattern,input_text)#create an iterator
         new_text = ''
         last_pos = 0
+
         for match in match_iter:
 
             #Get list of possibilities
