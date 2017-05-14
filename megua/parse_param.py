@@ -161,7 +161,7 @@ DEFAULT_OUTPUT_METHOD = EXPR2LATEX
 
 
 #Avoid this members in exercise
-AVOID_KEYWORDS = ['self', 'imagedirectory', 'image_relativepathnames', 'image_fullpathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir']
+AVOID_KEYWORDS = ['self', 'imagedirectory', 'image_relativepathnames', 'image_fullpathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir','TO_LATEX', '__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_adjust_images_url', '_answer_text', '_answer_whitoutmc', '_ascii_art_', '_axiom_', '_axiom_init_', '_build_ekeys', '_cache_key', '_collect_options_and_answer', '_current_answer', '_current_problem', '_fricas_', '_fricas_init_', '_gap_', '_gap_init_', '_giac_', '_giac_init_', '_gp_', '_gp_init_', '_interface_', '_interface_init_', '_interface_is_cached_', '_kash_', '_kash_init_', '_macaulay2_', '_macaulay2_init_', '_magma_init_', '_maple_', '_maple_init_', '_mathematica_', '_mathematica_init_', '_maxima_', '_maxima_init_', '_maxima_lib_', '_maxima_lib_init_', '_megbook', '_octave_', '_octave_init_', '_pari_', '_pari_init_', '_problem_text', '_problem_whitoutmc', '_r_init_', '_remove_multiplechoicetag', '_render', '_rendermethod', '_repr_', '_sage_', '_send_images', '_showone_possibilities', '_siacua_extractparameters', '_siacua_json', '_siacua_send', '_siacua_sqlprint', '_siacua_wronganswerdict', '_singular_', '_singular_init_', '_suggestive_name', '_summary_text', '_test_category', '_test_new', '_test_not_implemented_methods', '_test_pickling', '_tester', '_unicode_art_', '_unique_name', '_update_multiplechoice', 'all_choices', 'answer', 'category', 'correta1', 'db', 'dpi', 'dump', 'dumps', 'ekey', 'get_ekey', 'has_instance', 'has_multiplechoicetag', 'image_fullpathnames', 'image_relativepathnames', 'latex_render', 'make_random', 'paperx_cm', 'papery_cm', 'parent', 'print_instance', 'problem', 'rename', 'render_method', 'reset_name', 'rewrite', 'sage_graphic', 'save', 'screen_x', 'screen_y', 'search_replace', 'sgn1', 'sgn11', 'sgn2', 'sgn22', 'sgn3', 'show_one', 'siacua', 'siacuapreview', 'static_image', 'suggestive_name', 'summary', 'to_latex', 'try_random_updates', 'unique_name', 'update', 'update_dict', 'update_timed', 'wd_fullpath', 'wd_relative']
 
 
 
@@ -184,7 +184,7 @@ def parameter_change(inputtext,datadict):
     """
 
     #Create regex using datadict names
-    keys_no_keyword = [ v for v in datadict.keys() if v[0]!='_' and v not in AVOID_KEYWORDS] 
+    keys_no_keyword = [ v for v in datadict.keys() if v not in AVOID_KEYWORDS]
 
     #Reverse: why is important.
     #This reversed sort guarantees that 'onb1' is first changed and only then 'onb'.
@@ -225,34 +225,34 @@ def parameter_change(inputtext,datadict):
         try:
 
             if match.group(1) is not None:
-                
+
                 #CASE: name@()
                 #Get data from dict for this match
                 keyname = match.group(1)
                 data_value = datadict[keyname]    #; print "data_value=",data_value
                 outputtext += inputtext[text_last:match.start()+1]
                 outputtext += output_value(data_value,DEFAULT_OUTPUT_METHOD,parentesis=True)
-                
+
             elif match.group(2) is not None and match.group(3) is not None:
-                
+
                 #CASE: name@f{0.2g}
                 keyname = match.group(2)
                 data_value = datadict[keyname]
                 format_text = r"%" + match.group(3)
                 formated_argument = format_text % data_value
                 outputtext += inputtext[text_last:match.start()+1] + formated_argument
-                
+
             elif match.group(4) is not None and match.group(5) is not None:
-                
+
                 #CASE: name@s{RealField15}
                 keyname = match.group(4)
                 data_value = datadict[keyname]
                 sage_command = match.group(5) + '(' + str(data_value) +')'
                 ev = eval(sage_command,globals())
                 outputtext += inputtext[text_last:match.start()+1] + str(ev)
-                
+
             elif match.group(6) is not None and match.group(7) is not None:
-                
+
                 #print """parse_param.py: CASE: name@c{"text0","text1"}"""
                 #print "match.group(6)=",match.group(6)
                 #print "match.group(7)=",match.group(7)
@@ -261,12 +261,13 @@ def parameter_change(inputtext,datadict):
                     #create list with user given strings:
                     #name@c{"text0","text1"} --> ["text0","text1"]
                     str_uni = u"[" + match.group(7) + u"]"
-                    #print "parse_param.py: ",str_uni
+                    #print "parse_param.py: str_uni =",str_uni
                     str_list = eval( str_uni )
                     
                     #get value of 'name'
                     keyname = match.group(6)
                     data_value = datadict[keyname]
+                    #print "parse_param.py: data_value = datadict[keyname] => data_value = ", data_value
                     #get string from the list
                     str_value = str_list[data_value]
 
@@ -299,6 +300,7 @@ def parameter_change(inputtext,datadict):
                 #CASE: name wihtout formating
                 keyname = match.group(8)
                 data_value = datadict[keyname]
+                print "data_value = datadict[keyname]; data_value = ", data_value,"type(data_value)=",type(data_value)
                 if type(data_value) is str:
                     outputtext += inputtext[text_last:match.start()+1] + unicode(data_value,'utf8')
                 elif type(data_value) is unicode:
@@ -345,7 +347,16 @@ def output_value(s,output_method=None,parentesis=False):
 
     #convert the value into a string
     if output_method & EXPR2LATEX:
-        s_str = unicode(latex(s),'utf-8')
+        if type(s)==sage.symbolic.expression.Expression:
+            s_imag = s.imag()
+            if s_imag < 0:
+                s_str = unicode(latex(s.real()) + latex(s_imag) + "i" ,'utf-8')
+            elif s_imag ==0:
+                s_str = unicode(latex(s) ,'utf-8')
+            else: # s_imag > 0
+                s_str = unicode(latex(s.real()) + "+" + latex(s_imag) + "i" ,'utf-8')
+        else:
+            s_str = unicode(latex(s) ,'utf-8')
     else:
         s_str = unicode(str(s),'utf-8')
     
