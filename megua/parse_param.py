@@ -161,7 +161,7 @@ DEFAULT_OUTPUT_METHOD = EXPR2LATEX
 
 
 #Avoid this members in exercise
-AVOID_KEYWORDS = ['self', 'imagedirectory', 'image_relativepathnames', 'image_fullpathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir','TO_LATEX', '__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_adjust_images_url', '_answer_text', '_answer_whitoutmc', '_ascii_art_', '_axiom_', '_axiom_init_', '_build_ekeys', '_cache_key', '_collect_options_and_answer', '_current_answer', '_current_problem', '_fricas_', '_fricas_init_', '_gap_', '_gap_init_', '_giac_', '_giac_init_', '_gp_', '_gp_init_', '_interface_', '_interface_init_', '_interface_is_cached_', '_kash_', '_kash_init_', '_macaulay2_', '_macaulay2_init_', '_magma_init_', '_maple_', '_maple_init_', '_mathematica_', '_mathematica_init_', '_maxima_', '_maxima_init_', '_maxima_lib_', '_maxima_lib_init_', '_megbook', '_octave_', '_octave_init_', '_pari_', '_pari_init_', '_problem_text', '_problem_whitoutmc', '_r_init_', '_remove_multiplechoicetag', '_render', '_rendermethod', '_repr_', '_sage_', '_send_images', '_showone_possibilities', '_siacua_extractparameters', '_siacua_json', '_siacua_send', '_siacua_sqlprint', '_siacua_wronganswerdict', '_singular_', '_singular_init_', '_suggestive_name', '_summary_text', '_test_category', '_test_new', '_test_not_implemented_methods', '_test_pickling', '_tester', '_unicode_art_', '_unique_name', '_update_multiplechoice', 'all_choices', 'answer', 'category', 'correta1', 'db', 'dpi', 'dump', 'dumps', 'ekey', 'get_ekey', 'has_instance', 'has_multiplechoicetag', 'image_fullpathnames', 'image_relativepathnames', 'latex_render', 'make_random', 'paperx_cm', 'papery_cm', 'parent', 'print_instance', 'problem', 'rename', 'render_method', 'reset_name', 'rewrite', 'sage_graphic', 'save', 'screen_x', 'screen_y', 'search_replace', 'sgn1', 'sgn11', 'sgn2', 'sgn22', 'sgn3', 'show_one', 'siacua', 'siacuapreview', 'static_image', 'suggestive_name', 'summary', 'to_latex', 'try_random_updates', 'unique_name', 'update', 'update_dict', 'update_timed', 'wd_fullpath', 'wd_relative']
+AVOID_KEYWORDS = ['self', 'imagedirectory', 'image_relativepathnames', 'image_fullpathnames', 'has_instance', 'ekey', 'dpi', 'dimy', 'dimx', 'working_dir','TO_LATEX', '__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_adjust_images_url', '_answer_text', '_answer_whitoutmc', '_ascii_art_', '_axiom_', '_axiom_init_', '_build_ekeys', '_cache_key', '_collect_options_and_answer', '_current_answer', '_current_problem', '_fricas_', '_fricas_init_', '_gap_', '_gap_init_', '_giac_', '_giac_init_', '_gp_', '_gp_init_', '_interface_', '_interface_init_', '_interface_is_cached_', '_kash_', '_kash_init_', '_macaulay2_', '_macaulay2_init_', '_magma_init_', '_maple_', '_maple_init_', '_mathematica_', '_mathematica_init_', '_maxima_', '_maxima_init_', '_maxima_lib_', '_maxima_lib_init_', '_megbook', '_octave_', '_octave_init_', '_pari_', '_pari_init_', '_problem_text', '_problem_whitoutmc', '_r_init_', '_remove_multiplechoicetag', '_render', '_rendermethod', '_repr_', '_sage_', '_send_images', '_showone_possibilities', '_siacua_extractparameters', '_siacua_json', '_siacua_send', '_siacua_sqlprint', '_siacua_wronganswerdict', '_singular_', '_singular_init_', '_suggestive_name', '_summary_text', '_test_category', '_test_new', '_test_not_implemented_methods', '_test_pickling', '_tester', '_unicode_art_', '_unique_name', '_update_multiplechoice', 'all_choices', 'answer', 'category', 'correta1', 'db', 'dpi', 'dump', 'dumps', 'ekey', 'get_ekey', 'has_instance', 'has_multiplechoicetag', 'image_fullpathnames', 'image_relativepathnames', 'latex_render', 'make_random', 'paperx_cm', 'papery_cm', 'parent', 'print_instance', 'problem', 'rename', 'render_method', 'reset_name', 'rewrite', 'sage_graphic', 'save', 'screen_x', 'screen_y', 'search_replace', 'show_one', 'siacua', 'siacuapreview', 'static_image', 'suggestive_name', 'summary', 'to_latex', 'try_random_updates', 'unique_name', 'update', 'update_dict', 'update_timed', 'wd_fullpath', 'wd_relative']
 
 
 
@@ -300,7 +300,8 @@ def parameter_change(inputtext,datadict):
                 #CASE: name wihtout formating
                 keyname = match.group(8)
                 data_value = datadict[keyname]
-                print "data_value = datadict[keyname]; data_value = ", data_value,"type(data_value)=",type(data_value)
+                #print "data_value = datadict[keyname]; data_value = ", data_value,"type(data_value)=",type(data_value)
+                
                 if type(data_value) is str:
                     outputtext += inputtext[text_last:match.start()+1] + unicode(data_value,'utf8')
                 elif type(data_value) is unicode:
@@ -323,14 +324,14 @@ def parameter_change(inputtext,datadict):
 
 
 
-def output_value(s,output_method=None,parentesis=False):
+def output_value(expr,output_method=None,parentesis=False):
     r"""Return a unicode string with the 
         value or expression ``s`` 
         or some transformation of it.
 
     INPUT:
     
-    - ``s'': an expression or value
+    - ``expr'': an expression or **value**
     - ``output_method'': a sequence of bits (see EXPR2LATEX at the top of the file)
     - ``parentesis'': to write out or not parentesis
 
@@ -347,29 +348,75 @@ def output_value(s,output_method=None,parentesis=False):
 
     #convert the value into a string
     if output_method & EXPR2LATEX:
-        if type(s)==sage.symbolic.expression.Expression:
-            s_imag = s.imag()
-            if s_imag < 0:
-                s_str = unicode(latex(s.real()) + latex(s_imag) + "i" ,'utf-8')
-            elif s_imag ==0:
-                s_str = unicode(latex(s) ,'utf-8')
-            else: # s_imag > 0
-                s_str = unicode(latex(s.real()) + "+" + latex(s_imag) + "i" ,'utf-8')
-        else:
-            s_str = unicode(latex(s) ,'utf-8')
-    else:
-        s_str = unicode(str(s),'utf-8')
-    
-    if parentesis and bool(s<0):
 
-        if type(s)==sage.symbolic.expression.Expression:
-            return ur'\left(' + s_str + ur'\right)'
+        #print "parse_param.py: output_method & EXPR2LATEX = TRUE"
+        
+        if type(expr)==sage.symbolic.expression.Expression:
+
+            expr_imag = expr.imag()
+            expr_real = expr.real()
+
+            #print "parse_param.py:" + "expr=" + str(expr)
+            #print "   parte real=",expr_real," parte img=", expr_imag
+            #print "   parte real=",type(expr_real)," parte img=", type(expr_imag)
+            
+            w1 = SR.wild(n=0)
+            if expr_real.has(real_part(w1)) or expr_imag.has(imag_part(w1)):
+
+                expr_str = unicode(latex(expr) ,'utf-8')
+
+            elif expr_imag == 0:
+
+                expr_str = unicode(latex(expr) ,'utf-8')
+
+            elif expr_imag == 1:
+
+                if expr_real == 0:
+                    expr_str = r'i'
+                else:
+                    expr_str = unicode(latex(expr_real) + "+i" ,'utf-8')
+
+            elif expr_imag == -1:
+
+                if expr_real == 0:
+                    expr_str = r'-i'
+                else:
+                    expr_str = unicode(latex(expr_real) + "-i" ,'utf-8')
+
+            elif expr_imag < 0:
+
+                if expr_real == 0:
+                    expr_str = unicode(latex(expr_imag) + "i" ,'utf-8')
+                else:
+                    expr_str = unicode(latex(expr_real) + latex(expr_imag) + "i" ,'utf-8')
+
+            else: # expr_imag > 0
+
+                if expr_real == 0:
+                    expr_str = unicode(latex(expr_imag) + "i" ,'utf-8')
+                else:
+                    expr_str = unicode(latex(expr_real) + "+" + latex(expr_imag) + "i" ,'utf-8')
+
         else:
-            return r'(' + s_str + r')'
+
+            expr_str = unicode(latex(expr) ,'utf-8')
+
+    else:
+
+        #print "parse_param.py: output_method & EXPR2LATEX = FALSE"
+            
+        expr_str = unicode(str(expr),'utf-8')
+
+    if parentesis and bool(expr<0):
+
+        if type(expr)==sage.symbolic.expression.Expression:
+            return ur'\left(' + expr_str + ur'\right)'
+        else:
+            return r'(' + expr_str + r')'
             
     else:
         
-        return s_str  #unicode(s,'utf-8')
+        return expr_str  #unicode(s,'utf-8')
 
 
 """
