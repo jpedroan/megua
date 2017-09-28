@@ -109,6 +109,7 @@ class ExLatex(ExerciseBase):
         EXERCISE_PDF_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.pdf')
 
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             salvus.file(EXERCISE_PDF_PATHNAME,show=True,raw=True); print "\n"
             salvus.file(EXERCISE_TEX_PATHNAME,show=True,raw=True); print "\n"

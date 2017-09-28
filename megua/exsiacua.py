@@ -321,6 +321,7 @@ class ExSiacua(ExerciseBase):
 
 
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             salvus.html(html_string)
         elif MEGUA_PLATFORM=='DESKTOP':
@@ -543,6 +544,7 @@ class ExSiacua(ExerciseBase):
 
 
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             #print "exsiacua.py: using salvus.link:"
             html_relative_path = os.path.join(self.wd_relative,self.unique_name()+'_siacuapreview.html')
@@ -635,10 +637,10 @@ class ExSiacua(ExerciseBase):
             ~/Dropbox/all/megua/archive$ sage jsontest.sage
 
         """
-        
+
         #Other functions might require this.
         self.verbose = verbose
-        
+
         all_answers = []
 
         for e_number in ekeys:
@@ -654,7 +656,6 @@ class ExSiacua(ExerciseBase):
             assert(self.has_multiplechoicetag)
             answer_list = self._collect_options_and_answer()
 
-            #build json string
             send_dict =  self._siacua_json(course, self.unique_name(), e_number, self._problem_whitoutmc(), answer_list, self.siacua_concepts)
             send_dict.update(dict({'usernamesiacua': usernamesiacua, 'grid2x2': grid2x2, 'siacuatest': siacuatest}))
             send_dict.update(self.siacua_parameters)
@@ -760,17 +761,41 @@ class ExSiacua(ExerciseBase):
 
 
     def _siacua_send(self, send_dict):
+
+        #
+
+        #send_dict = dict( [k.encode('utf-8'), unicode(v).encode('utf-8')] for k,v in send_dict.items() )
+
+        #for k, v in send_dict.items():
+        #    #print "type(v)=",type(v)
+        #    #print "="*20,k
+        #    #print v
+        #    #print "="*20,k
+        #    all(ord(c) < 128 for c in v) #v is the "string"
+
+
         params = urllib.urlencode(send_dict)
+        params = urllib.quote(params,'\\')
+        print "exsiacua.py: params=",params
+
+        #params = urllib.urlencode(dict([k, v.encode('utf-8')] ))
+
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         if send_dict["siacuatest"]:
             conn = httplib.HTTPConnection("siacuatest.web.ua.pt")
         else:
             conn = httplib.HTTPConnection("siacua.web.ua.pt")
+
+        print dir(send_dict)
+
         conn.request("POST", "/MeguaInsert.aspx", params, headers)
+
         response = conn.getresponse()
+
         if self.verbose:
             print "exsiacua.py: response status from post",response.status
             print "exsiacua.py: response from post",response
+
         #TODO: improve message to user.
         if response.status==200:
 
@@ -853,17 +878,21 @@ class ExSiacua(ExerciseBase):
             problem = self._adjust_images_url(problem,course)
             answer_list = [self._adjust_images_url(a,course) for a in answer_list]
 
+        print "exsiacua.py: ANTES type problem",  type(problem)
+
         d.update( {
             "siacua_key": SIACUA_WEBKEY,
             "course": course,
             "exname": exname, 
             "ekey": str(e_number), 
-            "problem":  problem.strip().encode("utf-8"),
-            "answer":   answer_list[-1].strip().encode("utf-8"),
-            "rv":       answer_list[0].strip().encode("utf-8"),
+            "problem":  problem.strip(), #.encode("utf-8"),
+            "answer":   answer_list[-1].strip(), #.encode("utf-8"),
+            "rv":       answer_list[0].strip(), #.encode("utf-8"),
             "nre": len(answer_list) - 2
         } )
 
+        print "exsiacua.py: DEPOIS type d['problem']",  type(d['problem'])
+        
         #Concept list
         l = len(concept_list)
         if l>8:

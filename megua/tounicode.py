@@ -17,6 +17,9 @@ AUTHORS:
 
 def to_unicode(s):
     if type(s)!=unicode:
-        return unicode(s,'utf-8')
+        res = unicode(s,'utf-8')
     else:
-        return s
+        res = s
+    #print "tounicode.py: type(res)=", type(res)
+    #print "tounicode.py: codes in res=",[ord(c) for c in res]
+    return res

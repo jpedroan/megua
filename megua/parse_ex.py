@@ -276,7 +276,7 @@ def parse_ex(inputtext):
 
     error_found = False
     warn_found = False
-    
+
     while current<numlines and not error_found:
 
         tag = classlines[current].linetag
@@ -326,7 +326,7 @@ def parse_ex(inputtext):
                     else:
                         txt_problemname = txtinfo
                 #TODO Review this txt_problem = '\n%problem ' + txtinfo + '\n'
-                txt_problem = '\n' #starts class code with \n
+                txt_problem = u'\n' #starts class code with \n
                 current+=1
             else:
                 error_found = True
@@ -341,7 +341,7 @@ def parse_ex(inputtext):
             elif tag  == 're_answer':
                 #action
                 state=ExState.ANSWER
-                txt_answer = '\n' #TODO review '\n%answer\n'    
+                txt_answer = u'\n' #TODO review '\n%answer\n'    
                 if classlines[current].lineinfo is not None:
                     txtinfo = classlines[current].lineinfo.strip()
                     if  txtinfo != '':
@@ -401,20 +401,57 @@ def parse_ex(inputtext):
     if error_found:
         return None
     else:
+
+        print "parse_ex.py: type(txt_summary)=",type(txt_summary)
+        print "parse_ex.py: type(txt_problem)=",type(txt_problem)
+        print "parse_ex.py: type(txt_answer)=",type(txt_answer)
+        
+        """
+        #Warning about "strange chars":
+        if strange_chars(txt_summary):
+            print "parse_ex.py: due to a migration between systems:"
+            print "="*30
+            print "Please rewrite the following accented chars in the words in %SUMMARY part:"
+            print "="*30
+            write_strange_words(txt_summary)
+
+        if strange_chars(txt_problem):
+            print "parse_ex.py: due to a migration between systems:"
+            print "="*30
+            print "Please rewrite the following accented chars in the words in %PROBLEM part:"
+            print "="*30
+            write_strange_words(txt_problem)
+
+        if strange_chars(txt_answer):
+            print "parse_ex.py: due to a migration between systems:"
+            print "="*30
+            print "Please rewrite the following accented chars in the words in %ANSWER part:"
+            print "="*30
+            write_strange_words(txt_answer)
+        """
+
         #old way: return (unique_name,txt_sections,txt_summary,txt_problem,txt_answer,txt_class)
         return  {
-            'unique_name': unique_name.strip(), 
-            'sections_text': txt_sections.strip(), 
+            'unique_name': unique_name.strip(),
+            'sections_text': txt_sections.strip(),
             'suggestive_name': txt_problemname.strip(),
-            'summary_text': txt_summary.strip(), 
-            'problem_text': txt_problem.strip(), 
-            'answer_text': txt_answer.strip(), 
+            'summary_text': txt_summary.strip(),
+            'problem_text': txt_problem.strip(),
+            'answer_text': txt_answer.strip(),
             'class_text': txt_class.strip()
         }
 
 
+def strange_chars(s):
+    s = s.encode('utf-8')
+    return not all(ord(c)<128 for c in s)
 
-
+def write_strange_words(s):
+    s = s.encode('utf-8')
+    ls = s.split()
+    for w in ls:
+        if not all(ord(c)<128 for c in w):
+            print w
 
 
 #TODO: change this !

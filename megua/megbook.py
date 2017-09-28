@@ -5,7 +5,7 @@ MegBook -- Repository and functionalities for managing exercises.
 
 MEGUA build your own database of exercises in several markup languages.
 
-This module provides a means to produce a database of exercises 
+This module provides a means to produce a database of exercises
 that can be seen as a book of some author or authors.
 
 Using exercices:
@@ -197,8 +197,7 @@ Make a catalog:
    megbook.py say: producing E28E28_pdirect_001
    MegBook.py say: compiling latex file containing the instances of the exercises.
    MegBook module say: evince  _output/catalog.pdf
-   
-   
+
 Search an exercise:
 
 ::
@@ -469,6 +468,7 @@ class MegBook(MegSiacua):
         self._current_unique_name = unique_name
 
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             salvus.html("<h4>{}&nbsp;&nbsp;{}</h4><p>{}</p>".format(
                     unique_name,
@@ -660,13 +660,15 @@ class MegBook(MegSiacua):
             #    "_siacua or _moodle and related extension *.sagews or *.sage."
             return
 
-
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
+                print "Worksheet"
                 salvus.file(fullpath,show=True,raw=True); print "\n"
                 salvus.open_tab(fullpath)
             else:
+                print "Command line"
                 sys.path.append('/usr/local/lib/python2.7/dist-packages')
                 from smc_pyutil import smc_open
                 smc_open.process([fullpath])                
@@ -844,6 +846,7 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
                 #salvus.file(fullpath_new,show=True,raw=True); print "\n"
@@ -883,7 +886,7 @@ class MegBook(MegSiacua):
         #TODO: improve this try because it's hidding programmer coding errors and not only  author coding errors.
         #try:
         #First check: syntatic level ("megua" script)
-        
+        print "megbook.py: type(uexercise) is",type(uexercise)
         row =  parse_ex(to_unicode(uexercise))
         
         #print """megbook.py say: in save the type(row["summary_text"])=""",type(row["summary_text"])
@@ -1488,6 +1491,7 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
                 salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
@@ -1581,6 +1585,7 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
                 salvus.file(DOC_PDF_PATHNAME,show=True,raw=True); print "\n"
@@ -1883,6 +1888,7 @@ class MegBook(MegSiacua):
 
 
         if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
                 print "Check exam PDF file:"
