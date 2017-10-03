@@ -402,9 +402,9 @@ def parse_ex(inputtext):
         return None
     else:
 
-        print "parse_ex.py: type(txt_summary)=",type(txt_summary)
-        print "parse_ex.py: type(txt_problem)=",type(txt_problem)
-        print "parse_ex.py: type(txt_answer)=",type(txt_answer)
+        #print "parse_ex.py: type(txt_summary)=",type(txt_summary)
+        #print "parse_ex.py: type(txt_problem)=",type(txt_problem)
+        #print "parse_ex.py: type(txt_answer)=",type(txt_answer)
         
         """
         #Warning about "strange chars":

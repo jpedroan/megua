@@ -886,7 +886,7 @@ class MegBook(MegSiacua):
         #TODO: improve this try because it's hidding programmer coding errors and not only  author coding errors.
         #try:
         #First check: syntatic level ("megua" script)
-        print "megbook.py: type(uexercise) is",type(uexercise)
+        #print "megbook.py: type(uexercise) is",type(uexercise)
         row =  parse_ex(to_unicode(uexercise))
         
         #print """megbook.py say: in save the type(row["summary_text"])=""",type(row["summary_text"])
