@@ -61,6 +61,7 @@ Creation a LaTeX exercise:
 
 
 #PYTHON modules
+import sys
 import re
 import os
 from os import environ
