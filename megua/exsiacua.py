@@ -775,6 +775,7 @@ class ExSiacua(ExerciseBase):
         #    all(ord(c) < 128 for c in v) #v is the "string"
 
 
+        print send_dict
         params = urllib.urlencode(send_dict)
         params = urllib.quote(params,'\\')
         print "exsiacua.py: params=",params
@@ -886,9 +887,9 @@ class ExSiacua(ExerciseBase):
             "course": course,
             "exname": exname, 
             "ekey": str(e_number), 
-            "problem":  problem.strip(), #.encode("utf-8"),
-            "answer":   answer_list[-1].strip(), #.encode("utf-8"),
-            "rv":       answer_list[0].strip(), #.encode("utf-8"),
+            "problem":  problem.strip().encode("utf-8"),
+            "answer":   answer_list[-1].strip().encode("utf-8"),
+            "rv":       answer_list[0].strip().encode("utf-8"),
             "nre": len(answer_list) - 2
         } )
 
