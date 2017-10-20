@@ -12,8 +12,8 @@ AUTHORS:
 - Pedro Cruz (2016-01): first modifications for use in SMC.
 
 
-EXAMPLES:
-
+EXAMPLES:send_image
+E97I40_Teorema_Rolle_001_siacua
 
 A Siacua exercise in portuguese:
 
@@ -63,7 +63,13 @@ A Siacua exercise in portuguese:
        ....:  
        ....: class E97K50_Laplace_002(ExSiacua):
        ....:     _unique_name = "E97K50_Laplace_002"
-       ....:     def make_random(s,edict=None):
+       ....:     def make_random(s,edict=None):        #content = s.post        #content = s.post(r"http://pmate.ua.pt/wspointaccess/api/MEGUA", data={'Base64': base64_send_dict} )
+
+
+(r"http://pmate.ua.pt/wspointaccess/api/MEGUA", data={'Base64': base64_send_dict} )
+
+
+
        ....:         #problem 
        ....:         s.v1 = ur.iunif(5,15)
        ....:         s.v2 = ur.iunif(1,s.v1-2)
@@ -78,7 +84,9 @@ A Siacua exercise in portuguese:
        ....:         s.errada3 = s.cf/(s.cp/2)       
        ....: ''')
        Exsicua module say: firefox  _output/E97K50_Laplace_002/E97K50_Laplace_002.html
-       sage: ex = meg.new("E97K50_Laplace_002", returninstance=True)
+       sage: ex = meg.new("E97K50_Laplace_002", retur
+
+ninstance=True)
        sage: ex.print_instance()
        Exsicua module say: firefox  _output/E97K50_Laplace_002/E97K50_Laplace_002.html
        sage: ex.siacuapreview(ekeys=[10,20,30])
@@ -146,7 +154,7 @@ Another example that is sent to siacua system:
        ....:      
        ....: Logo a probabilidade pedida é dada por:
        ....:     $$P(\text{ambos os números menores que v2}) = \frac{cf}{cp} = vresp$$  
-       ....:  
+       ....:  E97I40_Teorema_Rolle_001_siacua
        ....: class E97K50_Laplace_001(ExSiacua):
        ....:  
        ....:     def make_random(s):
@@ -181,7 +189,7 @@ Another example that is sent to siacua system:
        ....:             return '&(%d,%d)' % (B,D)
        ....:         else:
        ....:             return '& '
-       ....:  
+       ....:  send_image
        ....: ''')
        Exsicua module say: firefox  _output/E97K50_Laplace_001/E97K50_Laplace_001.html
        sage: ex = meg.new("E97K50_Laplace_001", returninstance=True)
@@ -194,7 +202,7 @@ DEVELOPER NOTES:
 """
 
 #*****************************************************************************
-#       Copyright (C) 2012,2016 Pedro Cruz <PedroCruz@ua.pt>
+#       Copyright (C) 2012,2016,2017 Pedro Cruz <PedroCruz@ua.pt>
 #
 #  Distributed under the terms of the GNU General Public License (GPL)
 #                  http://www.gnu.org/licenses/
@@ -203,6 +211,7 @@ DEVELOPER NOTES:
 
 #PYTHON modules
 import httplib, urllib
+import base64,json
 import os
 import sys
 import re
@@ -337,7 +346,13 @@ class ExSiacua(ExerciseBase):
         """
         Called by ExSiacua.update()
 
-        Parses <multiplechoice>...</multiplecoice> and puts each option 
+        Parses <multiplechoice>...</multiplecoice> and puts each option         #content = s.post(r"http://pmate.ua.pt/wspointaccess/api/MEGUA", data={'Base64': base64_send_dict} )
+
+
+        #content = s.post(r"http://pmate.ua.pt/wspointaccess/api/MEGUA", data={'Base64': base64_send_dict} )
+
+
+
         in exercise fields: 
 
         * self.all_choices: list of all choices.
@@ -351,7 +366,7 @@ class ExSiacua(ExerciseBase):
 
         """
 
-        #TODO: remove in a few revisions
+        #TODO: remove in a few revisionsE97I40_Teorema_Rolle_001_siacua
         if "CDATA" in input_text:
             print "TODO: in %s, should issue warning when CDATA and multiplechoice are both present." % self.unique_name()
             self.detailed_answer = "Contains [CDATA]\n"
@@ -430,7 +445,7 @@ class ExSiacua(ExerciseBase):
         l = centered_all_choices + [self.detailed_answer] #join two lists
 
         if len(l)<5:
-            raise NameError('exsiacua modukle: missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
+            raise NameError('exsiacua module: missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
 
         #print "==========="
         #print "For _siacua_answer:",l
@@ -494,13 +509,13 @@ class ExSiacua(ExerciseBase):
             #TODO: do like in print_instance()
             problem = self._problem_whitoutmc()#m.c. options here?
             answer  = self._answer_whitoutmc() #m.c. options here?
-    
+
             #Adapt for appropriate URL for images
             #if ex_instance.image_list != []:
             #    problem = self._adjust_images_url(problem,course)
             #    answer = self._adjust_images_url(answer,course)
             #    self.send_images()
-    
+
             assert(self.has_multiplechoicetag)
             answer_list = self._collect_options_and_answer()
 
@@ -575,28 +590,38 @@ class ExSiacua(ExerciseBase):
 
 
     def siacua(self,
+               #new fields
+               targetmachine=None,
+               targetusername="(no username)",
                ekeys=[],
                course="calculo3",
-               usernamesiacua="(no username)",
+               #siacua
                level=1,
                slip=0.05,
                guess=0.25,
                discr=0.5,
                concepts = [ (0,  1) ],
+               #pmate
+               idtree=None,
+               #auxiliares
                grid2x2=False,
-               siacuatest=False,
-               sendpost=True,
-               verbose=False
+               verbose=False,
+               #deprecated fields
+               usernamesiacua="(no username)",
+               siacuatest=None,
+               sendpost=None
               ):
         r"""
 
         INPUT:
 
+        - ``targetmachine``: "siacua", "pmate", "siacuatest", "testting".
+
+        - ``targetusername``: the exercise is sent to some system. This is the system username.
+
         - ``ekeys``: list of numbers that generate the same problem instance.
 
         - ``course``: Right now could be "calculo3", "calculo2". Ask siacua administrator for more.
-
-        - ``usernamesiacua``: username used by the author in the siacua system.
 
         - ``level``: (usually 1) I don't know what does this mean but it's an small integer number.
 
@@ -608,13 +633,18 @@ class ExSiacua(ExerciseBase):
 
         - ``concepts``: a list like [(110, 0.3),(135, 0.7)] where 0.3+0.7 = 1 and 110 and 135 are codes of concepts.
 
+        - ``idtree``: integer of a node in a tree (pmate side).
+
         - ``grid2x2``: (usually False) Write exercise answering options in a 2x2 grid (useful for graphics).
 
-        - ``siacuatest``: (usually False) If True, send data to a test machine.
+        - ``usernamesiacua``: deprecated. See ``targetusername``. Used to be: username used by the author in the siacua system.
 
-        - ``sendpost``: (usually True) If True send information to siacua, otherwise simulates to check problems.
+        - ``siacuatest``: -- deprecated. See ``targetmachine``. Used to be: (usually False) If True, send data to a test machine.
+
+        - ``sendpost``: -- deprecated. See ``targetmachine``. Used to be: (usually True) If True send information to siacua, otherwise simulates to check problems.
 
         - ``verbose``: (usually False) print the message received by siacua.
+
 
         OUTPUT:
 
@@ -622,7 +652,7 @@ class ExSiacua(ExerciseBase):
 
         NOTE:
 
-        - you can export between 3 and 6 wrong options and 1 right.
+        - you can expotargetusernamert between 3 and 6 wrong options and 1 right.
 
         TODO: securitykey: implemenent in a megua-server configuration file.
 
@@ -639,8 +669,59 @@ class ExSiacua(ExerciseBase):
 
         """
 
-        #Other functions might require this.
+
+        # ---------------------------------
+        # Fields back integration of fields
+        # ---------------------------------
+        if targetmachine=="siacua":
+
+            self.targetmachine = "siacua"
+            self.targeturl = 'http://siacua.web.ua.pt/MeguaInsert2.aspx'
+            self.targetusername = targetusername
+
+        elif targetmachine=="siacuatest":
+
+            self.targetmachine = "siacuatest"
+            self.targeturl = 'http://siacuatest.web.ua.pt/MeguaInsert2.aspx'
+            self.targetusername = targetusername
+
+        elif targetmachine=="pmate":
+
+            self.targetmachine = "pmate"
+            self.targeturl = 'http://pmate.ua.pt/wspointaccess/api/MEGUA'
+            self.targetusername = targetusername
+
+        elif targetmachine is None:
+
+            if siacuatest is True:
+
+                self.targetmachine = "siacuatest"
+                self.targeturl = 'http://siacuatest.web.ua.pt/MeguaInsert2.aspx'
+                self.targetusername = usernamesiacua
+
+            elif siacuatest is False:
+
+                self.targetmachine = "siacua"
+                self.targeturl = 'http://siacua.web.ua.pt/MeguaInsert2.aspx'
+                self.targetusername = usernamesiacua
+
+        else:
+
+            self.targetmachine = "None"
+            self.targetusername = "(no username)"
+            self.targeturl = 'https://httpbin.org'
+
+
+        #In a future version remove sendpots argument:
+        if sendpost:
+            print "exsiacua.py: sendpots is not used. Please remove from siacua() call."
+        sendpost = True
+
+
+        #Other functions might require this fields
+        self.course = course
         self.verbose = verbose
+
 
         all_answers = []
 
@@ -651,38 +732,36 @@ class ExSiacua(ExerciseBase):
 
             #NOTE: inside self.update (many lines above) there is
             #extract parameters (old mode). This is the new mode:
-            self.siacua_parameters = dict(level=level, slip=slip, guess=guess,discr=discr)
+            self.siacua_parameters = dict(level=str(level), slip=str(slip), guess=str(guess),discr=str(discr),idtree=str(idtree))
             self.siacua_concepts = concepts
 
             assert(self.has_multiplechoicetag)
             answer_list = self._collect_options_and_answer()
 
-            send_dict =  self._siacua_json(course, self.unique_name(), e_number, self._problem_whitoutmc(), answer_list, self.siacua_concepts)
-            send_dict.update(dict({'usernamesiacua': usernamesiacua, 'grid2x2': grid2x2, 'siacuatest': siacuatest}))
+            send_dict =  self._siacua_json(self.unique_name(), e_number, self._problem_whitoutmc(), answer_list, self.siacua_concepts)
+            send_dict.update(dict({'targetusername': targetusername, 'grid2x2': grid2x2, 'targetmachine': targetmachine}))
             send_dict.update(self.siacua_parameters)
 
-            #Call siacua for store.
-            if sendpost:
-                send_dict.update(dict({'usernamesiacua': usernamesiacua}))
-                if self.verbose:
-                    print "exsiacua.py: is going to send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
-                send_result = self._siacua_send(send_dict)
-                all_answers += send_result
-                self._send_images(siacuatest,course=course)
-            else:
-                print "Not sending to siacua. Dictionary is", send_dict
+            send_dict.update(dict({'targetusername': targetusername}))
+            if self.verbose:
+                print "exsiacua.py: is going to send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
+            send_result = self._siacua_send(send_dict)
+            all_answers += send_result
+            self._send_images()
 
-        if all_answers:
-            print 'Exercícios a consultar no SIACUA: ' + ', '.join(all_answers) + '.'
-            if sendpost:
-                if siacuatest:
-                    print "Abrir http://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
-                else:
-                    print "Abrir http://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+
+        #TODO: adaptar isto aos novos parâmetros de chamada.
+        #if all_answers:
+        #    print 'Exercícios a consultar no SIACUA: ' + ', '.join(all_answers) + '.'
+        #    if sendpost:
+        #        if siacuatest:
+        #            print "Abrir http://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+        #        else:
+        #            print "Abrir http://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
         #end
 
 
-    def _send_images(self,siacuatest,course):
+    def _send_images(self):
         """Send images to siacua: now is to put them in a drpobox public folder
         # AttributeError: MegBookWeb instance has no attribute 'image_list'
         #for fn in self.image_list:
@@ -695,25 +774,21 @@ class ExSiacua(ExerciseBase):
         """
         import requests
 
-        if siacuatest:
-            url = 'http://siacuatest.web.ua.pt/MeguaInsert2.aspx'
-        else:
-            url = 'http://siacua.web.ua.pt/MeguaInsert2.aspx'
-
         if self.verbose:
             print "exsiacua.py: self.image_fullpathnames", self.image_fullpathnames
             print "exsiacua.py: self.image_relativepathnames", self.image_relativepathnames
-            
+
         for f in self.image_fullpathnames:
             if self.verbose:
                 print "exsiacua.py: is going to send:",f
             files = {'file': (course+"_"+os.path.basename(f), open(f, 'rb')) }
-            r = requests.post(url, files=files)
+            r = requests.post(self.targeturl, files=files)
             if self.verbose:
                 print "exsiacua.py: request response is =",r.ok
                 print "exsiacua.py: done, sending images."
 
-    def _adjust_images_url(self, input_text, course):
+
+    def _adjust_images_url(self, input_text):
         """the url in problem() and answer() is <img src='_images/filename.png'>
         Here we replace _images/ by the public dropbox folder
 
@@ -732,7 +807,7 @@ class ExSiacua(ExerciseBase):
         #(new_text,number) = re.subn("%s-(%s)"%(self.unique_name,self.unique_name), r"\1", new_text, re.DOTALL|re.UNICODE)  #, count=1)
         """
 
-        (new_text,number) = re.subn(r"\.OUTPUT/\w+/(\w+)", r"../imagens/%s_\1"%course, input_text, re.DOTALL|re.UNICODE)  #, count=1)
+        (new_text,number) = re.subn(r"\.OUTPUT/\w+/(\w+)", r"../imagens/%s_\1"%self.course, input_text, re.DOTALL|re.UNICODE)  #, count=1)
 
         #print "exsiacua.py ===> Replacement for %d url images." % number
         #print new_text
@@ -749,7 +824,7 @@ class ExSiacua(ExerciseBase):
     #    #TUNE this:os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
 
     #def _adjust_images_url_dropbox(self, input_text):
-    #    """the url in problem() and answer() is <img src='_images/filename.png'>
+    #    """the url in problem() and answer() is <img src='_iensure_ascii=False, indent=4, sort_keys=True)mages/filename.png'>
     #    Here we replace _images/ by the public dropbox folder"""
     #
     #    target = r"https://dl.dropboxusercontent.com/u/10518224/megua_images"
@@ -761,26 +836,57 @@ class ExSiacua(ExerciseBase):
 
 
 
+
     def _siacua_send(self, send_dict):
 
-        #
+        #Experiencia com Alex:
+        #como dito no email: json.dumps(texto , indent=4, sort_keys=True, ensure_ascii=False)
+        #Não deu? encoded_send_dict =  base64.b64encode( json.dumps(send_dict,ensure_ascii=True, encoding="utf-8") ) #,,  ensure_ascii=True dumps ) ) #string ASCII
 
-        #send_dict = dict( [k.encode('utf-8'), unicode(v).encode('utf-8')] for k,v in send_dict.items() )
+        json_send_dict =   json.dumps(send_dict, ensure_ascii=False, indent=4, sort_keys=True)
+        if self.verbose:
+            print "json_send_dict="
+            print json_send_dict
+        base64_send_dict =  base64.b64encode( json_send_dict  )
+        if self.verbose:
+            print "base64_json_send_dict="
+            print base64_send_dict
 
-        #for k, v in send_dict.items():
-        #    #print "type(v)=",type(v)
-        #    #print "="*20,k
-        #    #print v
-        #    #print "="*20,k
-        #    all(ord(c) < 128 for c in v) #v is the "string"
+
+        import requests
+
+        s = requests.Session()
+
+        content = s.post(self.targeturl, data={'Base64': base64_send_dict} )
+
+        #Check content.
+        if content.status_code == 201:
+            if MEGUA_PLATFORM=='SMC':
+                sys.path.append('/cocalc/lib/python2.7/site-packages')
+                from smc_sagews.sage_salvus import salvus
+                salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
+            elif MEGUA_PLATFORM=='DESKTOP':
+                print "Exsicua module say: firefox ",content.headers['Location']
+                subprocess.Popen(["firefox","-new-tab", content.headers['Location']])
+            else:
+                print "Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+
+            return "ok"
+        else:
+            raise Exception("exsiacua.py: envio para base de dados não funcionou. Código:" + content.status_code)
 
 
-        print send_dict
-        params = urllib.urlencode(send_dict)
-        params = urllib.quote(params,'\\')
-        print "exsiacua.py: params=",params
 
+        r"""
+        OLD SIACUA SEND CODE:
+        
+        params = urllib.urlencode({'concret': base64_send_dict})
+
+        #params = urllib.urlencode(encoded_send_dict)
+        #params = urllib.quote(params,'\\')
+        #print "exsiacua.py: params=",params
         #params = urllib.urlencode(dict([k, v.encode('utf-8')] ))
+
 
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         if send_dict["siacuatest"]:
@@ -817,7 +923,7 @@ class ExSiacua(ExerciseBase):
                 print "exsiacua.py: A chave MEGUA/SIACUA não é válida."
                 conn.close()
                 return "Invalid key megua/siacua" #TODO: do this with raise exception.
-            else:
+            else:all_ids
                 choice_pattern = re.compile(r'id = (\d+)', re.DOTALL|re.UNICODE)
                 akword = "New:"
 
@@ -839,6 +945,10 @@ class ExSiacua(ExerciseBase):
         else:
             return 'Not sent: ekey={}'.format(send_dict["ekey"])
 
+        """ # tirar caso seja necessário.
+
+
+
 
     def _build_ekeys(self,ekeys,many=2):
         r"""From ekeys or many build a range of ekeys."""
@@ -853,7 +963,7 @@ class ExSiacua(ExerciseBase):
             return ekeys
 
 
-    def _siacua_json(self,course, exname, e_number, problem, answer_list,concept_list):
+    def _siacua_json(self, exname, e_number, problem, answer_list,concept_list):
         r"""
         LINKS:
             http://docs.python.org/2/library/json.html
@@ -880,20 +990,20 @@ class ExSiacua(ExerciseBase):
             problem = self._adjust_images_url(problem,course)
             answer_list = [self._adjust_images_url(a,course) for a in answer_list]
 
-        print "exsiacua.py: ANTES type problem",  type(problem)
+        #print "exsiacua.py: ANTES type problem",  type(problem)
 
         d.update( {
             "siacua_key": SIACUA_WEBKEY,
-            "course": course,
+            "course": self.course,
             "exname": exname, 
             "ekey": str(e_number), 
             "problem":  problem.strip().encode("utf-8"),
             "answer":   answer_list[-1].strip().encode("utf-8"),
             "rv":       answer_list[0].strip().encode("utf-8"),
-            "nre": len(answer_list) - 2
+            "nre": str( len(answer_list) - 2 )
         } )
 
-        print "exsiacua.py: DEPOIS type d['problem']",  type(d['problem'])
+        #print "exsiacua.py: DEPOIS type d['problem']",  type(d['problem'])
         
         #Concept list
         l = len(concept_list)
@@ -901,39 +1011,37 @@ class ExSiacua(ExerciseBase):
             print "Number of concepts cannot exceed 8."
             return {}
 
-        d["nc"] = l #number of concepts
+        d["nc"] = str(l) #number of concepts
 
-        d["tc1"] =  concept_list[0][0] if l>=1 else ""
-        d["tp1"] =  concept_list[0][1] if l>=1 else ""
+        d["tc1"] =  str( concept_list[0][0] if l>=1 else "" )
+        d["tp1"] =  str( concept_list[0][1] if l>=1 else "" )
 
-        d["tc2"] =  concept_list[1][0] if l>=2 else ""
-        d["tp2"] =  concept_list[1][1] if l>=2 else ""
+        d["tc2"] =  str( concept_list[1][0] if l>=2 else "" )
+        d["tp2"] =  str( concept_list[1][1] if l>=2 else "" )
 
-        d["tc3"] =  concept_list[2][0] if l>=3 else ""
-        d["tp3"] =  concept_list[2][1] if l>=3 else ""
+        d["tc3"] =  str( concept_list[2][0] if l>=3 else "" )
+        d["tp3"] =  str( concept_list[2][1] if l>=3 else "" )
 
-        d["tc4"] =  concept_list[3][0] if l>=4 else ""
-        d["tp4"] =  concept_list[3][1] if l>=4 else ""
+        d["tc4"] =  str( concept_list[3][0] if l>=4 else "" )
+        d["tp4"] =  str( concept_list[3][1] if l>=4 else "" )
 
-        d["tc5"] =  concept_list[0][0] if l>=5 else ""
-        d["tp5"] =  concept_list[0][1] if l>=5 else ""
+        d["tc5"] =  str( concept_list[0][0] if l>=5 else "" )
+        d["tp5"] =  str( concept_list[0][1] if l>=5 else "" )
 
-        d["tc6"] =  concept_list[1][0] if l>=6 else ""
-        d["tp6"] =  concept_list[1][1] if l>=6 else ""
+        d["tc6"] =  str( concept_list[1][0] if l>=6 else "" )
+        d["tp6"] =  str( concept_list[1][1] if l>=6 else "" )
 
-        d["tc7"] =  concept_list[2][0] if l>=7 else ""
-        d["tp7"] =  concept_list[2][1] if l>=7 else ""
+        d["tc7"] =  str( concept_list[2][0] if l>=7 else "" )
+        d["tp7"] =  str( concept_list[2][1] if l>=7 else "" )
 
-        d["tc8"] =  concept_list[3][0] if l>=8 else ""
-        d["tp8"] =  concept_list[3][1] if l>=8 else ""
+        d["tc8"] =  str( concept_list[3][0] if l>=8 else "" )
+        d["tp8"] =  str( concept_list[3][1] if l>=8 else "" )
 
 
         #TODO: colocar concepts_list no dict
 
-        #return json.dumps(d,
-        #    ensure_ascii=True, 
-        #    encoding="utf-8")
-        return d
+        return d #d é dicionário
+
 
 
     def _siacua_wronganswerdict(self,alist):

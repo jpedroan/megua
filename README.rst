@@ -5,12 +5,12 @@ MEGUA package for SageMath and SageMath Cloud
 
 
 
-MEGUA is a package for SageMath for creating parametrized exercises in HTML+MathJAX or LaTeX+PDF files (more formats are planned). 
+MEGUA is a package for SageMath for creating parametrized exercises in HTML+MathJAX or LaTeX+PDF files (more formats are planned).
 
-This tutorials are being revised but now they give a good ideia of the topics of this project:
+This tutorials are being revised but now they give a good idea of the topics of this project:
 
 * `Tutorial em português <http://megua.readthedocs.io/pt/latest/>`_
-* `Tutorial in english <http://megua.readthedocs.io/en/latest/>`_ 
+* `Tutorial in english <http://megua.readthedocs.io/en/latest/>`_
 * Contact: pedrocruz@ua.pt
 
 Development state: `alpha version <https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha>`_
@@ -40,11 +40,11 @@ Neste tipo de conta, o usuário não tem acesso direto à internet estando dentr
 ::
 
 
-2. Crie uma conta no SMC `<https://cloud.sagemath.com>`_, 
+2. Crie uma conta no SMC `<https://cloud.sagemath.com>`_,
 ::
 
 
-- depois crie um projeto; 
+- depois crie um projeto;
 - outros usuários que queiram paricipar do projeto devem criar uma conta;
 - o "dono" do projeto deve depois adicioná-los (botão Settings).
 
@@ -105,7 +105,7 @@ Neste tipo de conta, o usuário não tem acesso direto à internet estando dentr
    $ megua catalog
    (mostra todos os exercícios criados para siacua ou latex)
 
-  
+
 11. Mais opções futuras com:
 ::
 
@@ -125,12 +125,12 @@ With this type of account the user does not have "internet access" using command
 1. Download MEGUA package to your computer from `PYPi <https://pypi.python.org/pypi/megua>`_ using the green button. Save the file in your computer.
 ::
 
-2. Create an account in SMC `<https://cloud.sagemath.com>`_, 
+2. Create an account in SMC `<https://cloud.sagemath.com>`_,
 ::
 
 
-- then create a project; 
-- other users must create an account 
+- then create a project;
+- other users must create an account
 - and then add them to this project.
 
 
@@ -176,9 +176,9 @@ With this type of account the user does not have "internet access" using command
 ::
 
    $ megua catalog
- 
-  
-   
+
+
+
 10. More options with:
 ::
 
@@ -197,12 +197,12 @@ Install on a SMC Payed account
 With this type of account it is necessary to turn "internet access" in Setting and MEGUA could be downloaded from github directly with recent updates in "master" branch.
 
 
-1. Create an account in SMC `<https://cloud.sagemath.com>`_, 
+1. Create an account in SMC `<https://cloud.sagemath.com>`_,
 ::
 
 
-- then create a project; 
-- other users must create an account 
+- then create a project;
+- other users must create an account
 - and then add them to this project.
 
 
@@ -241,21 +241,21 @@ With this type of account it is necessary to turn "internet access" in Setting a
 ::
 
    $ megua catalog
- 
-   
+
+
 8. More options with:
 ::
 
     $ megua help
 
 
- 
+
 Install on Ubuntu/linux desktop
 -------------------------------
 
 1. Download and install `SageMath <http://www.sagemath.org/>`_
 ::
-    
+
 
 2. In a terminal do:
 ::
@@ -264,7 +264,7 @@ Install on Ubuntu/linux desktop
     Enter <sage dir>:
     $ ./sage -sh
     $ pip install requests
-    $ cd local/lib/python2.7/site-packages 
+    $ cd local/lib/python2.7/site-packages
     $ ln -s /home/<user>/.local/lib/python2.7/site-packages/megua
     $ ln -s /home/<user>/.local/lib/python2.7/site-packages/megua-0.2.dev50+g1c43d5a-py2.7.egg-info
     (Adapt the last filename, please.)
@@ -278,8 +278,8 @@ Install on Ubuntu/linux desktop
     $ edit megua
     Change the first line to something like:
     #!/usr/bin/env /<path-to-sage>/sage
-    
-    
+
+
 3. Run for initialization:
 ::
 
@@ -293,15 +293,15 @@ Install on Ubuntu/linux desktop
 5. Create the first exercise targeting a LaTeX exercise
 ::
 
-    $ megua new E12X34_AddTwoNumbers_001_latex.sage  
+    $ megua new E12X34_AddTwoNumbers_001_latex.sage
 
 
 6. Create a catalog of all exercises:
 ::
 
    $ megua catalog
- 
-   
+
+
 7. More options with:
 ::
 
@@ -311,21 +311,21 @@ Install on Ubuntu/linux desktop
 
 
 
-   
+
 Memória (português)
 -------------------
 
-Começou em 2010, num almoço com uma das principais protagonistas do `PMate <http://pmate.ua.pt>`_. A conversa surgiu sobre  "resoluções" parametrizadas em LaTeX (na altura ainda não disponíveis no sistema pmate). 
+Começou em 2010, num almoço com uma das principais protagonistas do `PMate <http://pmate.ua.pt>`_. A conversa surgiu sobre  "resoluções" parametrizadas em LaTeX (na altura ainda não disponíveis no sistema pmate).
 O SageMath estava na arranque e pensou-se: porque não juntar as duas abordagens?
 
-Em 2011 surgiu uma primeira versão e logo uma nova colega veio dar força ao projeto MEGUA. Este projeto, até agora tem sido uma  biblioteca externa que depende do SageMath, linguagem Python e LaTeX para criar exercícios parametrizados para LaTeX. Entretanto, a chegada do SIACUA (siacua.web.ua.pt) fez com que durante um ano a produção se concentrasse apenas para HTML+MathJAX com a ajuda de mais dois colegas tendo o desenvolvimento em LaTeX/PDF ficado mais parado. 
+Em 2011 surgiu uma primeira versão e logo uma nova colega veio dar força ao projeto MEGUA. Este projeto, até agora tem sido uma  biblioteca externa que depende do SageMath, linguagem Python e LaTeX para criar exercícios parametrizados para LaTeX. Entretanto, a chegada do SIACUA (siacua.web.ua.pt) fez com que durante um ano a produção se concentrasse apenas para HTML+MathJAX com a ajuda de mais dois colegas tendo o desenvolvimento em LaTeX/PDF ficado mais parado.
 
 - `Página Institucional do MEGUA <http://cms.ua.pt/megua>`_: people, works, seminars, and related things.
 - `Tutorial em portuguê <http://megua.readthedocs.org/pt/latest/>`_: conceitos e prática.
 
 O trabalho foi apresentado em:
 
-- `MEGUA PACKAGE FOR PARAMETERIZED EXERCISES <http://library.iated.org/view/CRUZ2013MEG>`_ 
+- `MEGUA PACKAGE FOR PARAMETERIZED EXERCISES <http://library.iated.org/view/CRUZ2013MEG>`_
 
 
 **END**

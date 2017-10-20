@@ -35,46 +35,31 @@ class MegSiacua:
 
     #TODO: rever isto tudo
     def siacua(self,
+               #new fields
+               targetmachine=None,
+               targetusername="(no username)",
                ekeys=[],
                course="calculo3",
-               usernamesiacua="(no username)",
+               #siacua
                level=1,
                slip=0.05,
                guess=0.25,
                discr=0.5,
                concepts = [ (0,  1) ],
+               #pmate
+               idtree=None,
+               #auxiliares
                grid2x2=False,
-               siacuatest=False,
-               sendpost=True,
-               verbose=False
+               verbose=False,
+               #old fields
+               usernamesiacua="(no username)",
+               siacuatest=None,
+               sendpost=None
               ):
         r"""
 
         INPUT:
 
-        - ``ekeys``: list of numbers that generate the same problem instance.
-
-        - ``course``: Right now could be "calculo3", "calculo2". Ask siacua administrator for more.
-
-        - ``usernamesiacua``: username used by the author in the siacua system.
-
-        - ``level``: (usually 1) I don't know what does this mean but it's an small integer number.
-
-        - ``slip``: (0,...,1) The probability of knowing how to answer, commit a mistake.
-
-        - ``guess``: (usually 0.25) The probability of guessing the right option.
-
-        - ``discr``: (0,...,1) Parameter `discr` is the probability that a student knows how to select the right answer.
-
-        - ``concepts``: a list like [(110, 0.3),(135, 0.7)] where 0.3+0.7 = 1 and 110 and 135 are codes of concepts.
-
-        - ``grid2x2``: (usually False) Write exercise answering options in a 2x2 grid (useful for graphics).
-
-        - ``siacuatest``: (usually False) If True, send data to a test machine.
-
-        - ``sendpost``: (usually True) If True send information to siacua, otherwise simulates to check problems.
-
-        - ``verbose``: (usually False) print the message received by siacua.
 
         OUTPUT:
 
@@ -109,7 +94,27 @@ class MegSiacua:
         ex_instance = self.exerciseinstance(row=row, ekey=0)
 
         #exercise instance will sent instances to siacua
-        ex_instance.siacua(ekeys,course,usernamesiacua,level,slip,guess,discr,concepts,grid2x2,siacuatest,sendpost,verbose)
+        ex_instance.siacua(
+               targetmachine,
+               targetusername,
+               ekeys,
+               course,
+               #siacua
+               level,
+               slip,
+               guess,
+               discr,
+               concepts,
+               #pmate
+               idtree,
+               #auxiliares
+               grid2x2,
+               verbose,
+               #old fields
+               usernamesiacua,
+               siacuatest,
+               sendpost
+            )
 
         #done
             
