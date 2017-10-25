@@ -54,7 +54,7 @@ class MegSiacua:
                #old fields
                usernamesiacua="(no username)",
                siacuatest=None,
-               sendpost=None
+               sendpost=True
               ):
         r"""
 

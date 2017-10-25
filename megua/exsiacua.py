@@ -609,7 +609,7 @@ class ExSiacua(ExerciseBase):
                #deprecated fields
                usernamesiacua="(no username)",
                siacuatest=None,
-               sendpost=None
+               sendpost=True
               ):
         r"""
 
@@ -641,7 +641,7 @@ class ExSiacua(ExerciseBase):
 
         - ``siacuatest``: -- deprecated. See ``targetmachine``. Used to be: (usually False) If True, send data to a test machine.
 
-        - ``sendpost``: -- deprecated. See ``targetmachine``. Used to be: (usually True) If True send information to siacua, otherwise simulates to check problems.
+        - ``sendpost``: -- See ``targetmachine``. Usually True and if True send information to targeturl, otherwise simulates to check problems.
 
         - ``verbose``: (usually False) print the message received by siacua.
 
@@ -676,13 +676,13 @@ class ExSiacua(ExerciseBase):
         if targetmachine=="siacua":
 
             self.targetmachine = "siacua"
-            self.targeturl = 'http://siacua.web.ua.pt/MeguaInsert2.aspx'
+            self.targeturl = 'http://siacua.web.ua.pt/MeguaInsert.aspx'
             self.targetusername = targetusername
 
         elif targetmachine=="siacuatest":
 
             self.targetmachine = "siacuatest"
-            self.targeturl = 'http://siacuatest.web.ua.pt/MeguaInsert2.aspx'
+            self.targeturl = 'http://siacuatest.web.ua.pt/MeguaInsert.aspx'
             self.targetusername = targetusername
 
         elif targetmachine=="pmate":
@@ -696,13 +696,13 @@ class ExSiacua(ExerciseBase):
             if siacuatest is True:
 
                 self.targetmachine = "siacuatest"
-                self.targeturl = 'http://siacuatest.web.ua.pt/MeguaInsert2.aspx'
+                self.targeturl = 'http://siacuatest.web.ua.pt/MeguaInsert.aspx'
                 self.targetusername = usernamesiacua
 
             elif siacuatest is False:
 
                 self.targetmachine = "siacua"
-                self.targeturl = 'http://siacua.web.ua.pt/MeguaInsert2.aspx'
+                self.targeturl = 'http://siacua.web.ua.pt/MeguaInsert.aspx'
                 self.targetusername = usernamesiacua
 
         else:
@@ -712,15 +712,10 @@ class ExSiacua(ExerciseBase):
             self.targeturl = 'https://httpbin.org'
 
 
-        #In a future version remove sendpots argument:
-        if sendpost:
-            print "exsiacua.py: sendpots is not used. Please remove from siacua() call."
-        sendpost = True
-
-
         #Other functions might require this fields
         self.course = course
         self.verbose = verbose
+        self.sendpost = sendpost
 
 
         all_answers = []
@@ -746,6 +741,8 @@ class ExSiacua(ExerciseBase):
             if self.verbose:
                 print "exsiacua.py: is going to send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
             send_result = self._siacua_send(send_dict)
+            print "exsiacua.py: ",send_result
+            print "type(send_result)=",type(send_result)
             all_answers += send_result
             self._send_images()
 
@@ -765,7 +762,7 @@ class ExSiacua(ExerciseBase):
         """Send images to siacua: now is to put them in a drpobox public folder
         # AttributeError: MegBookWeb instance has no attribute 'image_list'
         #for fn in self.image_list:
-        #    os.system("cp -uv _images/%s.png /home/nbuser/megua_images" % fn)
+        #    os.system("cp -uv _images/%shttp://siacua.web.ua.pt.png /home/nbuser/megua_images" % fn)
         #
         #TUNE this:os.system("cp -ru _images/*.png /home/nbuser/megua_images  > /dev/null") #TODO: check this
         #import request
@@ -782,10 +779,12 @@ class ExSiacua(ExerciseBase):
             if self.verbose:
                 print "exsiacua.py: is going to send:",f
             files = {'file': (course+"_"+os.path.basename(f), open(f, 'rb')) }
-            r = requests.post(self.targeturl, files=files)
-            if self.verbose:
-                print "exsiacua.py: request response is =",r.ok
-                print "exsiacua.py: done, sending images."
+            if self.sendpost:
+                #TODO: pmate precisa de um URL especializado.
+                r = requests.post('http://siacuatest.web.ua.pt/MeguaInsert2.aspx', files=files)
+                if self.verbose:
+                    print "exsiacua.py: request response is =",r.ok
+                    print "exsiacua.py: done, sending images."
 
 
     def _adjust_images_url(self, input_text):
@@ -852,28 +851,101 @@ class ExSiacua(ExerciseBase):
             print "base64_json_send_dict="
             print base64_send_dict
 
+        if self.sendpost:
 
-        import requests
+            import requests
 
-        s = requests.Session()
+            s = requests.Session()
 
-        content = s.post(self.targeturl, data={'Base64': base64_send_dict} )
+            content = s.post(self.targeturl, data={'Base64': base64_send_dict} )
 
-        #Check content.
-        if content.status_code == 201:
-            if MEGUA_PLATFORM=='SMC':
-                sys.path.append('/cocalc/lib/python2.7/site-packages')
-                from smc_sagews.sage_salvus import salvus
-                salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
-            elif MEGUA_PLATFORM=='DESKTOP':
-                print "Exsicua module say: firefox ",content.headers['Location']
-                subprocess.Popen(["firefox","-new-tab", content.headers['Location']])
+            #Check content.
+            if content.status_code == 200:
+
+                if self.verbose:
+                    print "="*30
+                    print "exsiacua.py: Content has reached siacua with the following content:"
+                    print "="*30
+                    print dir(content) #content is has type: requests.models.Response
+                    print type(content)
+                    print "print content:"
+                    print content
+                    print "print content.headers:"
+                    print content.headers
+                    print "print content.text:"
+                    print content.text
+                    r"""
+Comentário:
+==============================
+exsiacua.py: Content has reached siacua with the following content:
+==============================
+['__attrs__', '__bool__', '__class__', '__delattr__', '__dict__', '__doc__', '__enter__', '__exit__', '__format__', '__getattribute__', '__getstate__', '__hash__', '__init__', '__iter__', '__module__', '__new__', '__nonzero__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_content', '_content_consumed', '_next', 'apparent_encoding', 'close', 'connection', 'content', 'cookies', 'elapsed', 'encoding', 'headers', 'history', 'is_permanent_redirect', 'is_redirect', 'iter_content', 'iter_lines', 'json', 'links', 'next', 'ok', 'raise_for_status', 'raw', 'reason', 'request', 'status_code', 'text', 'url']
+<Response [200]>
+<form name="form1" method="post" action="./MeguaInsert.aspx" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTE1NDM3NzE5MDAPZBYCZg9kFgICBQ8PFgIeBFRleHQFO09jb3JyZXUgYWxndW0gZXJybyBhIGludGVycHJldGFyIG8gcGFyw6JtZXRybyAnc2lhY3VhX2tleScuZGRkpdRObJ5RADj/Mv9lwFaiyM40nR5duyt4BJas+6wM+Ig=" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="F7061F0D" />
+        exname: <span id="lexname">Label</span>  ekey:  <span id="lekey">Label</span>
+        &nbsp;
+        Resultado: <span id="resultado">Ocorreu algum erro a interpretar o parâmetro 'siacua_key'.</span>
+        <br />
+
+    </form>
+exsiacua.py:  ['exsiacua.py: SomeExCodeMustBeHere']
+type(send_result)= <type 'list'>
+                """
+                    
+                # Perfeito! Temos um novo exercício! id = 12
+                # Perfeito! Temos um novo exercício! id = 12
+                
+#                r"""
+#                data = response.read()
+
+                if self.verbose:
+                    print "exsiacua.py: content.text=", content.text
+
+                if u"Muito bem, melhorou o exercício, parabéns!" in content.text:
+                    akword = "Improved:"
+                    choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
+                elif u"A chave não é válida" in content.text:
+                    print "exsiacua.py: A chave MEGUA/SIACUA não é válida."
+                    conn.close()
+                    return "Invalid key megua/siacua" #TODO: do this with raise exception.
+                else:
+                    choice_pattern = re.compile(r'id = (\d+)', re.DOTALL|re.UNICODE)
+                    akword = "New:"
+
+                #print "exsiacua.py: data=",data
+                match_iter = re.finditer(choice_pattern,content.text) 
+                all_ids = [ "{} {}".format(akword,match.group(1)) for match in match_iter] #TODO: do this better
+
+#                """
+
+                return all_ids  #["exsiacua.py: SomeExCodeMustBeHere"]
+
+            elif content.status_code == 201:
+
+                if MEGUA_PLATFORM=='SMC':
+                    sys.path.append('/cocalc/lib/python2.7/site-packages')
+                    from smc_sagews.sage_salvus import salvus
+                    salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
+                elif MEGUA_PLATFORM=='DESKTOP':
+                    print "Exsicua module say: firefox ",content.headers['Location']
+                    subprocess.Popen(["firefox","-new-tab", content.headers['Location']])
+                else:
+                    print "Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+
+                return ["ok"]
+
             else:
-                print "Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
 
-            return "ok"
+                print "="*30
+                print "exsiacua.py: envio para base de dados não funcionou. Código:" + str(content.status_code)
+                print "="*30
+                raise NameError
+
         else:
-            raise Exception("exsiacua.py: envio para base de dados não funcionou. Código:" + content.status_code)
+            return ["not sent"]
 
 
 
@@ -923,7 +995,7 @@ class ExSiacua(ExerciseBase):
                 print "exsiacua.py: A chave MEGUA/SIACUA não é válida."
                 conn.close()
                 return "Invalid key megua/siacua" #TODO: do this with raise exception.
-            else:all_ids
+            else:
                 choice_pattern = re.compile(r'id = (\d+)', re.DOTALL|re.UNICODE)
                 akword = "New:"
 
