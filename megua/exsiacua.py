@@ -737,12 +737,12 @@ class ExSiacua(ExerciseBase):
             send_dict.update(dict({'targetusername': targetusername, 'grid2x2': grid2x2, 'targetmachine': targetmachine}))
             send_dict.update(self.siacua_parameters)
 
-            send_dict.update(dict({'targetusername': targetusername}))
+            send_dict.update(dict({'targetusername': targetusername, 'usernamesiacua': usernamesiacua}))
             if self.verbose:
                 print "exsiacua.py: is going to send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
             send_result = self._siacua_send(send_dict)
             print "exsiacua.py: ",send_result
-            print "type(send_result)=",type(send_result)
+            #print "type(send_result)=",type(send_result)
             all_answers += send_result
             self._send_images()
 
