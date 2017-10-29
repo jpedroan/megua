@@ -741,21 +741,22 @@ class ExSiacua(ExerciseBase):
             if self.verbose:
                 print "exsiacua.py: is going to send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
             send_result = self._siacua_send(send_dict)
-            print "exsiacua.py: ",send_result
+            if self.verbose:
+                print "exsiacua.py: ",send_result
             #print "type(send_result)=",type(send_result)
             all_answers += send_result
             self._send_images()
 
 
         #TODO: adaptar isto aos novos parâmetros de chamada.
-        #if all_answers:
-        #    print 'Exercícios a consultar no SIACUA: ' + ', '.join(all_answers) + '.'
-        #    if sendpost:
-        #        if siacuatest:
-        #            print "Abrir http://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
-        #        else:
-        #            print "Abrir http://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
-        #end
+        
+        if all_answers:
+            print 'Exercícios a consultar : ' + ', '.join(all_answers) + '.'
+            if self.targetmachine != 'pmate' and sendpost:
+                if siacuatest:
+                    print "Abrir http://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+                else:
+                    print "Abrir http://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
 
 
     def _send_images(self):
@@ -778,7 +779,7 @@ class ExSiacua(ExerciseBase):
         for f in self.image_fullpathnames:
             if self.verbose:
                 print "exsiacua.py: is going to send:",f
-            files = {'file': (course+"_"+os.path.basename(f), open(f, 'rb')) }
+            files = {'file': (self.course+"_"+os.path.basename(f), open(f, 'rb')) }
             if self.sendpost:
                 #TODO: pmate precisa de um URL especializado.
                 r = requests.post('http://siacuatest.web.ua.pt/MeguaInsert2.aspx', files=files)
@@ -910,7 +911,7 @@ type(send_result)= <type 'list'>
                 elif u"A chave não é válida" in content.text:
                     print "exsiacua.py: A chave MEGUA/SIACUA não é válida."
                     conn.close()
-                    return "Invalid key megua/siacua" #TODO: do this with raise exception.
+                    raise Exception("Invalid key megua/siacua") #TODO: do this with raise exception.
                 else:
                     choice_pattern = re.compile(r'id = (\d+)', re.DOTALL|re.UNICODE)
                     akword = "New:"
@@ -1059,8 +1060,8 @@ type(send_result)= <type 'list'>
 
         #Adapt for appropriate URL for images
         if self.image_relativepathnames:
-            problem = self._adjust_images_url(problem,course)
-            answer_list = [self._adjust_images_url(a,course) for a in answer_list]
+            problem = self._adjust_images_url(problem)
+            answer_list = [self._adjust_images_url(a) for a in answer_list]
 
         #print "exsiacua.py: ANTES type problem",  type(problem)
 
