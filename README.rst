@@ -89,6 +89,8 @@ With this type of account it is necessary to turn "internet access" in cocalc pr
 Install on Ubuntu/linux desktop
 -------------------------------
 
+This instructions have been revised for Sage 8.1 and Ubuntu 16.04.
+
 1. Download and install `SageMath <http://www.sagemath.org/>`_
 ::
 
@@ -96,10 +98,10 @@ Install on Ubuntu/linux desktop
 2. In a terminal do:
 ::
 
-    $ pip install --user git+https://github.com/jpedroan/meguacocalc
-    Enter <sage dir>:
+    $ pip2 install --user git+https://github.com/jpedroan/meguacocalc 
     $ ./sage -sh
-    $ pip install requests
+    $ cd cd $SAGE_ROOT/
+    $ pip2 install requests
     $ cd local/lib/python2.7/site-packages
     $ ln -s /home/<user>/.local/lib/python2.7/site-packages/megua
     $ ln -s /home/<user>/.local/lib/python2.7/site-packages/megua-0.2.dev50+g1c43d5a-py2.7.egg-info
@@ -124,7 +126,10 @@ Install on Ubuntu/linux desktop
 4. Change working options with (portuguese: for siacua system see topic above):
 ::
 
-    $ open ~/.megua/conf.py
+    $ gedit ~/.megua/conf.py
+    Change to:
+    --> MEGUA_PLATFORM="DESKTOP"
+    --> the last three variables with some strings
 
 5. Create the first exercise targeting a LaTeX exercise
 ::
