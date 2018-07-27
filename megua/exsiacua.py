@@ -676,19 +676,19 @@ class ExSiacua(ExerciseBase):
         if targetmachine=="siacua":
 
             self.targetmachine = "siacua"
-            self.targeturl = 'http://siacua.web.ua.pt/MeguaInsert.aspx'
+            self.targeturl = 'https://siacua.web.ua.pt/MeguaInsert.aspx'
             self.targetusername = targetusername
 
         elif targetmachine=="siacuatest":
 
             self.targetmachine = "siacuatest"
-            self.targeturl = 'http://siacuatest.web.ua.pt/MeguaInsert.aspx'
+            self.targeturl = 'https://siacuatest.web.ua.pt/MeguaInsert.aspx'
             self.targetusername = targetusername
 
         elif targetmachine=="pmate":
 
             self.targetmachine = "pmate"
-            self.targeturl = 'http://pmate.ua.pt/wspointaccess/api/MEGUA'
+            self.targeturl = 'https://pmate.ua.pt/wspointaccess/api/MEGUA'
             self.targetusername = targetusername
 
         elif targetmachine is None:
@@ -696,13 +696,13 @@ class ExSiacua(ExerciseBase):
             if siacuatest is True:
 
                 self.targetmachine = "siacuatest"
-                self.targeturl = 'http://siacuatest.web.ua.pt/MeguaInsert.aspx'
+                self.targeturl = 'https://siacuatest.web.ua.pt/MeguaInsert.aspx'
                 self.targetusername = usernamesiacua
 
             elif siacuatest is False:
 
                 self.targetmachine = "siacua"
-                self.targeturl = 'http://siacua.web.ua.pt/MeguaInsert.aspx'
+                self.targeturl = 'https://siacua.web.ua.pt/MeguaInsert.aspx'
                 self.targetusername = usernamesiacua
 
         else:
