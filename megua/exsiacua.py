@@ -754,9 +754,9 @@ class ExSiacua(ExerciseBase):
             print 'Exercícios a consultar : ' + ', '.join(all_answers) + '.'
             if self.targetmachine != 'pmate' and sendpost:
                 if siacuatest:
-                    print "Abrir http://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+                    print "Abrir https://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
                 else:
-                    print "Abrir http://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+                    print "Abrir https://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
 
 
     def _send_images(self):
@@ -782,10 +782,16 @@ class ExSiacua(ExerciseBase):
             files = {'file': (self.course+"_"+os.path.basename(f), open(f, 'rb')) }
             if self.sendpost:
                 #TODO: pmate precisa de um URL especializado.
-                r = requests.post('http://siacuatest.web.ua.pt/MeguaInsert2.aspx', files=files)
-                if self.verbose:
-                    print "exsiacua.py: request response is =",r.ok
-                    print "exsiacua.py: done, sending images."
+                if self.targetmachine == "siacua":
+                    r = requests.post('https://siacua.web.ua.pt/MeguaInsert2.aspx', files=files)
+                    if self.verbose:
+                        print "exsiacua.py: request response is =",r.ok
+                        print "exsiacua.py: done, sending images."
+                if self.targetmachine == "siacuatest":
+                    r = requests.post('https://siacuatest.web.ua.pt/MeguaInsert2.aspx', files=files)
+                    if self.verbose:
+                        print "exsiacua.py: request response is =",r.ok
+                        print "exsiacua.py: done, sending images."
 
 
     def _adjust_images_url(self, input_text):
