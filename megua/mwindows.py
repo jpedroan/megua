@@ -1,3 +1,9 @@
+def conf__siacua_send(self):
+    print("conf__siacua_send")
+
+def conf_siacuapreview(self):
+    print("conf_siacuapreview")
+
 def conf_set_current_exercise(self):
     print("windows_conf_set_current_exercise")
     

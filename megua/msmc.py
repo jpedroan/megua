@@ -7,6 +7,18 @@ from megua.jinjatemplates import templates
 from megua.platex import html2latex, pcompile
 from megua.megoptions import *
 
+def conf__siacua_send(self):
+    sys.path.append('/cocalc/lib/python2.7/site-packages')
+    from smc_sagews.sage_salvus import salvus
+    salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
+
+def conf_siacuapreview(self):
+    sys.path.append('/cocalc/lib/python2.7/site-packages')
+    from smc_sagews.sage_salvus import salvus
+    #print "exsiacua.py: using salvus.link:"
+    html_relative_path = os.path.join(self.wd_relative,self.unique_name()+'_siacuapreview.html')
+    salvus.file(html_relative_path,raw=True)
+
 def conf_set_current_exercise(self):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus

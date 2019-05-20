@@ -245,6 +245,30 @@ class ExSiacua(ExerciseBase):
     #def __init__(self,ekey=None, edict=None):
     #    ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
 
+    def conf__siacua_send(self):
+        if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
+            from smc_sagews.sage_salvus import salvus
+            salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
+        elif MEGUA_PLATFORM=='DESKTOP':
+            print("Exsicua module say: firefox ",content.headers['Location'])
+            subprocess.Popen(["firefox","-new-tab", content.headers['Location']])
+        else:
+            print("Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+
+    def conf_siacuapreview(self):
+        if MEGUA_PLATFORM=='SMC':
+            sys.path.append('/cocalc/lib/python2.7/site-packages')
+            from smc_sagews.sage_salvus import salvus
+            #print "exsiacua.py: using salvus.link:"
+            html_relative_path = os.path.join(self.wd_relative,self.unique_name()+'_siacuapreview.html')
+            salvus.file(html_relative_path,raw=True)
+        elif MEGUA_PLATFORM=='DESKTOP':
+            print("exsiacua.py: opening firefox ",html_full_path,"in the browser and press F5.")
+            subprocess.Popen(["firefox","-new-tab", html_full_path])
+        else:
+            print("exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+    
     def update(self,ekey=None,edict=None, render_method=None):
 
 
@@ -279,8 +303,6 @@ class ExSiacua(ExerciseBase):
         self.detailed_answer  = self._remove_multiplechoicetag(self.answer())
         self.formated_problem = self._remove_multiplechoicetag(self.problem()) + u'\n<br/>' + options_txt + u'\n<br/>' 
 
-
-
     def search_replace(self,input_text):
         """Called after parameter_change call. See above."""
 
@@ -294,7 +316,6 @@ class ExSiacua(ExerciseBase):
         text = _old_html(text)
 
         return text
-
 
     def print_instance(self):
         """
@@ -329,7 +350,6 @@ class ExSiacua(ExerciseBase):
         f.write(html_string)
         f.close()
 
-
         if MEGUA_PLATFORM=='SMC':
             sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
@@ -339,8 +359,6 @@ class ExSiacua(ExerciseBase):
             subprocess.Popen(["firefox","-new-tab", EXERCISE_HTML_PATHNAME])
         else:
             print("Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
-
-
 
     def _update_multiplechoice(self,input_text,where):
         """
@@ -408,10 +426,6 @@ class ExSiacua(ExerciseBase):
 
         return all_options
 
-
-
-
-
     def _remove_multiplechoicetag(self,input_text):
         """When <multiplechoice>...</multiplecoice> removes it from input_text.
         It returns the text but no changes are made in fields.
@@ -435,7 +449,6 @@ class ExSiacua(ExerciseBase):
 
         return new_text
 
-
     def _collect_options_and_answer(self):
         r"""
         This routine applies when using <multiplechoice>...</multiplechoice>.
@@ -452,7 +465,6 @@ class ExSiacua(ExerciseBase):
         #print "=========="
         return l
 
-
 #TODO: remove this lines soon.
 #    def _answer_extract_options(self):
 #        r"""
@@ -465,11 +477,6 @@ class ExSiacua(ExerciseBase):
 #               """At least 4 options must be given and the first must be """\
 #               """the correct one. Also the full answer must be given.""")
 #        return l
-
-
-
-
-
 
     def siacuapreview(self,ekeys):
         r"""
@@ -559,18 +566,7 @@ class ExSiacua(ExerciseBase):
         f.close()
 
 
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            #print "exsiacua.py: using salvus.link:"
-            html_relative_path = os.path.join(self.wd_relative,self.unique_name()+'_siacuapreview.html')
-            salvus.file(html_relative_path,raw=True)
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("exsiacua.py: opening firefox ",html_full_path,"in the browser and press F5.")
-            subprocess.Popen(["firefox","-new-tab", html_full_path])
-        else:
-            print("exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
-
+        conf_siacuapreview()
 
     def _problem_whitoutmc(self):
         """
@@ -579,15 +575,12 @@ class ExSiacua(ExerciseBase):
         assert(self.has_instance)
         return self._remove_multiplechoicetag(self.problem())
 
-
     def _answer_whitoutmc(self):
         """
         The answer text without multiple choice tag.
         """
         assert(self.has_instance)
         return self._remove_multiplechoicetag(self.answer())
-
-
 
     def siacua(self,
                #new fields
@@ -758,7 +751,6 @@ class ExSiacua(ExerciseBase):
                 else:
                     print("Abrir https://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'")
 
-
     def _send_images(self):
         """Send images to siacua: now is to put them in a drpobox public folder
         # AttributeError: MegBookWeb instance has no attribute 'image_list'
@@ -793,7 +785,6 @@ class ExSiacua(ExerciseBase):
                         print("exsiacua.py: request response is =",r.ok)
                         print("exsiacua.py: done, sending images.")
 
-
     def _adjust_images_url(self, input_text):
         """the url in problem() and answer() is <img src='_images/filename.png'>
         Here we replace _images/ by the public dropbox folder
@@ -819,8 +810,6 @@ class ExSiacua(ExerciseBase):
         #print new_text
         return new_text
 
-
-
     #def _send_images_dropbox(self):
     #    """Send images to siacua: now is to put them in a drpobox public folder"""
     #    # AttributeError: MegBookWeb instance has no attribute 'image_list'
@@ -839,9 +828,6 @@ class ExSiacua(ExerciseBase):
     #    (new_text,number) = img_pattern.subn(r"src='%s/" % target, input_text) #, count=1)
     #    #print "===> Replacement for %d url images." % number
     #    return new_text
-
-
-
 
     def _siacua_send(self, send_dict):
 
@@ -932,15 +918,7 @@ type(send_result)= <type 'list'>
 
             elif content.status_code == 201:
 
-                if MEGUA_PLATFORM=='SMC':
-                    sys.path.append('/cocalc/lib/python2.7/site-packages')
-                    from smc_sagews.sage_salvus import salvus
-                    salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
-                elif MEGUA_PLATFORM=='DESKTOP':
-                    print("Exsicua module say: firefox ",content.headers['Location'])
-                    subprocess.Popen(["firefox","-new-tab", content.headers['Location']])
-                else:
-                    print("Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+                conf__siacua_send()
 
                 return ["ok"]
 

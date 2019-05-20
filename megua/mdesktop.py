@@ -6,6 +6,14 @@ from megua.platex import pcompile
 from megua.jinjatemplates import templates
 from megua.megoptions import *
 
+def conf__siacua_send(self):
+    print("Exsicua module say: firefox ",content.headers['Location'])
+    subprocess.Popen(["firefox","-new-tab", content.headers['Location']])
+
+def conf_siacuapreview(self):
+    print("exsiacua.py: opening firefox ",html_full_path,"in the browser and press F5.")
+    subprocess.Popen(["firefox","-new-tab", html_full_path])
+
 def conf_set_current_exercise(self):
     print("Exercise {}".format(unique_name))
 
