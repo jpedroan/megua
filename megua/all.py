@@ -21,6 +21,7 @@ from megua.ex_amc import ExAMC
 from megua.megoptions import MEGUA_PLATFORM
 
 if MEGUA_PLATFORM == "WINDOWS":
+    print("here")
     import megua.mwindows as mwindows
     ExLatex.print_instancte = mwindows.exlatex_print_instance
     ExSiacua.print_instancte = mwindows.exsiacua_print_instance
