@@ -325,7 +325,6 @@ class MegBook(MegSiacua):
 
     #TODO 2: assure that there is a natlang folder in templates (otherwise put it in english). Warn for existing languages if specifies lan does not exist.
 
-
     def __init__(self,filename=None,natlang='pt_pt',markuplang='latex'): 
         r"""
 
