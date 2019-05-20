@@ -46,9 +46,9 @@ elif MEGUA_PLATFORM == "SMC":
 
 elif MEGUA_PLATFORM == "DESKTOP":
     import megua.mdesktop as mdesktop
-    ExLatex.print_instancte = mdesktop.desktop_exlatex_print_instance
-    ExSiacua.print_instancte = mdesktop.desktop_exsiacua_print_instance
-    ExAMC.print_instancte = mdesktop.desktop_examc_print_instance
+    ExLatex.print_instancte = mdesktop.exlatex_print_instance
+    ExSiacua.print_instancte = mdesktop.exsiacua_print_instance
+    ExAMC.print_instancte = mdesktop.examc_print_instance
     MegBook.conf_catalog = mdesktop.conf_catalog
     MegBook.conf_fast_exam_siacu = mdesktop.conf_fast_exam_siacu
     MegBook.conf_latex_document = mdesktop.conf_latex_document
