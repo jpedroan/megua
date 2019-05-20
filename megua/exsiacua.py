@@ -255,8 +255,8 @@ class ExSiacua(ExerciseBase):
         #Extract, from summary, details about bayesian network
         #TODO: old mode of extracting bayesian parameters
         if 'SIACUAstart' in self._summary_text:
-            print "exsiacua.py: please remove SIACUAStart...SIACUAend from %SUMMARY in ",self.unique_name()
-            print "             and add those lines, separated by commas ',' to meg.siacua(....) commmand."
+            print ("exsiacua.py: please remove SIACUAStart...SIACUAend from %SUMMARY in ",self.unique_name())
+            print ("             and add those lines, separated by commas ',' to meg.siacua(....) commmand.")
             self._siacua_extractparameters()
 
         #Call user derived function to generate a set of random variables.
@@ -266,13 +266,13 @@ class ExSiacua(ExerciseBase):
             options_txt = self._update_multiplechoice(self.problem(),where="problem")
         else:
             options_txt = self._update_multiplechoice(self.answer(), where="answer")
-            print self.unique_name()," has multiplechoice in answer part. CHANGE <multiplechoice> to the %problem"
+            print (self.unique_name()," has multiplechoice in answer part. CHANGE <multiplechoice> to the %problem")
 
 
         if "multiplechoice" in self.problem():
             options_txt = self._update_multiplechoice(self.problem(),where="problem")
         else:
-            print self.unique_name()," has multiplechoice in answer part. CHANGE <multiplechoice> to the %problem"
+            print (self.unique_name()," has multiplechoice in answer part. CHANGE <multiplechoice> to the %problem")
             self._update_multiplechoice(self.answer(),where="answer")
 
 
@@ -335,10 +335,10 @@ class ExSiacua(ExerciseBase):
             from smc_sagews.sage_salvus import salvus
             salvus.html(html_string)
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME
+            print ("Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME)
             subprocess.Popen(["firefox","-new-tab", EXERCISE_HTML_PATHNAME])
         else:
-            print "Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+            print ("Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
 
 
@@ -368,7 +368,7 @@ class ExSiacua(ExerciseBase):
 
         #TODO: remove in a few revisionsE97I40_Teorema_Rolle_001_siacua
         if "CDATA" in input_text:
-            print "TODO: in %s, should issue warning when CDATA and multiplechoice are both present." % self.unique_name()
+            print ("TODO: in %s, should issue warning when CDATA and multiplechoice are both present." % self.unique_name())
             self.detailed_answer = "Contains [CDATA]\n"
             self.all_choices = []
             raise SyntaxError("exsiacua module say:  {} should have <multiplechoice>...</multiplechoice> tags.".format(self.unique_name()))
@@ -566,10 +566,10 @@ class ExSiacua(ExerciseBase):
             html_relative_path = os.path.join(self.wd_relative,self.unique_name()+'_siacuapreview.html')
             salvus.file(html_relative_path,raw=True)
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "exsiacua.py: opening firefox ",html_full_path,"in the browser and press F5."
+            print ("exsiacua.py: opening firefox ",html_full_path,"in the browser and press F5.")
             subprocess.Popen(["firefox","-new-tab", html_full_path])
         else:
-            print "exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+            print ("exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
 
     def _problem_whitoutmc(self):
@@ -739,10 +739,10 @@ class ExSiacua(ExerciseBase):
 
             send_dict.update(dict({'targetusername': targetusername, 'usernamesiacua': usernamesiacua}))
             if self.verbose:
-                print "exsiacua.py: is going to send %s to siacua with ekey=%d."%(self.unique_name(),e_number)
+                print ("exsiacua.py: is going to send %s to siacua with ekey=%d."%(self.unique_name(),e_number))
             send_result = self._siacua_send(send_dict)
             if self.verbose:
-                print "exsiacua.py: ",send_result
+                print ("exsiacua.py: ",send_result)
             #print "type(send_result)=",type(send_result)
             all_answers += send_result
             self._send_images()
@@ -751,12 +751,12 @@ class ExSiacua(ExerciseBase):
         #TODO: adaptar isto aos novos parâmetros de chamada.
         
         if all_answers:
-            print 'Exercícios a consultar : ' + ', '.join(all_answers) + '.'
+            print ('Exercícios a consultar : ' + ', '.join(all_answers) + '.')
             if self.targetmachine != 'pmate' and sendpost:
                 if siacuatest:
-                    print "Abrir https://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+                    print ("Abrir https://siacuatest.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'")
                 else:
-                    print "Abrir https://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'"
+                    print ("Abrir https://siacua.web.ua.pt depois de entrar no curso: Gestão Professor -- Botão 'Ler Questões'")
 
 
     def _send_images(self):
@@ -773,25 +773,25 @@ class ExSiacua(ExerciseBase):
         import requests
 
         if self.verbose:
-            print "exsiacua.py: self.image_fullpathnames", self.image_fullpathnames
-            print "exsiacua.py: self.image_relativepathnames", self.image_relativepathnames
+            print ("exsiacua.py: self.image_fullpathnames", self.image_fullpathnames)
+            print ("exsiacua.py: self.image_relativepathnames", self.image_relativepathnames)
 
         for f in self.image_fullpathnames:
             if self.verbose:
-                print "exsiacua.py: is going to send:",f
+                print ("exsiacua.py: is going to send:",f)
             files = {'file': (self.course+"_"+os.path.basename(f), open(f, 'rb')) }
             if self.sendpost:
                 #TODO: pmate precisa de um URL especializado.
                 if self.targetmachine == "siacua":
                     r = requests.post('https://siacua.web.ua.pt/MeguaInsert2.aspx', files=files)
                     if self.verbose:
-                        print "exsiacua.py: request response is =",r.ok
-                        print "exsiacua.py: done, sending images."
+                        print ("exsiacua.py: request response is =",r.ok)
+                        print ("exsiacua.py: done, sending images.")
                 if self.targetmachine == "siacuatest":
                     r = requests.post('https://siacuatest.web.ua.pt/MeguaInsert2.aspx', files=files)
                     if self.verbose:
-                        print "exsiacua.py: request response is =",r.ok
-                        print "exsiacua.py: done, sending images."
+                        print ("exsiacua.py: request response is =",r.ok)
+                        print ("exsiacua.py: done, sending images.")
 
 
     def _adjust_images_url(self, input_text):
@@ -851,12 +851,12 @@ class ExSiacua(ExerciseBase):
 
         json_send_dict =   json.dumps(send_dict, ensure_ascii=False, indent=4, sort_keys=True)
         if self.verbose:
-            print "json_send_dict="
-            print json_send_dict
+            print ("json_send_dict=")
+            print (json_send_dict)
         base64_send_dict =  base64.b64encode( json_send_dict  )
         if self.verbose:
-            print "base64_json_send_dict="
-            print base64_send_dict
+            print ("base64_json_send_dict=")
+            print (base64_send_dict)
 
         if self.sendpost:
 
@@ -870,17 +870,17 @@ class ExSiacua(ExerciseBase):
             if content.status_code == 200:
 
                 if self.verbose:
-                    print "="*30
-                    print "exsiacua.py: Content has reached siacua with the following content:"
-                    print "="*30
-                    print dir(content) #content is has type: requests.models.Response
-                    print type(content)
-                    print "print content:"
-                    print content
-                    print "print content.headers:"
-                    print content.headers
-                    print "print content.text:"
-                    print content.text
+                    print ("="*30)
+                    print ("exsiacua.py: Content has reached siacua with the following content:")
+                    print ("="*30)
+                    print (dir(content)) #content is has type: requests.models.Response
+                    print (type(content))
+                    print ("print content:")
+                    print (content)
+                    print ("print content.headers:")
+                    print (content.headers)
+                    print ("print content.text:")
+                    print (content.text)
                     r"""
 Comentário:
 ==============================
@@ -909,13 +909,13 @@ type(send_result)= <type 'list'>
 #                data = response.read()
 
                 if self.verbose:
-                    print "exsiacua.py: content.text=", content.text
+                    print ("exsiacua.py: content.text=", content.text)
 
                 if u"Muito bem, melhorou o exercício, parabéns!" in content.text:
                     akword = "Improved:"
                     choice_pattern = re.compile(r'id=(\d+)', re.DOTALL|re.UNICODE)
                 elif u"A chave não é válida" in content.text:
-                    print "exsiacua.py: A chave MEGUA/SIACUA não é válida."
+                    print ("exsiacua.py: A chave MEGUA/SIACUA não é válida.")
                     conn.close()
                     raise Exception("Invalid key megua/siacua") #TODO: do this with raise exception.
                 else:
@@ -937,18 +937,18 @@ type(send_result)= <type 'list'>
                     from smc_sagews.sage_salvus import salvus
                     salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
                 elif MEGUA_PLATFORM=='DESKTOP':
-                    print "Exsicua module say: firefox ",content.headers['Location']
+                    print ("Exsicua module say: firefox ",content.headers['Location'])
                     subprocess.Popen(["firefox","-new-tab", content.headers['Location']])
                 else:
-                    print "Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+                    print ("Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
                 return ["ok"]
 
             else:
 
-                print "="*30
-                print "exsiacua.py: envio para base de dados não funcionou. Código:" + str(content.status_code)
-                print "="*30
+                print ("="*30)
+                print ("exsiacua.py: envio para base de dados não funcionou. Código:" + str(content.status_code))
+                print ("="*30)
                 raise NameError
 
         else:
@@ -1087,7 +1087,7 @@ type(send_result)= <type 'list'>
         #Concept list
         l = len(concept_list)
         if l>8:
-            print "Number of concepts cannot exceed 8."
+            print ("Number of concepts cannot exceed 8.")
             return {}
 
         d["nc"] = str(l) #number of concepts

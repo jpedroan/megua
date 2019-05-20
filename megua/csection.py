@@ -312,9 +312,9 @@ class Section:
         Textual print of the contents of this section and, recursivly, of the subsections.
         """
         sp = " "*self.level
-        print sp + self.sec_name
+        print (sp + self.sec_name)
         for e in self.exercises:
-            print sp+r"> "+e
+            print (sp+r"> "+e)
         for sub in self.subsections:
             self.subsections[sub].textprint()
 

@@ -344,7 +344,7 @@ class MegBook(MegSiacua):
             self.local_store_filename = self.megbook_store.local_store_filename #keep record.
             #print "Opened " + str(self)
         except sqlite3.Error as e:
-            print "Filename couldn't be opened: " , e.args[0], "\n"
+            print ("Filename couldn't be opened: " , e.args[0], "\n")
             raise e
 
 
@@ -426,7 +426,7 @@ class MegBook(MegSiacua):
         self._current_unique_name = None
 
         if not isidentifier(unique_name):
-            print "Megbook.py: Filename is not a valid Python identifier."
+            print ("Megbook.py: Filename is not a valid Python identifier.")
             usage_new()
             raise SyntaxError
 
@@ -450,16 +450,16 @@ class MegBook(MegSiacua):
             new_source_code = re.sub(old_unique_name,unique_name,source_code,re.U|re.M)
             with codecs.open(pathname, mode='w', encoding='utf-8') as f:
                 f.write(new_source_code)
-            print "========================"
-            print "Please, "
-            print "1. Execute the above comand again using shift-enter ('meg.set_current_exercise(__file__)')."
-            print ""
-            print "Explanation:"
-            print "1. The filename containing the exercise was renamed."
-            print "2. The new name of the exercise is now: {}".format(unique_name)
-            print "3. Confirm the new <name_of_exercise> in the line 'class <name>(...)'."
-            print ""
-            print "========================"
+            print ("========================")
+            print ("Please, ")
+            print ("1. Execute the above comand again using shift-enter ('meg.set_current_exercise(__file__)').")
+            print ("")
+            print ("Explanation:")
+            print ("1. The filename containing the exercise was renamed.")
+            print ("2. The new name of the exercise is now: {}".format(unique_name))
+            print ("3. Confirm the new <name_of_exercise> in the line 'class <name>(...)'.")
+            print ("")
+            print ("========================")
             raise IOError
 
         #To be used in all megbook commands
@@ -475,9 +475,9 @@ class MegBook(MegSiacua):
                     '<a href="https://github.com/jpedroan/megua/wiki" target=_blank>MEGUA wiki for help</a> or email to dmat-siacua@ua.pt.'
                 ))
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "Exercise {}".format(unique_name)
+            print ("Exercise {}".format(unique_name))
         else:
-            print "megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+            print ("megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
 
 
@@ -522,7 +522,7 @@ class MegBook(MegSiacua):
             filename)
 
         if os.path.isfile(fullpath) :
-            print "Megbook.py say: '%s' already exists. Choose another name" % filename
+            print ("Megbook.py say: '%s' already exists. Choose another name" % filename)
             return
 
         # =====
@@ -603,7 +603,7 @@ class MegBook(MegSiacua):
 
             else:
 
-                print templates.render("megbook_new_exercise_usage.txt")
+                print (templates.render("megbook_new_exercise_usage.txt"))
                 return
                 
             
@@ -647,13 +647,13 @@ class MegBook(MegSiacua):
 
             else:
                 
-                print templates.render("megbook_new_exercise_usage.txt")
+                print (templates.render("megbook_new_exercise_usage.txt"))
                 return
             
             
         else:
 
-            print templates.render("megbook_new_exercise_usage.txt")
+            print (templates.render("megbook_new_exercise_usage.txt"))
             #print "Megbook.py say: filename must be " 
             #    "a name in form E12X34_SomeName_001_latex ou "
             #    "_siacua or _moodle and related extension *.sagews or *.sage."
@@ -663,19 +663,20 @@ class MegBook(MegSiacua):
             sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
-                print "Worksheet"
-                salvus.file(fullpath,show=True,raw=True); print "\n"
+                print ("Worksheet")
+                salvus.file(fullpath,show=True,raw=True); 
+                print ("\n")
                 salvus.open_tab(fullpath)
             else:
-                print "Command line"
+                print ("Command line")
                 sys.path.append('/usr/local/lib/python2.7/dist-packages')
                 from smc_pyutil import smc_open
                 smc_open.process([fullpath])                
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "MegBook module say: gvim ",fullpath
+            print ("MegBook module say: gvim ",fullpath)
             subprocess.Popen(["gvim",fullpath])
         else:
-            print "megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+            print ("megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
 
     def replicate_exercise(self,filename):
@@ -702,7 +703,7 @@ class MegBook(MegSiacua):
             filename)
 
         if not os.path.isfile(fullpath) :
-            print "Megbook.py say: '%s' does not exist. Choose another name to replicate" % filename
+            print ("Megbook.py say: '%s' does not exist. Choose another name to replicate" % filename)
             return
 
         # =====
@@ -717,7 +718,7 @@ class MegBook(MegSiacua):
 
             if '_latex' in filename:
 
-                print "megbook.py, replicate_exercise: not implemented for this case."
+                print ("megbook.py, replicate_exercise: not implemented for this case.")
                 return
 
                 htmlstr = u'<h4>%s (Latex)</h4>' % filename[0:-7]
@@ -740,7 +741,7 @@ class MegBook(MegSiacua):
 
             elif '_amc' in filename:
 
-                print "megbook.py, replicate_exercise: not implemented for this case."
+                print ("megbook.py, replicate_exercise: not implemented for this case.")
                 return
                 htmlstr = u'<h4>%s (Latex for AMC)</h4>' % filename[0:-7]
 
@@ -765,18 +766,18 @@ class MegBook(MegSiacua):
                 # "_" is on -14:  '_siacua.sagews':
                 # "0" is on -17:  '001_siacua.sagews':
 
-                print filename
+                print (filename)
                 #invert the string
-                i_filename = filename[-15::-1]; print i_filename
+                i_filename = filename[-15::-1]; print (i_filename)
                 #find next "_"
                 pos = i_filename.index("_")
                 #get number
-                nums = i_filename[0:pos][::-1]; print nums
+                nums = i_filename[0:pos][::-1]; print (nums)
                 #get value
-                value = int(nums)+1; print value
-                newnums = "%03d" % value; print newnums
+                value = int(nums)+1; print (value)
+                newnums = "%03d" % value; print (newnums)
                 #TODO: i'm here
-                new_filename = filename[:-17] + newnums + "_siacua.sagews"; print new_filename
+                new_filename = filename[:-17] + newnums + "_siacua.sagews"; print (new_filename)
 
                 fullpath_new = os.path.join( MEGUA_EXERCISE_INPUT, new_filename)
 
@@ -784,13 +785,13 @@ class MegBook(MegSiacua):
                 
             else:
 
-                print templates.render("megbook_new_exercise_usage.txt")
+                print (templates.render("megbook_new_exercise_usage.txt"))
                 return
                 
             
         elif filename[-5:] == '.sage':
 
-            print "megbook.py, replicate_exercise: not implemented for this case."
+            print ("megbook.py, replicate_exercise: not implemented for this case.")
             return
 
             # =====
@@ -831,13 +832,13 @@ class MegBook(MegSiacua):
 
             else:
                 
-                print templates.render("megbook_new_exercise_usage.txt")
+                print (templates.render("megbook_new_exercise_usage.txt"))
                 return
             
             
         else:
 
-            print templates.render("megbook_new_exercise_usage.txt")
+            print (templates.render("megbook_new_exercise_usage.txt"))
             #print "Megbook.py say: filename must be " 
             #    "a name in form E12X34_SomeName_001_latex ou "
             #    "_siacua or _moodle and related extension *.sagews or *.sage."
@@ -849,17 +850,17 @@ class MegBook(MegSiacua):
             from smc_sagews.sage_salvus import salvus
             if salvus:
                 #salvus.file(fullpath_new,show=True,raw=True); print "\n"
-                print fullpath_new
-                print "salvus.open_tab(fullpath_new)"
+                print (fullpath_new)
+                print ("salvus.open_tab(fullpath_new)")
             else:
                 sys.path.append('/usr/local/lib/python2.7/dist-packages')
                 from smc_pyutil import smc_open
                 smc_open.process([fullpath_new])
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "MegBook module say: gvim ",fullpath
+            print ("MegBook module say: gvim ",fullpath)
             subprocess.Popen(["gvim",fullpath])
         else:
-            print "megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py"
+            print ("megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
 
         
@@ -933,7 +934,7 @@ class MegBook(MegSiacua):
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
         if not row:
-            print "%s cannot be accessed on database" % unique_name
+            print ("%s cannot be accessed on database" % unique_name)
             return
 
         #Create and print the instance
@@ -1027,19 +1028,19 @@ class MegBook(MegSiacua):
                 load(cfilename) #sagemath load command
 
                 if len(wlist)>0:
-                    print 'MegBook.py say: exercise "%s" needs review! See below:' % row['unique_name']
+                    print ('MegBook.py say: exercise "%s" needs review! See below:' % row['unique_name'])
                 for w in wlist:
                     #print warnings.showwarning(w)
                     #Simple way of showing an warning: 
                     #print w
                     display_warning(w,code_string) #find in this file
                 if len(wlist)>0:
-                    print '======= end of warning list =========='
+                    print ('======= end of warning list ==========')
 
         except SyntaxError as s:
-            print 'MegBook.py say: exercise "%s" causes a syntatical error and needs review! See below.' % row['unique_name']
+            print ('MegBook.py say: exercise "%s" causes a syntatical error and needs review! See below.' % row['unique_name'])
             if s.lineno is not None:
-                print 'See line %d in file "%s".' % (s.lineno,cfilename)
+                print ('See line %d in file "%s".' % (s.lineno,cfilename))
                 display_syntaxerror(s,code_string)
             raise s
 
@@ -1127,7 +1128,7 @@ class MegBook(MegSiacua):
         """
         #Modify this
         sname = 'Exercise name %s' % exrow['unique_name'].encode('utf8')
-        print sname + '\n' + exrow['problem_text'].encode('utf8') + '\n'
+        print (sname + '\n' + exrow['problem_text'].encode('utf8') + '\n')
         #TODO
         #if is_notebook():
         #    html('<b>' + sname + ': </b><pre>' + exrow['problem_text'].encode('utf8') + '</pre><br/>')
@@ -1168,12 +1169,12 @@ class MegBook(MegSiacua):
             #store it on a text file
             with codecs.open(fname, encoding='utf-8', mode='w') as f:
                 f.write(e_string)
-            print "Exercise '%s' has a backup in %s" % (unique_name,fname)
+            print ("Exercise '%s' has a backup in %s" % (unique_name,fname))
 
             #remove it
             self.megbook_store.remove_exercise(unique_name)
         elif warn:
-            print "Exercise %s is not on the database." % unique_name
+            print ("Exercise %s is not on the database." % unique_name)
 
 
 
@@ -1227,7 +1228,7 @@ class MegBook(MegSiacua):
         allproblems_text = ''
         for (problem_name,ekey) in paired_list:
 
-            print "Generating sample of",problem_name
+            print ("Generating sample of",problem_name)
 
             #print "Write",(problem_name,ekey),"in thesis."
 
@@ -1236,7 +1237,7 @@ class MegBook(MegSiacua):
             #Get summary, problem and answer and class_text
             row = self.megbook_store.get_classrow(problem_name)
             if not row:
-                print "meg.thesis(): %s cannot be accessed on database" % problem_name
+                print ("meg.thesis(): %s cannot be accessed on database" % problem_name)
                 continue
             #Create and print the instance
             ex_instance = exerciseinstance(row, int(ekey) )
@@ -1350,10 +1351,10 @@ class MegBook(MegSiacua):
         #os.system("rm -r images > /dev/null 2>&1")
 
 
-        print '\nInstrucoes:\n1. Use o botao direito e "Save link as..." para guardar "thesis_problems.tex" no seu computador.'
-        print '2. Se houver imagens, o conteudo do ficheiro "images.zip" deve ser colocado numa pasta "images".'
-        print '3. Sera necessaria paciencia para finalizar a pre conversao de HTML para LaTeX em cada exercicio.'
-        print '4. Recomenda-se adaptar um exercicio de cada vez compilado um por um.'
+        print ('\nInstrucoes:\n1. Use o botao direito e "Save link as..." para guardar "thesis_problems.tex" no seu computador.')
+        print ('2. Se houver imagens, o conteudo do ficheiro "images.zip" deve ser colocado numa pasta "images".')
+        print ('3. Sera necessaria paciencia para finalizar a pre conversao de HTML para LaTeX em cada exercicio.')
+        print ('4. Recomenda-se adaptar um exercicio de cada vez compilado um por um.')
     
 
 
@@ -1374,7 +1375,7 @@ class MegBook(MegSiacua):
         lts = u'' #exerciseinstanceslatex
 
         #Instance creation
-        print "MegBook.py say: making instances of the exercises."
+        print ("MegBook.py say: making instances of the exercises.")
         for s in section_iterator:
 
             #Section creation
@@ -1401,7 +1402,7 @@ class MegBook(MegSiacua):
             #TODO: image render mode to "filenameimage"
             lts += u'\n\nThis section has {0} exercises.\n\n'.format(len(s.exercises)) # {{ => }
             for unique_name in s.exercises:
-                print "megbook.py say: producing %s" % unique_name
+                print ("megbook.py say: producing %s" % unique_name)
                 try:
                     ex = self.new(unique_name,ekey=0,returninstance=True)
 
@@ -1452,7 +1453,7 @@ class MegBook(MegSiacua):
                         )
                 except:
                     ex_str = "Check problem with %s. It was not generated." % unique_name
-                    print "megbook.py: exercise %s was not generated for catalog. Please check it." % unique_name
+                    print ("megbook.py: exercise %s was not generated for catalog. Please check it." % unique_name)
 
 
                 lts += ex_str
@@ -1467,7 +1468,7 @@ class MegBook(MegSiacua):
                 #lts += u'\\textbf{{Answer}}\n\n{0}\n\n'.format(ex.answer())
 
 
-        print "MegBook.py say: compiling latex file containing the instances of the exercises."
+        print ("MegBook.py say: compiling latex file containing the instances of the exercises.")
 
         latex_text =  templates.render("megbook_catalog_latex.tex",
                          exerciseinstanceslatex=lts)
@@ -1482,10 +1483,10 @@ class MegBook(MegSiacua):
             pcompile(latex_text, MEGUA_EXERCISE_CATALOGS, "catalog.tex")
             pcompile(latex_text, MEGUA_EXERCISE_CATALOGS, "catalog.tex")
         except:
-            print "="*30
-            print "megbook.py: file catalog.tex need to be edited."
-            print CATALOG_TEX_PATHNAME
-            print "="*30
+            print ("="*30)
+            print ("megbook.py: file catalog.tex need to be edited.")
+            print (CATALOG_TEX_PATHNAME)
+            print ("="*30)
             return
 
 
@@ -1493,18 +1494,20 @@ class MegBook(MegSiacua):
             sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
-                salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); print "\n"
-                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); print "\n"
+                salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); 
+                print ("\n")
+                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); 
+                print ("\n")
                 salvus.open_tab(CATALOG_PDF_PATHNAME)
             else:
                 sys.path.append('/usr/local/lib/python2.7/dist-packages')
                 from smc_pyutil import smc_open
                 smc_open.process([CATALOG_PDF_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "MegBook module say: evince ",CATALOG_PDF_PATHNAME
+            print ("MegBook module say: evince ",CATALOG_PDF_PATHNAME)
             subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
         else:
-            print "megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py"
+            print ("megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
 
 
@@ -1576,10 +1579,10 @@ class MegBook(MegSiacua):
         try:
             pcompile(doc_latex, MEGUA_EXERCISE_CATALOGS, ofilename)
         except:
-            print "="*30
-            print "megbook.py: file %s need to be edited." % (ofilename+'.tex')
-            print DOC_LATEX_PATHNAME
-            print "="*30
+            print ("="*30)
+            print ("megbook.py: file %s need to be edited." % (ofilename+'.tex'))
+            print (DOC_LATEX_PATHNAME)
+            print ("="*30)
             return
 
 
@@ -1587,18 +1590,20 @@ class MegBook(MegSiacua):
             sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
-                salvus.file(DOC_PDF_PATHNAME,show=True,raw=True); print "\n"
-                salvus.file(DOC_LATEX_PATHNAME,show=True,raw=True); print "\n"
+                salvus.file(DOC_PDF_PATHNAME,show=True,raw=True); 
+                print ("\n")
+                salvus.file(DOC_LATEX_PATHNAME,show=True,raw=True); 
+                print ("\n")
                 salvus.open_tab(DOC_PDF_PATHNAME)
             else:
                 sys.path.append('/usr/local/lib/python2.7/dist-packages')
                 from smc_pyutil import smc_open
                 smc_open.process([DOC_PDF_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "MegBook module say: evince ",DOC_PDF_PATHNAME
+            print ("MegBook module say: evince ",DOC_PDF_PATHNAME)
             subprocess.Popen(["evince",DOC_PDF_PATHNAME])
         else:
-            print "megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py"
+            print ("megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
 
 
@@ -1627,7 +1632,7 @@ class MegBook(MegSiacua):
         row = self.megbook_store.get_classrow(unique_name)        
         if not row:
             #TODO: passar a raise Error
-            print "%s cannot be accessed on database" % unique_name
+            print ("%s cannot be accessed on database" % unique_name)
             return "\n\n\\vspace*{1cm}%s cannot be accessed on database.\n\n\\vspace*{1cm}\n\n" % latexunderscore(unique_name)
 
            
@@ -1766,7 +1771,7 @@ class MegBook(MegSiacua):
         exs = ''.join(exstate) #duplicate stringnum_questions
         exs = re.sub("[vhn]","",exs)
         if exs != "":
-            print "Megbook.py say: exstate parameter must be a string with only 'vhn' chars."
+            print ("Megbook.py say: exstate parameter must be a string with only 'vhn' chars.")
 
         send_dict = { 
             "course": course,
@@ -1790,8 +1795,8 @@ class MegBook(MegSiacua):
 
         #print response.read()    
         if response.status!=200:
-            print "Could not get an exam from server."
-            print response.status, response.reason
+            print ("Could not get an exam from server.")
+            print (response.status, response.reason)
             conn.close()
             return
         #print 'Sent to server:  "', send_dict["exname"], '" with ekey=', send_dict["ekey"] 
@@ -1806,9 +1811,9 @@ class MegBook(MegSiacua):
         #print data
         #print "========"
         s = "System siacua (or siacuatest) has randomly collected, according to bayesian tree with weigths, the following exercises:"
-        print "="*len(s)
-        print s
-        print "="*len(s),"\n"
+        print ("="*len(s))
+        print (s)
+        print ("="*len(s),"\n")
         
 
         #Join all questions
@@ -1830,14 +1835,14 @@ class MegBook(MegSiacua):
 
             ekey = uniquename_ekey[1]
 
-            print "megbook.py module say: generating exercise %s." % unique_name, "with ekey=",ekey, "\n\n"
+            print ("megbook.py module say: generating exercise %s." % unique_name, "with ekey=",ekey, "\n\n")
 
             ex = self.new(unique_name,ekey=ekey,returninstance=True)
 
             #print ex
             
             if not ex:
-                print "megbook.fast_exam_siacua: exercise", unique_name, "is not on database."
+                print ("megbook.fast_exam_siacua: exercise", unique_name, "is not on database.")
                 continue
 
             ex_str = templates.render("megbook_catalog_instance.tex",
@@ -1890,9 +1895,9 @@ class MegBook(MegSiacua):
             sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             if salvus:
-                print "Check exam PDF file:"
+                print ("Check exam PDF file:")
                 salvus.file(EXAM_PDF_PATHNAME,show=True,raw=True); print "\n"
-                print "Save tex file to your computer to improve the text at",EXAM_TEX_PATHNAME
+                print ("Save tex file to your computer to improve the text at",EXAM_TEX_PATHNAME)
                 salvus.file(EXAM_TEX_PATHNAME,show=True,raw=True); print "\n"
                 salvus.open_tab(EXAM_TEX_PATHNAME)
             else:
@@ -1900,10 +1905,10 @@ class MegBook(MegSiacua):
                 from smc_pyutil import smc_open
                 smc_open.process([EXAM_TEX_PATHNAME])
         elif MEGUA_PLATFORM=='DESKTOP':
-            print "MegBook module say: evince ",EXAM_PDF_PATHNAME
+            print ("MegBook module say: evince ",EXAM_PDF_PATHNAME)
             subprocess.Popen(["evince",EXAM_PDF_PATHNAME])
         else:
-            print "megbook.py module say: in context of megbook.fast_exam_siacua() the MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py"
+            print ("megbook.py module say: in context of megbook.fast_exam_siacua() the MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
 
 
@@ -1919,7 +1924,7 @@ def m_get_sections(sectionstxt):
 
 
 def display_warning(w,code_string):
-    print w.message
+    print (w.message)
     #print "Around line:",w.lineno #<-could be on runtime without line
     #print "Filename:",w.filename #<- always megbase.py ?
     code_list = code_string.split("\n")
@@ -1928,18 +1933,18 @@ def display_warning(w,code_string):
         code_debug_str = '\n'.join(code_list[line-2:line+2])
     else:
         code_debug_str = '\n'.join(code_list[0:line+1])
-    print code_debug_str 
+    print (code_debug_str) 
         
 
 def display_syntaxerror(s,code_string):
-    print s.msg #specific error description
+    print (s.msg) #specific error description
     #TODO: print s.message #code where error is
 
     if '(unicode error)' in s.msg:
-        print "Localte with" 
-        print "   $ python -c \"print hex(<position of the byte>)\" "
-        print "   $ hd <file.sage>"
-        print "   and rewrite the full paragraph, maybe!"
+        print ("Localte with")
+        print ("   $ python -c \"print hex(<position of the byte>)\" ")
+        print ("   $ hd <file.sage>")
+        print ("   and rewrite the full paragraph, maybe!")
 
     # strcuture of "s":    
     #'__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', 

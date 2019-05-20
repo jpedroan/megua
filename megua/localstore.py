@@ -173,7 +173,7 @@ class LocalStore:
     
         version = self._database_version()
         if LocalStore._debug:
-            print "Version in file: ", version, " -- Localstore code version: ", __VERSION__
+            print ("Version in file: ", version, " -- Localstore code version: ", __VERSION__)
 
         if version == None:
 
@@ -206,7 +206,7 @@ class LocalStore:
 
 
         if LocalStore._debug:
-            print "Database opened in: ", self.local_store_filename
+            print ("Database opened in: ", self.local_store_filename)
 
  
 
@@ -215,7 +215,7 @@ class LocalStore:
         Open to use.
         """
         if LocalStore._debug:
-            print "Open MegBook %s to use." % self.local_store_filename
+            print ("Open MegBook %s to use." % self.local_store_filename)
         self.conn = sqlite3.connect(self.local_store_filename)
         self.conn.create_function("regexp",2,megregexp)
         self.conn.row_factory = sqlite3.Row
@@ -226,7 +226,7 @@ class LocalStore:
         else:
             sqlite3.enable_callback_tracebacks(True)#while in testing TODO
         if LocalStore._debug:
-            print "....  ready."
+            print ("....  ready.")
 
 
     def _database_version(self):
@@ -395,7 +395,7 @@ class LocalStore:
         self.conn.commit()
         c.close()
         if LocalStore._debug:
-            print "Exercise '" + row['unique_name'] + "' inserted in database."
+            print ("Exercise '" + row['unique_name'] + "' inserted in database.")
 
 
 
@@ -431,7 +431,7 @@ class LocalStore:
         self.conn.commit()
         c.close()
         if LocalStore._debug:
-            print "Exercise '" + row['unique_name'] + "' changed in database."
+            print ("Exercise '" + row['unique_name'] + "' changed in database.")
 
     #See def search(...) below. 
     #
@@ -452,11 +452,11 @@ class LocalStore:
 
         #INSERT INTO Persons (P_Id, LastName, FirstName) VALUES (5, 'Tjessem', 'Jakob')
         #http://www.w3schools.com/sql/sql_insert.asp
-        print "localstore.py: old_unique_name,unique_name=", old_unique_name, unique_name
+        print ("localstore.py: old_unique_name,unique_name=", old_unique_name, unique_name)
             
         row = self.get_classrow(unique_name)
         if row:
-            print "Exercise name already exists on database. Please choose a new one or rename with a different one."
+            print ("Exercise name already exists on database. Please choose a new one or rename with a different one.")
             raise Exception("Exercise name already exists on database")
 
         c = self.conn.cursor()
@@ -472,7 +472,7 @@ class LocalStore:
         self.conn.commit()
         c.close()
         if warn or LocalStore._debug:
-            print "Exercise '" + row['unique_name'] + "' changed in database."
+            print ("Exercise '" + row['unique_name'] + "' changed in database.")
 
 
     def get_classrow(self, unique_name):
@@ -543,16 +543,16 @@ class LocalStore:
         Helper function to print each exercise.
         """
 
-        print "----------------------"
-        print "List of all exercises:"
-        print "----------------------"
+        print ("----------------------")
+        print ("List of all exercises:")
+        print ("----------------------")
         for row in ExIter(self):
             self.print_row(row)
 
 
     def print_row(self,row):
         sname = 'Record %03d: %s' % (row['problem_id'],row['unique_name'])
-        print sname + '\n\n' + row['problem_text'] + '\n'
+        print (sname + '\n\n' + row['problem_text'] + '\n')
 
 
 

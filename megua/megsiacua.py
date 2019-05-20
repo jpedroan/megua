@@ -87,7 +87,7 @@ class MegSiacua:
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(self._current_unique_name)
         if not row:
-            print "megsiacua module: %s cannot be accessed on database." % self._current_unique_name
+            print ("megsiacua module: %s cannot be accessed on database." % self._current_unique_name)
             return
 
         #Create an instance (ekey=0 because it needs one.)
@@ -152,7 +152,7 @@ class MegSiacua:
         #Get summary, problem and answer and class_text
         row = self.megbook_store.get_classrow(unique_name)
         if not row:
-            print "megsiacua module: %s cannot be accessed on database." % unique_name
+            print ("megsiacua module: %s cannot be accessed on database." % unique_name)
             return
         #Create an instance (ekey=0 because it needs one.)
         ex_instance = self.exerciseinstance(row=row, ekey=0)
