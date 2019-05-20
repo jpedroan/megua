@@ -18,11 +18,7 @@ from megua.exbase import ExerciseBase
 from megua.exsiacua import ExSiacua
 from megua.exlatex import ExLatex
 from megua.ex_amc import ExAMC
-
-# SYSTEM CONFIGURATION
-#MEGUA_BASH_ENVIRONMENT=environ["MEGUA_BASH_ENVIRONMENT"]
-from os import environ
-MEGUA_PLATFORM=environ["MEGUA_PLATFORM"]
+from megua.megoptions import MEGUA_PLATFORM
 
 if MEGUA_PLATFORM == "WINDOWS":
     import megua.mwindows as mwindows
