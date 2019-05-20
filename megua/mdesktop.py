@@ -6,7 +6,30 @@ from megua.platex import pcompile
 from megua.jinjatemplates import templates
 from megua.megoptions import *
 
-def desktop_exlatex_print_instance(self):
+def conf_set_current_exercise(self):
+    print("Exercise {}".format(unique_name))
+
+def conf_new_exercise(self):
+    print("MegBook module say: gvim ",fullpath)
+    subprocess.Popen(["gvim",fullpath])
+
+def conf_replicate_exercise(self):
+    print("MegBook module say: gvim ",fullpath)
+    subprocess.Popen(["gvim",fullpath])
+
+def conf_catalog(self):
+    print("MegBook module say: evince ",CATALOG_PDF_PATHNAME)
+    subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
+
+def conf_latex_document(self):
+    print("MegBook module say: evince ",DOC_PDF_PATHNAME)
+    subprocess.Popen(["evince",DOC_PDF_PATHNAME])
+
+def conf_fast_exam_siacu(self):
+    print("MegBook module say: evince ",EXAM_PDF_PATHNAME)
+    subprocess.Popen(["evince",EXAM_PDF_PATHNAME])
+
+def exlatex_print_instance(self):
     """
     After producing an exercise template or requesting a new instance of some exercise
     this routine will print it on notebook notebook or command line mode. It also should
@@ -24,7 +47,7 @@ def desktop_exlatex_print_instance(self):
     print("exlatex module say: evince ",EXERCISE_PDF_PATHNAME)
     subprocess.Popen(["evince",EXERCISE_PDF_PATHNAME])
 
-def desktop_exsiacua_print_instance(self):
+def exsiacua_print_instance(self):
     """
     After producing an exercise template or requesting a new instance of some exercise
     this routine will print it on notebook notebook or command line mode. It also should
@@ -58,7 +81,7 @@ def desktop_exsiacua_print_instance(self):
     print("Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME)
     subprocess.Popen(["firefox","-new-tab", EXERCISE_HTML_PATHNAME])
 
-def desktop_examc_print_instance(self):
+def examc_print_instance(self):
     """
     After producing an exercise template or requesting a new instance of some exercise
     this routine will print it on notebook notebook or command line mode. It also should

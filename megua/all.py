@@ -25,22 +25,40 @@ from os import environ
 MEGUA_PLATFORM=environ["MEGUA_PLATFORM"]
 
 if MEGUA_PLATFORM == "WINDOWS":
-    import mwindows
-    ExLatex.print_instancte = mwindows.windows_exlatex_print_instance
-    ExSiacua.print_instancte = mwindows.windows_exsiacua_print_instance
-    ExAMC.print_instancte = mwindows.windows_examc_print_instance
+    import megua.mwindows as mwindows
+    ExLatex.print_instancte = mwindows.exlatex_print_instance
+    ExSiacua.print_instancte = mwindows.exsiacua_print_instance
+    ExAMC.print_instancte = mwindows.examc_print_instance
+    MegBook.conf_catalog = mwindows.conf_catalog
+    MegBook.conf_fast_exam_siacu = mwindows.conf_fast_exam_siacu
+    MegBook.conf_latex_document = mwindows.conf_latex_document
+    MegBook.conf_new_exercise = mwindows.conf_new_exercise
+    MegBook.conf_replicate_exercise = mwindows.conf_replicate_exercise
+    MegBook.conf_set_current_exercise = mwindows.conf_set_current_exercise
 
 elif MEGUA_PLATFORM == "SMC":
-    import msmc
-    ExLatex.print_instancte = msmc.smc_exlatex_print_instance
-    ExSiacua.print_instancte = msmc.smc_exsiacua_print_instance
-    ExAMC.print_instancte = msmc.smc_examc_print_instance
+    import megua.msmc as msmc
+    ExLatex.print_instancte = msmc.exlatex_print_instance
+    ExSiacua.print_instancte = msmc.exsiacua_print_instance
+    ExAMC.print_instancte = msmc.examc_print_instance
+    MegBook.conf_catalog = msmc.conf_catalog
+    MegBook.conf_fast_exam_siacu = msmc.conf_fast_exam_siacu
+    MegBook.conf_latex_document = msmc.conf_latex_document
+    MegBook.conf_new_exercise = msmc.conf_new_exercise
+    MegBook.conf_replicate_exercise = msmc.conf_replicate_exercise
+    MegBook.conf_set_current_exercise = msmc.conf_set_current_exercise
 
 elif MEGUA_PLATFORM == "DESKTOP":
-    import mdesktop
+    import megua.mdesktop as mdesktop
     ExLatex.print_instancte = mdesktop.desktop_exlatex_print_instance
     ExSiacua.print_instancte = mdesktop.desktop_exsiacua_print_instance
     ExAMC.print_instancte = mdesktop.desktop_examc_print_instance
+    MegBook.conf_catalog = mdesktop.conf_catalog
+    MegBook.conf_fast_exam_siacu = mdesktop.conf_fast_exam_siacu
+    MegBook.conf_latex_document = mdesktop.conf_latex_document
+    MegBook.conf_new_exercise = mdesktop.conf_new_exercise
+    MegBook.conf_replicate_exercise = mdesktop.conf_replicate_exercise
+    MegBook.conf_set_current_exercise = mdesktop.conf_set_current_exercise
 
 #Open the project database 
 #(see configuration in $HOME/.megua/conf.py or at megua/megua/sage bash)
