@@ -102,7 +102,7 @@ else: #MEGUA setup is in $HOME/.megua/conf.py
         try:
             mkdir(path.join(environ["HOME"],".megua"))
         except error as e: #error is os.error alias of exceptions.OSError
-            print (e.message)
+            print(e.message)
 
         #2. get template of conf.py (conf_megua.py because there is conf.py for rest)
         source = path.join(MEGUA_TEMPLATE_DIR,"conf_megua.py")
@@ -132,7 +132,7 @@ if not os.path.exists(MEGUA_WORKDIR_FULLPATH):
 STOP_MEGUA = False
 
 if not path.isdir(MEGUA_EXERCISE_INPUT):
-    print ("Directory MEGUA_EXERCISE_INPUT='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_INPUT))
+    print("Directory MEGUA_EXERCISE_INPUT='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_INPUT))
     STOP_MEGUA = True
 
 #TODO: the string for project database is ok but there is no databae YET
@@ -140,20 +140,20 @@ if not path.isdir(MEGUA_EXERCISE_INPUT):
 #assert(path.isfile(PROJECT_DATABASE))
 
 if not path.isdir(MEGUA_EXERCISE_CATALOGS):
-    print ("Directory MEGUA_EXERCISE_CATALOGS='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_CATALOGS))
+    print("Directory MEGUA_EXERCISE_CATALOGS='{0}' does not exist. Create it or change configuration.".format(MEGUA_EXERCISE_CATALOGS))
     STOP_MEGUA = True
 
 if not 'SIACUA_WEBKEY' in locals():
-    print ("To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_WEBKEY='somestring'")
+    print("To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_WEBKEY='somestring'")
     STOP_MEGUA = True
 if not 'SIACUA_COURSENAME':
-    print ("To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_COURSENAME='somestring'")
+    print("To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_COURSENAME='somestring'")
     STOP_MEGUA = True
 if not 'SIACUA_USERNAME' in locals():
-    print ("To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_USERNAME='somestring'")
+    print("To configure for SIACUA configure please edit ~/.megua/conf.py and write SIACUA_USERNAME='somestring'")
     STOP_MEGUA = True
     
 if STOP_MEGUA:
-    print ("Check configurable options in ~/.megua/conf.py")
+    print("Check configurable options in ~/.megua/conf.py")
     exit(-1)
 

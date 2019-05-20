@@ -124,14 +124,14 @@ def pcompile(latex_text, workdir, filename):
         # rerun?
         # http://tex.stackexchange.com/questions/265744/how-to-know-if-a-latex-file-needs-another-compilation-pass
         if "LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right." in output:
-            print ("="*20)
-            print ("platex.py say: Running laTeX a second time.")
-            print ("="*20)
+            print("="*20)
+            print("platex.py say: Running laTeX a second time.")
+            print("="*20)
             output = subprocess.check_output(lt,cwd=workdir) #return output in a string
             if "LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right." in output:
-                print ("="*20)
-                print ("platex.py say: Running laTeX a third and last time")
-                print ("="*20)
+                print("="*20)
+                print("platex.py say: Running laTeX a third and last time")
+                print("="*20)
                 output = subprocess.check_output(lt,cwd=workdir) #return output in a string
     except subprocess.CalledProcessError as err:
         #Try to show the message to user
@@ -158,26 +158,26 @@ def pcompile(latex_text, workdir, filename):
                     #First the "end" mark to get 
                     m_end = re.search("%LATEX DEBUG END (.+)",lines[i])
                     ex_unique_name = m_end.group(1)
-                    print ("\nExercise with name '{}' has a LaTeX compilation error.".format(ex_unique_name))
+                    print("\nExercise with name '{}' has a LaTeX compilation error.".format(ex_unique_name))
                     break
 
             #Print lines where the error could be.
-            print ("\n")
+            print("\n")
             for dk in xrange(-4,0):
-                print ("| :",lines[error_line+dk])
-            print ("> :", lines[error_line])
+                print("| :",lines[error_line+dk])
+            print("> :", lines[error_line])
             for dk in xrange(1,5):
-                print ("| :",lines[error_line+dk])
+                print("| :",lines[error_line+dk])
 
 
-        print ("\n\nYou can inspect\n  %s\nand use your LaTeX "\
+        print("\n\nYou can inspect\n  %s\nand use your LaTeX "\
               "editor to help find the error in exercise source code.\n" % fullpath)
 
         if match:
             #print LaTeX error style "l.9 ........"
-            print (match.group(0)) 
+            print(match.group(0)) 
 
-        print ("\n")
+        print("\n")
         raise UserWarning("Check exercise for LaTeX errors")
 
 
@@ -295,7 +295,7 @@ def img2includegraphics(text):
     inpattern = ur"<img src='.OUTPUT/.+?/(.+?)' alt='.+?' height='(.+?)' width='(.+?)' style='background-color:white;'/>"
     outpattern = ur"\includegraphics[width=\3pt,height=\2pt]{IMG/\1}\n"
     (newtext, nr) = re.subn(inpattern, outpattern, text, count=0, flags=re.DOTALL|re.UNICODE)
-    print ("platex.py: includegraphics conversions:", nr)
+    print("platex.py: includegraphics conversions:", nr)
 
     return newtext
 

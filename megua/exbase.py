@@ -215,19 +215,19 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         #TODO: should author write each filed ? Can he leave empty fields?
         #TODO: assert or exit() ?
         if not self._unique_name:
-            print ("exbase.py: exercise should have a 'unique_name' stated in the class part.")
+            print("exbase.py: exercise should have a 'unique_name' stated in the class part.")
             #assert(self._unique_name)
             exit()
         if not self._summary_text:
-            print ("exbase.py: exercise '%s' should have a '%%summary' tag and text in it should not be empty." % self._unique_name)
+            print("exbase.py: exercise '%s' should have a '%%summary' tag and text in it should not be empty." % self._unique_name)
             #assert(self._summary_text)
             exit()
         if not self._problem_text:
-            print ("exbase.py: exercise '%s' should have a '%%problem' tag and text in it should not be empty." % self._unique_name)
+            print("exbase.py: exercise '%s' should have a '%%problem' tag and text in it should not be empty." % self._unique_name)
             #assert(self._problem_text)
             exit()
         if not self._answer_text:
-            print ("exbase.py: exercise '%s' should have an '%%answer' tag and text in it should not be empty." % self._unique_name)
+            print("exbase.py: exercise '%s' should have an '%%answer' tag and text in it should not be empty." % self._unique_name)
             #assert(self._answer_text)
             exit()
 
@@ -276,8 +276,8 @@ class ExerciseBase(SageObject,UnifiedGraphics):
             self.update(ekey,edict,render_method)
 
         except AlarmInterrupt:
-            print ('Exercise "%s" is taking too long to make!' % self.unique_name())
-            print ('Check make_random() routine or increase meg.max_computation_time.')
+            print('Exercise "%s" is taking too long to make!' % self.unique_name())
+            print('Check make_random() routine or increase meg.max_computation_time.')
             # if the computation finished early, though, the alarm is still ticking!
             # so let's turn it off below.
             raise AlarmInterrupt
@@ -302,7 +302,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         """
 
         #For debug:
-        print (self.unique_name())
+        print(self.unique_name())
 
         #TODO: is this flag is being used ?
         self.has_instance = False
@@ -394,7 +394,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         r"""This method is called by megbook.save() before
         an exercise is saved into database.
         """
-        print ("Trying several ekeys ...")
+        print("Trying several ekeys ...")
 
         start = 0 #TODO: choose a random start
 
@@ -402,7 +402,7 @@ class ExerciseBase(SageObject,UnifiedGraphics):
             maxiter = self._megbook.max_tried_instances
 
         for ekey in range(start,start+maxiter):
-            print ("    Testing for random key: ekey=",ekey)
+            print("    Testing for random key: ekey=",ekey)
             self.update_timed(ekey=ekey)
 
 
@@ -465,15 +465,15 @@ class ExerciseBase(SageObject,UnifiedGraphics):
         answtxt =  self.answer()
         uname   =  self.unique_name()
 
-        print ('-'*13 + '-'*len(uname))
-        print ("Instance of:", uname) 
-        print ('-'*13 + '-'*len(uname))
-        print ("==> Summary:")
-        print (summtxt) #.encode('utf8')
-        print ("==> Problem instance")
-        print (probtxt) #.encode('utf8')
-        print ("==> Answer instance")
-        print (answtxt) #.encode('utf8')
+        print('-'*13 + '-'*len(uname))
+        print("Instance of:", uname) 
+        print('-'*13 + '-'*len(uname))
+        print("==> Summary:")
+        print(summtxt) #.encode('utf8')
+        print("==> Problem instance")
+        print(probtxt) #.encode('utf8')
+        print("==> Answer instance")
+        print(answtxt) #.encode('utf8')
 
     def show_one(self,input_text):
         """Find all <showone value>...</showone> tags and select proper <thisone>...</thisone>

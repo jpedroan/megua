@@ -182,7 +182,7 @@ def svg_pie_chart(valueslist, chartid="chart1", title="Chart", width=400, height
                     width=width,
                     height=height)
 
-    print ("TYPE=",type(r))
+    print("TYPE=",type(r))
 
     return r
 

@@ -21,7 +21,7 @@ def desktop_exlatex_print_instance(self):
     EXERCISE_TEX_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.tex')
     EXERCISE_PDF_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.pdf')
 
-    print ("exlatex module say: evince ",EXERCISE_PDF_PATHNAME)
+    print("exlatex module say: evince ",EXERCISE_PDF_PATHNAME)
     subprocess.Popen(["evince",EXERCISE_PDF_PATHNAME])
 
 def desktop_exsiacua_print_instance(self):

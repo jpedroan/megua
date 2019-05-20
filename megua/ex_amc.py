@@ -120,15 +120,15 @@ class ExAMC(ExerciseBase):
             sys.path.append('/cocalc/lib/python2.7/site-packages')
             from smc_sagews.sage_salvus import salvus
             salvus.file(EXERCISE_PDF_PATHNAME,show=True,raw=True); 
-            print ("\n")
+            print("\n")
             salvus.file(EXERCISE_TEX_PATHNAME,show=True,raw=True); 
-            print ("\n")
+            print("\n")
             salvus.open_tab(EXERCISE_PDF_PATHNAME)
         elif MEGUA_PLATFORM=='DESKTOP':
-            print ("ex_amc.py module say: evince ",EXERCISE_PDF_PATHNAME)
+            print("ex_amc.py module say: evince ",EXERCISE_PDF_PATHNAME)
             subprocess.Popen(["evince",EXERCISE_PDF_PATHNAME])
         else:
-            print ("ex_amc module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+            print("ex_amc module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
 
 
