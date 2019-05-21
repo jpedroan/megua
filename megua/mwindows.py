@@ -15,29 +15,29 @@ def conf_siacuapreview(self):
     webbrowser.open(url)
 
 def conf_set_current_exercise(self):
-    print("Not implemented windows: windows_conf_set_current_exercise")
+    print("Not implemented windows: conf_set_current_exercise")
     
 def conf_new_exercise(self):
-    print("Not implemented windows: windows_conf_new_exercise")
+    print("Not implemented windows: conf_new_exercise")
     
 def conf_replicate_exercise(self):
-    print("Not implemented windows: windows_conf_replicate_exercise")
+    print("Not implemented windows: conf_replicate_exercise")
     
 def conf_catalog(self):
-    print("Not implemented windows: windows_conf_catalog")
+    print("Not implemented windows: conf_catalog")
     
 def conf_latex_document(self):
-    print("Not implemented windows: windows_conf_latex_document")
+    print("Not implemented windows: conf_latex_document")
     
 def conf_fast_exam_siacu(self):
-    print("Not implemented windows: windows_conf_fast_exam_siacu")
+    print("Not implemented windows: conf_fast_exam_siacu")
 
 def conf_exlatex_print_instance(self):
-    print("Not implemented windows: windows_exlatex_print_instance")
+    print("Not implemented windows: conf_exlatex_print_instance")
 
 def conf_exsiacua_print_instance(self):
     from IPython.display import display, Markdown
     display(Markdown(html_string))
 
 def conf_examc_print_instance(self):
-    print("Not implemented windows: windows_examc_print_instance")
+    print("Not implemented windows: conf_examc_print_instance")
