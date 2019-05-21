@@ -3,16 +3,16 @@ import sys
 import codecs
 
 from megua.exbase import ExerciseBase
-from megua.jinjatemplates import templates
 from megua.platex import html2latex, pcompile
+from megua.jinjatemplates import templates
 from megua.megoptions import *
 
-def conf__siacua_send(self):
+def conf__siacua_send(self, content):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
 
-def conf_siacuapreview(self):
+def conf_siacuapreview(self, html_full_path):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     #print "exsiacua.py: using salvus.link:"
@@ -29,7 +29,7 @@ def conf_set_current_exercise(self):
             '<a href="https://github.com/jpedroan/megua/wiki" target=_blank>MEGUA wiki for help</a> or email to dmat-siacua@ua.pt.'
         ))
 
-def conf_new_exercise(self):
+def conf_new_exercise(self, fullpath):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     if salvus:
@@ -43,7 +43,7 @@ def conf_new_exercise(self):
         from smc_pyutil import smc_open
         smc_open.process([fullpath])                
 
-def conf_replicate_exercise(self):
+def conf_replicate_exercise(self, fullpath, fullpath_new):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     if salvus:
@@ -55,7 +55,7 @@ def conf_replicate_exercise(self):
         from smc_pyutil import smc_open
         smc_open.process([fullpath_new])
 
-def conf_catalog(self):
+def conf_catalog(self, CATALOG_PDF_PATHNAME, CATALOG_TEX_PATHNAME):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     if salvus:
@@ -69,7 +69,7 @@ def conf_catalog(self):
         from smc_pyutil import smc_open
         smc_open.process([CATALOG_PDF_PATHNAME])
 
-def conf_latex_document(self):
+def conf_latex_document(self, DOC_PDF_PATHNAME, DOC_LATEX_PATHNAME):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     if salvus:
@@ -83,7 +83,7 @@ def conf_latex_document(self):
         from smc_pyutil import smc_open
         smc_open.process([DOC_PDF_PATHNAME])
 
-def conf_fast_exam_siacu(self):
+def conf_fast_exam_siacua(self, EXAM_PDF_PATHNAME, EXAM_TEX_PATHNAME):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     if salvus:
@@ -99,7 +99,7 @@ def conf_fast_exam_siacu(self):
         from smc_pyutil import smc_open
         smc_open.process([EXAM_TEX_PATHNAME])
 
-def conf_exlatex_print_instance(self):
+def conf_exlatex_print_instance(self, EXERCISE_TEX_PATHNAME, EXERCISE_PDF_PATHNAME):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     salvus.file(EXERCISE_PDF_PATHNAME,show=True,raw=True); 
@@ -108,13 +108,12 @@ def conf_exlatex_print_instance(self):
     print("\n")
     salvus.open_tab(EXERCISE_PDF_PATHNAME)
 
-
-def conf_exsiacua_print_instance(self):
+def conf_exsiacua_print_instance(self, html_string, EXERCISE_HTML_PATHNAME):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     salvus.html(html_string)
 
-def conf_examc_print_instance(self):
+def conf_examc_print_instance(self, EXERCISE_TEX_PATHNAME, EXERCISE_PDF_PATHNAME):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     salvus.file(EXERCISE_PDF_PATHNAME,show=True,raw=True); 

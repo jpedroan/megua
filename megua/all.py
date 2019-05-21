@@ -28,7 +28,7 @@ if MEGUA_PLATFORM == "WINDOWS":
     ExSiacua.conf_siacuapreview = mwindows.conf_siacuapreview
     ExAMC.conf_print_instance = mwindows.conf_examc_print_instance
     MegBook.conf_catalog = mwindows.conf_catalog
-    MegBook.conf_fast_exam_siacu = mwindows.conf_fast_exam_siacu
+    MegBook.conf_fast_exam_siacua = mwindows.conf_fast_exam_siacua
     MegBook.conf_latex_document = mwindows.conf_latex_document
     MegBook.conf_new_exercise = mwindows.conf_new_exercise
     MegBook.conf_replicate_exercise = mwindows.conf_replicate_exercise
@@ -42,7 +42,7 @@ elif MEGUA_PLATFORM == "SMC":
     ExSiacua.conf_siacuapreview = msmc.conf_siacuapreview
     ExAMC.conf_print_instance = msmc.conf_examc_print_instance
     MegBook.conf_catalog = msmc.conf_catalog
-    MegBook.conf_fast_exam_siacu = msmc.conf_fast_exam_siacu
+    MegBook.conf_fast_exam_siacua = msmc.conf_fast_exam_siacua
     MegBook.conf_latex_document = msmc.conf_latex_document
     MegBook.conf_new_exercise = msmc.conf_new_exercise
     MegBook.conf_replicate_exercise = msmc.conf_replicate_exercise
@@ -56,7 +56,7 @@ elif MEGUA_PLATFORM == "DESKTOP":
     ExSiacua.conf_siacuapreview = mdesktop.conf_siacuapreview
     ExAMC.conf_print_instance = mdesktop.conf_examc_print_instance
     MegBook.conf_catalog = mdesktop.conf_catalog
-    MegBook.conf_fast_exam_siacu = mdesktop.conf_fast_exam_siacu
+    MegBook.conf_fast_exam_siacua = mdesktop.conf_fast_exam_siacua
     MegBook.conf_latex_document = mdesktop.conf_latex_document
     MegBook.conf_new_exercise = mdesktop.conf_new_exercise
     MegBook.conf_replicate_exercise = mdesktop.conf_replicate_exercise

@@ -79,8 +79,7 @@ class ExLatex(ExerciseBase):
     #def __init__(self,ekey=None, edict=None):
     #    ExerciseBase.__init__(self,ekey, edict)
 
-
-    def conf_print_instance(self):
+    def conf_print_instance(self, EXERCISE_TEX_PATHNAME, EXERCISE_PDF_PATHNAME):
         print("ExLaTeX module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
     def _latex_string(self):
@@ -94,8 +93,6 @@ class ExLatex(ExerciseBase):
          )
 
         return lts
-
-
 
     def print_instance(self):
         """
@@ -112,5 +109,4 @@ class ExLatex(ExerciseBase):
         EXERCISE_TEX_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.tex')
         EXERCISE_PDF_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.pdf')
 
-        self.conf_print_instace()
-
+        self.conf_print_instace(EXERCISE_TEX_PATHNAME ,EXERCISE_PDF_PATHNAME)

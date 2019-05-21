@@ -92,7 +92,7 @@ class ExAMC(ExerciseBase):
    
    #TODO: review all "amc" in templates/pt_pt
 
-    def conf_print_instance():
+    def conf_print_instance(self, EXERCISE_TEX_PATHNAME, EXERCISE_PDF_PATHNAME):
         print("ExAMC module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
    
@@ -120,6 +120,6 @@ class ExAMC(ExerciseBase):
         EXERCISE_TEX_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.tex')
         EXERCISE_PDF_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.pdf')
 
-        self.conf_print_instance()
+        self.conf_print_instance(EXERCISE_TEX_PATHNAME, EXERCISE_PDF_PATHNAME)
 
 

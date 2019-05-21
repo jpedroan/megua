@@ -371,19 +371,19 @@ class MegBook(MegSiacua):
     def conf_set_current_exercise(self):
         print("MegBook module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
-    def conf_new_exercise(self):
+    def conf_new_exercise(self, fullpath):
         print("MegBook module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
-    def conf_replicate_exercise(self):
+    def conf_replicate_exercise(self, fullpath, fullpath_new):
         print("MegBook module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
-    def conf_catalog(self):
+    def conf_catalog(self, CATALOG_PDF_PATHNAME, CATALOG_TEX_PATHNAME):
         print("MegBook module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
-    def conf_latex_document(self):
+    def conf_latex_document(self, DOC_PDF_PATHNAME, DOC_LATEX_PATHNAME):
         print("MegBook module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
-    def conf_fast_exam_siacu(self):
+    def conf_fast_exam_siacua(self, EXAM_PDF_PATHNAME, EXAM_TEX_PATHNAME):
         print("MegBook module say: in context of megbook.fast_exam_siacua() the MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
     def set_current_exercise(self,pathname):
@@ -662,7 +662,7 @@ class MegBook(MegSiacua):
             #    "_siacua or _moodle and related extension *.sagews or *.sage."
             return
 
-        self.conf_new_exercise()
+        self.conf_new_exercise(fullpath)
 
     def replicate_exercise(self,filename):
         r"""
@@ -830,7 +830,7 @@ class MegBook(MegSiacua):
             return
 
 
-        self.conf_replicate_exercise()
+        self.conf_replicate_exercise(fullpath, fullpath_new)
 
     def save(self,uexercise):
         r"""
@@ -1438,7 +1438,7 @@ class MegBook(MegSiacua):
             print("="*30)
             return
 
-        self.conf_catalog()
+        self.conf_catalog(CATALOG_PDF_PATHNAME, CATALOG_TEX_PATHNAME)
 
     def latex_document(self, latexdocument, exercisetemplate=None, ofilename='latex_document.tex', ekey=None):
         r"""
@@ -1514,7 +1514,7 @@ class MegBook(MegSiacua):
             return
 
 
-        self.conf_latex_document()
+        self.conf_latex_document(DOC_PDF_PATHNAME, DOC_LATEX_PATHNAME)
 
     def put_here(self,unique_name, ekey=None, edict=None, elabel="NoLabel", em=True):
         r"""
@@ -1797,7 +1797,7 @@ class MegBook(MegSiacua):
         os.system("pdflatex -interaction=nonstopmode %s 1> /dev/null" % "exam.tex" )
 
 
-        self.conf_fast_exam_siacua()
+        self.conf_fast_exam_siacua(EXAM_PDF_PATHNAME, EXAM_TEX_PATHNAME)
 
 def m_get_sections(sectionstxt):
     r"""

@@ -245,13 +245,13 @@ class ExSiacua(ExerciseBase):
     #def __init__(self,ekey=None, edict=None):
     #    ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
 
-    def conf_print_instance(self):
+    def conf_print_instance(self, html_string, EXERCISE_HTML_PATHNAME):
         print("ExSiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
     
-    def conf__siacua_send(self):
+    def conf__siacua_send(self, content):
         print("ExSiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
-    def conf_siacuapreview(self):
+    def conf_siacuapreview(self, html_full_path):
         print("ExSiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
     
     def update(self,ekey=None,edict=None, render_method=None):
@@ -334,7 +334,7 @@ class ExSiacua(ExerciseBase):
         f.write(html_string)
         f.close()
 
-        self.conf_print_instance()
+        self.conf_print_instance(html_string, EXERCISE_HTML_PATHNAME)
 
     def _update_multiplechoice(self,input_text,where):
         """
@@ -542,7 +542,7 @@ class ExSiacua(ExerciseBase):
         f.close()
 
 
-        self.conf_siacuapreview()
+        self.conf_siacuapreview(html_full_path)
 
     def _problem_whitoutmc(self):
         """
@@ -894,7 +894,7 @@ type(send_result)= <type 'list'>
 
             elif content.status_code == 201:
 
-                self.conf__siacua_send()
+                self.conf__siacua_send(content)
 
                 return ["ok"]
 
@@ -1075,8 +1075,6 @@ type(send_result)= <type 'list'>
 
         return d #d é dicionário
 
-
-
     def _siacua_wronganswerdict(self,alist):
         r"""Wrong answer extraction"""
 
@@ -1156,8 +1154,6 @@ type(send_result)= <type 'list'>
 
             f.write(html_string)
 
-
-
     def _siacua_extractparameters(self):
         """
         Extract from summary:
@@ -1181,8 +1177,6 @@ type(send_result)= <type 'list'>
             exec(concepts_match.group(1))
             #[assert( w in globals()) for w in ['guess', 'slip', 'guess', 'discr', 'concepts'] ]
             print("Add this to meg.siacua: level=%d,slip=%f,guess=%f,discr=%f,concepts=%s" % (level, slip, guess, discr, concepts))
-
-
 
     #ExSiacua specific conversion
     TO_LATEX = [
@@ -1256,7 +1250,6 @@ type(send_result)= <type 'list'>
         
         return newtext
 
-
 def _old_html(input_text):
     r"""Remove tags like the example below and let
     only the "show" part between <center>.        
@@ -1305,4 +1298,3 @@ def _old_html(input_text):
     #print "old_html():", nr
 
     return newtext
-
