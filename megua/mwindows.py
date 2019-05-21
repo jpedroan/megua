@@ -36,6 +36,7 @@ def set_current_exercise(self):
     pathname = {r['kernel']['id']: r['notebook']['path'] for r in response}[kernel_id]
 
     (edir,filename) = os.path.split(pathname)
+    pathname = os.getcwd() + "/" + filename
     (unique_name,ext) = os.path.splitext(filename)
 
     if ext == '.py':
