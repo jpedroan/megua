@@ -29,7 +29,6 @@ if MEGUA_PLATFORM == "WINDOWS":
     ExAMC.conf_print_instance = mwindows.conf_examc_print_instance
     MegBook.conf_catalog = mwindows.conf_catalog
     MegBook.conf_fast_exam_siacua = mwindows.conf_fast_exam_siacua
-    
     MegBook.conf_latex_document = mwindows.conf_latex_document
     MegBook.conf_new_exercise = mwindows.conf_new_exercise
     MegBook.conf_replicate_exercise = mwindows.conf_replicate_exercise
