@@ -35,7 +35,7 @@ def conf_fast_exam_siacu(self):
 def conf_exlatex_print_instance(self):
     print("Not implemented windows: windows_exlatex_print_instance")
 
-def conf_exsiacua_print_instance(self):
+def exsiacua_print_instance(self):
     from IPython.display import display, Markdown
     display(Markdown(html_string))
 
