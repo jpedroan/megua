@@ -245,7 +245,7 @@ class ExSiacua(ExerciseBase):
     #def __init__(self,ekey=None, edict=None):
     #    ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
 
-    def conf_print_instance(self):
+    def conf_print_instance(self, html_string):
         print("ExSiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
     
     def conf__siacua_send(self):
@@ -334,7 +334,7 @@ class ExSiacua(ExerciseBase):
         f.write(html_string)
         f.close()
 
-        self.conf_print_instance()
+        self.conf_print_instance(html_string)
 
     def _update_multiplechoice(self,input_text,where):
         """
