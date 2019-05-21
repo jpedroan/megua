@@ -566,7 +566,7 @@ class ExSiacua(ExerciseBase):
         f.close()
 
 
-        conf_siacuapreview()
+        self.conf_siacuapreview()
 
     def _problem_whitoutmc(self):
         """
@@ -918,7 +918,7 @@ type(send_result)= <type 'list'>
 
             elif content.status_code == 201:
 
-                conf__siacua_send()
+                self.conf__siacua_send()
 
                 return ["ok"]
 

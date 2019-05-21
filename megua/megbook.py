@@ -579,7 +579,7 @@ class MegBook(MegSiacua):
         #To be used in all megbook commands
         self._current_unique_name = unique_name
 
-        confMegua()
+        self.conf_set_current_exercise()
 
     def new_exercise(self,filename):
         r"""
@@ -759,7 +759,7 @@ class MegBook(MegSiacua):
             #    "_siacua or _moodle and related extension *.sagews or *.sage."
             return
 
-        conf_new_exercise()
+        self.conf_new_exercise()
 
     def replicate_exercise(self,filename):
         r"""
@@ -927,7 +927,7 @@ class MegBook(MegSiacua):
             return
 
 
-        conf_replicate_exercise()
+        self.conf_replicate_exercise()
 
     def save(self,uexercise):
         r"""
@@ -1535,7 +1535,7 @@ class MegBook(MegSiacua):
             print("="*30)
             return
 
-        conf_catalog()
+        self.conf_catalog()
 
     def latex_document(self, latexdocument, exercisetemplate=None, ofilename='latex_document.tex', ekey=None):
         r"""
@@ -1611,7 +1611,7 @@ class MegBook(MegSiacua):
             return
 
 
-        conf_latex_document()
+        self.conf_latex_document()
 
     def put_here(self,unique_name, ekey=None, edict=None, elabel="NoLabel", em=True):
         r"""
@@ -1894,7 +1894,7 @@ class MegBook(MegSiacua):
         os.system("pdflatex -interaction=nonstopmode %s 1> /dev/null" % "exam.tex" )
 
 
-        conf_fast_exam_siacua()
+        self.conf_fast_exam_siacua()
 
 def m_get_sections(sectionstxt):
     r"""
