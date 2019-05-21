@@ -295,8 +295,8 @@ def parse_ex(inputtext):
                 if classlines[current].lineinfo is not None:
                     txtinfo = classlines[current].lineinfo.strip()
                     if txtinfo == '':
-                        print "Each exercise can belong to a section/subsection/subsubsection. \n"\
-                              "Write sections using ';' in the '%summary' line. For ex., '%summary Section; Subsection; Subsubsection'.\n"
+                        print("Each exercise can belong to a section/subsection/subsubsection. \n"\
+                              "Write sections using ';' in the '%summary' line. For ex., '%summary Section; Subsection; Subsubsection'.\n")
                         warn_found = True      
                     txt_sections = txtinfo
                 #TODO review: txt_summary = '\n%summary ' + txtinfo + '\n'
@@ -304,7 +304,7 @@ def parse_ex(inputtext):
                 current+=1
             else:
                 error_found = True
-                print "Expected %summary tag on line {0}.".format(current+1)
+                print("Expected %summary tag on line {0}.".format(current+1))
 
         elif state == ExState.SUMMARY: #consume summary lines
             #Check transition
@@ -319,8 +319,8 @@ def parse_ex(inputtext):
                 if classlines[current].lineinfo is not None:
                     txtinfo = classlines[current].lineinfo.strip()
                     if txtinfo == '':
-                        print "Each problem can have a suggestive name. \n"\
-                              "Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.\n"
+                        print("Each problem can have a suggestive name. \n"\
+                              "Write in the '%problem' line a name, for ex., '%problem The Fish Problem'.\n")
                         warn_found = True     
                         txt_problemname = '(...)' #txtinfo
                     else:
@@ -330,7 +330,7 @@ def parse_ex(inputtext):
                 current+=1
             else:
                 error_found = True
-                print "Expected %problem tag on line {0}.".format(current+1)
+                print("Expected %problem tag on line {0}.".format(current+1))
 
         elif state == ExState.PROBLEM: #consume problem lines
             #Check transition
@@ -345,12 +345,12 @@ def parse_ex(inputtext):
                 if classlines[current].lineinfo is not None:
                     txtinfo = classlines[current].lineinfo.strip()
                     if  txtinfo != '':
-                        print "Ignoring text '" + txtinfo + "' in %answer tag at line {0}.\n".format(current+1)
+                        print("Ignoring text '" + txtinfo + "' in %answer tag at line {0}.\n".format(current+1))
                         warn_found = True
                 current+=1
             else:
                 error_found = True
-                print "Expected %answer tag on line {0}.".format(current+1)
+                print("Expected %answer tag on line {0}.".format(current+1))
 
         elif state == ExState.ANSWER: #consume answer lines
             #Check transition
@@ -369,12 +369,12 @@ def parse_ex(inputtext):
                 #this error find "class" word in text but something is wrong. This error here prints the proper line number.
                 error_found = True
                 txt_class = ''
-                print "Expected python/sage class definition on line %d or class identifier is wrong." % (current+1)
-                print "Class identifier must start with a letter. Suggestion: E12A34_somename_number."
+                print("Expected python/sage class definition on line %d or class identifier is wrong." % (current+1))
+                print("Class identifier must start with a letter. Suggestion: E12A34_somename_number.")
             else:
                 error_found = True
-                print "Expected python/sage class definition on line %d or class identifier is wrong." % (current+1)
-                print "Class identifier must start with a letter. Suggestion: E12A34_somename_number."
+                print("Expected python/sage class definition on line %d or class identifier is wrong." % (current+1))
+                print("Class identifier must start with a letter. Suggestion: E12A34_somename_number.")
 
         elif state == ExState.CLASS: #consume class lines
             #Check transition
@@ -384,18 +384,18 @@ def parse_ex(inputtext):
                 current+=1
             else:
                 error_found = True
-                print "Symbol not expected at line %d." % (current+1)
+                print("Symbol not expected at line %d." % (current+1))
 
     if not error_found and state != ExState.CLASS:
         error_found = True
-        print "Expected python/sage class definition on line %d or class identifier is wrong." % (current+1)
-        print "Class identifier must start with a letter. Suggestion: E12A34_somename_number."
+        print("Expected python/sage class definition on line %d or class identifier is wrong." % (current+1))
+        print("Class identifier must start with a letter. Suggestion: E12A34_somename_number.")
 
     if warn_found:
         if "unique_name" in locals() and unique_name:
-            print "Check exercise %s for the above warnings." % unique_name.strip()
+            print("Check exercise %s for the above warnings." % unique_name.strip())
         else:
-            print "Check the exercise for the above warnings."
+            print("Check the exercise for the above warnings.")
 
 
     if error_found:
@@ -451,7 +451,7 @@ def write_strange_words(s):
     ls = s.split()
     for w in ls:
         if not all(ord(c)<128 for c in w):
-            print w
+            print(w)
 
 
 #TODO: change this !
@@ -482,8 +482,8 @@ class E26A36_antiderivativeparts_005(Exercise):
     txtlines = txt.splitlines()
 
     for line,r in enumerate(flex(txt)):
-            print '"' + txtlines[line] +'"'
-            print r
+            print('"' + txtlines[line] +'"')
+            print(r)
 
 
 def test2():
@@ -575,24 +575,21 @@ class E26A36_antiderivativeparts_005(Exercise):
     txtlines = txt.splitlines()
 
     for line,r in enumerate(flex(txt)):
-            print 'line '+str(line+1)+': "' + txtlines[line] +'"'
-            print r
+            print('line '+str(line+1)+': "' + txtlines[line] +'"')
+            print(r)
 
     res = parse_ex(txt)
     if res is not None:    
         (s,p,a,c) = res
-        print s
-        print p
-        print a
-        print c
+        print(s)
+        print(p)
+        print(a)
+        print(c)
     else:
-        print "See error above."
+        print("See error above.")
 
 
 
 #if __name__=='__main__':
 #
 #    test2()
-
-
-

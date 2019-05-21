@@ -1202,9 +1202,9 @@ type(send_result)= <type 'list'>
 
         if concepts_match is not None:
             #print "GROUP 1=", concepts_match.group(1)
-            exec concepts_match.group(1)
+            exec(concepts_match.group(1))
             #[assert( w in globals()) for w in ['guess', 'slip', 'guess', 'discr', 'concepts'] ]
-            print "Add this to meg.siacua: level=%d,slip=%f,guess=%f,discr=%f,concepts=%s" % (level, slip, guess, discr, concepts)
+            print("Add this to meg.siacua: level=%d,slip=%f,guess=%f,discr=%f,concepts=%s" % (level, slip, guess, discr, concepts))
 
 
 

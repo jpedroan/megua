@@ -284,7 +284,7 @@ class UnifiedGraphics:
             self.image_fullpathnames.add(full_pathname)
             return "\n\\includegraphics[height=%dcm,width=%dcm]{%s}\n" % (paper_cm[1],papercm[0],full_pathname)
         elif self._rendermethod=='asciiart':
-            print "ug.py say: 'asciiart' is not yet implemented"
+            print("ug.py say: 'asciiart' is not yet implemented")
             #screen = aalib.AsciiScreen(width=dimx, height=dimy)
             #image = PIL.Image.open(pathname).convert('L').resize(screen.virtual_size)
             #screen.put_image((0, 0), image)
@@ -515,9 +515,9 @@ class UnifiedGraphics:
                 #print "================"
                 match = latex_error_pattern.search(err.output) #create an iterator
                 if match:
-                    print match.group(0)
+                    print(match.group(0))
                 else:
-                    print "There was a problem with an latex image file."
+                    print("There was a problem with an latex image file.")
 
                 #TODO: check this code below:
                 #if latex inside codemirror does not work

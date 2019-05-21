@@ -284,11 +284,11 @@ def parameter_change(inputtext,datadict):
 
                 except SyntaxError as e:
                     #value = keyname
-                    print """parse_param.py: syntax problem on name@c{"text0","text1"}. Text say: %s.""" % match.group(7)
+                    print("""parse_param.py: syntax problem on name@c{"text0","text1"}. Text say: %s.""" % match.group(7))
                     raise SyntaxError(e)
                 except NameError as e:
                     #value = keyname
-                    print "parse_param.py: use double quotes even on names (case: %s in '%s')." % (e,match.group(7))
+                    print("parse_param.py: use double quotes even on names (case: %s in '%s')." % (e,match.group(7)))
                     raise NameError(e)
                 #print type(str_value), " ", str_value
                 if type(str_value) == str:
@@ -448,13 +448,13 @@ def test1():
     match_iter = re.finditer(prog,text)
 
     for match in match_iter:
-        print "Groups in here: " + str(match.groups())
-        print text[match.start():match.end()]
-        print "Group = " + str(match.group(0))
-        print "Group = " + str(match.group(1))
-        print "Group = " + str(match.group(2))
-        print "Group = " + str(match.group(3))
-        print "Group = " + str(match.group(4))
+        print("Groups in here: " + str(match.groups()))
+        print(text[match.start():match.end()])
+        print("Group = " + str(match.group(0)))
+        print("Group = " + str(match.group(1)))
+        print("Group = " + str(match.group(2)))
+        print("Group = " + str(match.group(3)))
+        print("Group = " + str(match.group(4)))
         print
 
 
