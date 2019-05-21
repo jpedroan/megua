@@ -226,8 +226,8 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename,course="",usernamesiacua="
         lines = row["class_text"].splitlines(True) #including \n
         mobj = re_class.match(lines[0])
         if not mobj:       
-            print "===== Did not recognize class ====="
-            print lines
+            print("===== Did not recognize class =====")
+            print(lines)
             exit()
             
         if instyle == "latex":    
@@ -267,10 +267,10 @@ def meg2smc(instyle,sqlitefilename,newmegbookfilename,course="",usernamesiacua="
 
             uname = row['unique_name']
             try:
-                print "{0}, {1}, {2}, {3}\n".format(exdict[uname][0],course,usernamesiacua,exdict[uname][1]) 
+                print("{0}, {1}, {2}, {3}\n".format(exdict[uname][0],course,usernamesiacua,exdict[uname][1])) 
                 send_siacua_string = SEND_SIACUA.format(exdict[uname][0],course,usernamesiacua,exdict[uname][1])
             except:
-                print "unique_name=",uname,"has no ekey data."
+                print("unique_name=",uname,"has no ekey data.")
                 send_siacua_string = SEND_SIACUA
 
 
@@ -402,7 +402,7 @@ def read_ekeys(COURSE=None):
         #csvfile = codecs.open('ekeys.csv', 'r', 'utf-8')
         csvfile = open('ekeys_latin1.csv','r') # codecs.open('ekeys_latin1.csv', 'r', 'latin1')
     except:
-        print "megua2smc.py: Cannot open file ekeys.csv. This file shoube be in current directory and was obtained from siacua db.\n"
+        print("megua2smc.py: Cannot open file ekeys.csv. This file shoube be in current directory and was obtained from siacua db.\n")
         exit(-1)
 
     #Com Dictreader, o header fica logo lido e as row são dicts.
@@ -469,22 +469,22 @@ if __name__=='__main__':
     if len(sys.argv)==1 or sys.argv[1]=="help":
         ##### "1.......................26..................................................78
         #####  |.....................--.|...................................................|
-        print "Open old sqlite db and change owner_key to unique_name."
-        print "See more details in megua2smc.py file."
-        print "Usage examples:"
-        print "[1] sage -python $HOME/megua/megua/megua2smc.py latex megua_latex.sqlite .newfile.sqlite" 
-        print "[2] sage -python $HOME/megua/megua/megua2smc.py web megua_siacua.sqlite .newfile.sqlite course username"
-        print "[3] sage -python $HOME/megua/megua/megua2smc.py mix .newfile.sqlite .newfile.sqlite"
+        print("Open old sqlite db and change owner_key to unique_name.")
+        print("See more details in megua2smc.py file.")
+        print("Usage examples:")
+        print("[1] sage -python $HOME/megua/megua/megua2smc.py latex megua_latex.sqlite .newfile.sqlite")
+        print("[2] sage -python $HOME/megua/megua/megua2smc.py web megua_siacua.sqlite .newfile.sqlite course username")
+        print("[3] sage -python $HOME/megua/megua/megua2smc.py mix .newfile.sqlite .newfile.sqlite")
         exit()
         
     assert(sys.argv[1] in ["latex","web", "mix","help"])
 
-    print "Producing *.sagews files from '%s' for %s...." % (sys.argv[2],sys.argv[1])
+    print("Producing *.sagews files from '%s' for %s...." % (sys.argv[2],sys.argv[1]))
     #print 'Number of arguments:', len(sys.argv), 'arguments.'
     #print 'Argument List:', str(sys.argv)
     import os.path
     if not os.path.isfile(sys.argv[2]):
-        print "...filename does not exist."
+        print("...filename does not exist.")
         exit()
     if len(sys.argv)==4:
         meg2smc(sys.argv[1],sys.argv[2],sys.argv[3])

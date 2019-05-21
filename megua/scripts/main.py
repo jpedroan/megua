@@ -76,37 +76,37 @@ def usage(argv):
     if len(argv)<=1:
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
-        print "Arguments:"
-        print "  help <cmd>          -- calls help on command <cmd>"  
-        print "  new <filename>      -- make new exercise file"  
-        print "  replicate <filename>-- make new exercise file"  
-        print "  catalog             -- produce a catalog based on exercises database"  
-        print "Advanced:"
-        print "  status              -- show unsyncronized worksheet exercise files"  
-        print "  add                 -- add unsyncronized worksheet exercise files"  
+        print("Arguments:")
+        print("  help <cmd>          -- calls help on command <cmd>")
+        print("  new <filename>      -- make new exercise file")
+        print("  replicate <filename>-- make new exercise file")
+        print("  catalog             -- produce a catalog based on exercises database")  
+        print("Advanced:")
+        print("  status              -- show unsyncronized worksheet exercise files")
+        print("  add                 -- add unsyncronized worksheet exercise files")
     #TODO: are the following lines useful?
     elif len(argv)==2 and not sys.argv[1] in ['catalog','new','status','add']:
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
-        print "Arguments:"
-        print "  help catalog          -- calls help on command catalog"  
-        print "  help new              -- calls help on command new"  
-        print "  help status           -- calls help on command status"  
-        print "  add                   -- add unsyncronized worksheet exercise files"  
+        print("Arguments:")
+        print("  help catalog          -- calls help on command catalog")
+        print("  help new              -- calls help on command new")
+        print("  help status           -- calls help on command status")
+        print("  add                   -- add unsyncronized worksheet exercise files")  
     elif len(argv)==3 and sys.argv[1]=='help' and sys.argv[2]=='catalog':
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
-        print "megua catalog         -- produces a pdf file with an instance with all exercises."
-        print "                         Many of them have \\verbatim commands when compilation is not possible."
+        print("megua catalog         -- produces a pdf file with an instance with all exercises.")
+        print("                         Many of them have \\verbatim commands when compilation is not possible.")
     elif len(argv)>=3 and sys.argv[1]=='help' and sys.argv[2]=='status':
         #####  1.......................26..................................................78
         #####  |.....................--.|...................................................|
-        print "megua status          -- show unsyncronized worksheet exercise files"
-        print ""
-        print "For each filename,"
-        print "1. checks if filename is recorded in the database"
-        print "2. when a record is in the database, checks if a filename exists."
-        print "3. if 'status test' is given, and a filename is recorded in the database, checks if it runs properly."
+        print("megua status          -- show unsyncronized worksheet exercise files")
+        print("")
+        print("For each filename,")
+        print("1. checks if filename is recorded in the database")
+        print("2. when a record is in the database, checks if a filename exists.")
+        print("3. if 'status test' is given, and a filename is recorded in the database, checks if it runs properly.")
         #TODO: 3. is not READY! Write more help above,  store help in templates, make 'test' option work
         #TODO: a general help file is easy!
     elif len(argv)==2 and sys.argv[1]=='new':
@@ -122,21 +122,21 @@ def usage(argv):
 def usage_new():
     #####  1.......................26..................................................78
     #####  |.....................--.|...................................................|
-    print "megua new <filename> "
-    print "  <filename> is       --  E12X34_name_001_latex.sagews"
-    print "  <filename> is       --  E12X34_name_001_siacua.sagews"
-    print "      or"
-    print "  <filename> is       --  E12X34_name_001_latex.sage"
-    print "  <filename> is       --  E12X34_name_001_siacua.sage"
+    print("megua new <filename> ")
+    print("  <filename> is       --  E12X34_name_001_latex.sagews")
+    print("  <filename> is       --  E12X34_name_001_siacua.sagews")
+    print("      or")
+    print("  <filename> is       --  E12X34_name_001_latex.sage")
+    print("  <filename> is       --  E12X34_name_001_siacua.sage")
 
 
 def usage_show_options():
     try:
-        print "\nProject directories:"
-        print "  exercises source directory:", MEGUA_EXERCISE_INPUT
-        print "  catalogs directory:", MEGUA_EXERCISE_CATALOGS
+        print("\nProject directories:")
+        print("  exercises source directory:", MEGUA_EXERCISE_INPUT)
+        print("  catalogs directory:", MEGUA_EXERCISE_CATALOGS)
     except KeyError as k:
-        print "\n\nscripts/main.py say: there are missing variables in '.megua/conf.py'."
+        print("\n\nscripts/main.py say: there are missing variables in '.megua/conf.py'.")
 
 
 def valid_filename(filename):
@@ -178,16 +178,16 @@ def init():
         try:
             mkdir(path.join(environ["HOME"],".megua"))
         except error as e: #error is os.error alias of exceptions.OSError
-            print e.message
+            print(e.message)
         
         #2. get template of conf.py (conf_megua.py because there is conf.py for rest)
         source = path.join(MEGUA_TEMPLATE_DIR,"conf_megua.py")
         shutil.copyfile(source,PATH_CONF_PY)
         
-        print "NOTE:"
-        print "1. Configuration file 'conf.py' created at:", PATH_CONF_PY
-        print "2. Edit pathnames in 'conf.py' and other options, if necessary."
-        print "3. Call '$ megua help' for help on other routines."
+        print("NOTE:")
+        print("1. Configuration file 'conf.py' created at:", PATH_CONF_PY)
+        print("2. Edit pathnames in 'conf.py' and other options, if necessary.")
+        print("3. Call '$ megua help' for help on other routines.")
         return 'user-must-run-again'
         
 
@@ -269,18 +269,18 @@ def main():
             usage(sys.argv)
             return 0
         if len(sys.argv)>3:
-            print "megua replicate <filename>, only; other arguments were ignored."
+            print("megua replicate <filename>, only; other arguments were ignored.")
         replicate_exercise(sys.argv[2])
     elif sys.argv[1] == 'new':
         if len(sys.argv)<3: # or (len(sys.argv)==3 and not valid_filename(sys.argv[2])):
             usage(sys.argv)
             return 0
         if len(sys.argv)>3:
-            print "megua new <filename>, only; other arguments were ignored."
+            print("megua new <filename>, only; other arguments were ignored.")
         from megua.all import meg
         meg.new_exercise(sys.argv[2])
     else:
-        print "Command not known."
+        print("Command not known.")
         usage()
         return 0
 

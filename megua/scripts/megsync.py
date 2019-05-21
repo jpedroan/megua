@@ -61,9 +61,9 @@ def inputfiles_status():
         search_pattern = os.path.join(MEGUA_EXERCISE_INPUT,"*.sagews") #TODO: ideias correct this: it should be *.sage, only
 
 
-    print "="*23+"\n"
-    print "Check files that are not in the database."
-    print "="*23+"\n"
+    print("="*23+"\n")
+    print("Check files that are not in the database.")
+    print("="*23+"\n")
 
     
     #to search exercise code
@@ -85,21 +85,21 @@ def inputfiles_status():
             row =  parse_ex(to_unicode(uexercise))
 
             if not row:
-                print "Check",fn,"(cannot save the exercise)."
+                print("Check",fn,"(cannot save the exercise).")
                 continue
 
             #print row["unique_name"]
             
             if not meg.megbook_store.get_classrow(row["unique_name"]):
-                print row["unique_name"],"is not in",PROJECT_DATABASE_NAME
+                print(row["unique_name"],"is not in",PROJECT_DATABASE_NAME)
                 
         else:
-            print "\n",fn,"does not have 'save' command (it seems it does not have an exercise).\n"
+            print("\n",fn,"does not have 'save' command (it seems it does not have an exercise).\n")
 
 
-    print "="*23+"\n"
-    print "Check records in the database that are not in the files."
-    print "="*23+"\n"
+    print("="*23+"\n")
+    print("Check records in the database that are not in the files.")
+    print("="*23+"\n")
 
     #Check db for records and verify if they exist as a file
     for row in ExIter(meg.megbook_store):
@@ -109,7 +109,7 @@ def inputfiles_status():
             fn = os.path.join(MEGUA_EXERCISE_INPUT,row['unique_name']+'.sage')
             
         if not os.path.isfile(fn):
-            print "Exercise",row['unique_name'],"exists in",PROJECT_DATABASE,"but not in filesystem."
+            print("Exercise",row['unique_name'],"exists in",PROJECT_DATABASE,"but not in filesystem.")
             
             
             
@@ -154,7 +154,7 @@ def inputfiles_add():
             row =  parse_ex(to_unicode(uexercise))
             
             if not row:
-                print "Check",fn,"(cannot save the exercise)."
+                print("Check",fn,"(cannot save the exercise).")
                 continue
             
             if not meg.megbook_store.get_classrow(row["unique_name"]):
@@ -164,7 +164,7 @@ def inputfiles_add():
                 meg.megbook_store.insertchange(row)
                 
         else:
-            print fn,"does not have 'save' command (it seems it does not have an exercise)."
+            print(fn,"does not have 'save' command (it seems it does not have an exercise).")
             
 
     #Check db for records and verify if they exist as a file
@@ -180,7 +180,7 @@ def inputfiles_add():
             unique_name = row['unique_name']+"_siacua"
             try:
                 meg.megbook_store.rename(old_unique_name,unique_name,warn=False)
-                print "Exercise",row['unique_name'],"in",PROJECT_DATABASE_FULLPATH,"is now", unique_name
+                print("Exercise",row['unique_name'],"in",PROJECT_DATABASE_FULLPATH,"is now", unique_name)
             except:
                 pass
 
@@ -194,7 +194,7 @@ def inputfiles_add():
                 new_source_code = re.sub(old_unique_name,unique_name,source_code,re.U|re.M)
             with codecs.open(pathname, mode='w', encoding='utf-8') as f:
                 f.write(new_source_code)
-                print "Exercise",unique_name,"contained in file",pathname,"has changed all occurrences of",old_unique_name
+                print("Exercise",unique_name,"contained in file",pathname,"has changed all occurrences of",old_unique_name)
 
 
 

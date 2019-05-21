@@ -245,32 +245,16 @@ class ExSiacua(ExerciseBase):
     #def __init__(self,ekey=None, edict=None):
     #    ExerciseBase.__init__(self,ekey, edict,rendermethod,dimx,dimy,dpi)
 
+    def conf_print_instance(self):
+        print("ExSiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+    
     def conf__siacua_send(self):
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            salvus.html("<a href='%s'>%s</a><br/>" %  (content.headers['Location'],  content.headers['Location']))
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("Exsicua module say: firefox ",content.headers['Location'])
-            subprocess.Popen(["firefox","-new-tab", content.headers['Location']])
-        else:
-            print("Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+        print("ExSiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
     def conf_siacuapreview(self):
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            #print "exsiacua.py: using salvus.link:"
-            html_relative_path = os.path.join(self.wd_relative,self.unique_name()+'_siacuapreview.html')
-            salvus.file(html_relative_path,raw=True)
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("exsiacua.py: opening firefox ",html_full_path,"in the browser and press F5.")
-            subprocess.Popen(["firefox","-new-tab", html_full_path])
-        else:
-            print("exsiacua.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+        print("ExSiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
     
     def update(self,ekey=None,edict=None, render_method=None):
-
 
         #For multiplechoice
         self.all_choices = []
@@ -350,15 +334,7 @@ class ExSiacua(ExerciseBase):
         f.write(html_string)
         f.close()
 
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            salvus.html(html_string)
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("Exsicua module say: firefox ",EXERCISE_HTML_PATHNAME)
-            subprocess.Popen(["firefox","-new-tab", EXERCISE_HTML_PATHNAME])
-        else:
-            print("Exsiacua module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+        self.conf_print_instance()
 
     def _update_multiplechoice(self,input_text,where):
         """
@@ -389,7 +365,7 @@ class ExSiacua(ExerciseBase):
             print("TODO: in %s, should issue warning when CDATA and multiplechoice are both present." % self.unique_name())
             self.detailed_answer = "Contains [CDATA]\n"
             self.all_choices = []
-            raise SyntaxError("exsiacua module say:  {} should have <multiplechoice>...</multiplechoice> tags.".format(self.unique_name()))
+            raise SyntaxError("ExSiacua module say:  {} should have <multiplechoice>...</multiplechoice> tags.".format(self.unique_name()))
 
         #Find and extract text inside <multiplechoice>...</multiplechoice>
         choices_match = re.search(r'<\s*multiplechoice\s*>(.+?)<\s*/multiplechoice\s*>', input_text, re.DOTALL|re.UNICODE)
@@ -397,7 +373,7 @@ class ExSiacua(ExerciseBase):
         #print "group 1=",choices_match.group(1)
 
         if choices_match is None:
-            raise SyntaxError("exsiacua module: problem should have <multiplechoice>...</multiplechoice> tags.")
+            raise SyntaxError("ExSiacua module: problem should have <multiplechoice>...</multiplechoice> tags.")
 
         #Text inside tags <multiplechoice> ... </multiplechoice>
         choice_text = choices_match.group(1)
@@ -458,7 +434,7 @@ class ExSiacua(ExerciseBase):
         l = centered_all_choices + [self.detailed_answer] #join two lists
 
         if len(l)<5:
-            raise NameError('exsiacua module: missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
+            raise NameError('ExSiacua module: missing of options in multiple choice question or full answer. At least 4 options must be given and the first must be the correct one. Also the full answer must be given.')
 
         #print "==========="
         #print "For _siacua_answer:",l

@@ -80,6 +80,9 @@ class ExLatex(ExerciseBase):
     #    ExerciseBase.__init__(self,ekey, edict)
 
 
+    def conf_print_instance(self):
+        print("ExLaTeX module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+
     def _latex_string(self):
 
         lts = templates.render("exlatex_print_instance.tex",
@@ -109,17 +112,5 @@ class ExLatex(ExerciseBase):
         EXERCISE_TEX_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.tex')
         EXERCISE_PDF_PATHNAME = os.path.join(self.wd_fullpath, self.unique_name()+'.pdf')
 
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            salvus.file(EXERCISE_PDF_PATHNAME,show=True,raw=True); 
-            print("\n")
-            salvus.file(EXERCISE_TEX_PATHNAME,show=True,raw=True); 
-            print("\n")
-            salvus.open_tab(EXERCISE_PDF_PATHNAME)
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("exlatex module say: evince ",EXERCISE_PDF_PATHNAME)
-            subprocess.Popen(["evince",EXERCISE_PDF_PATHNAME])
-        else:
-            print("exlatex module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+        self.conf_print_instace()
 

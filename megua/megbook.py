@@ -369,119 +369,22 @@ class MegBook(MegSiacua):
         return "MegBook('%s')" % self.local_store_filename
 
     def conf_set_current_exercise(self):
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            salvus.html("<h4>{}&nbsp;&nbsp;{}</h4><p>{}</p>".format(
-                    unique_name,
-                    "(The dog picture has been stolen. Reward of $100000, dead or alive.)",
-                    #DOGSVG, #'<img src="https://cloud.sagemath.com/4531e156-82ac-4387-8f19-b066e940b28b/raw/stationary/small_megua_dog.png"/>',
-                    '<a href="https://github.com/jpedroan/megua/wiki" target=_blank>MEGUA wiki for help</a> or email to dmat-siacua@ua.pt.'
-                ))
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("Exercise {}".format(unique_name))
-        else:
-            print("megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+        print("MegBook module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
     def conf_new_exercise(self):
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            if salvus:
-                print("Worksheet")
-                salvus.file(fullpath,show=True,raw=True); 
-                print("\n")
-                salvus.open_tab(fullpath)
-            else:
-                print("Command line")
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([fullpath])                
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("MegBook module say: gvim ",fullpath)
-            subprocess.Popen(["gvim",fullpath])
-        else:
-            print("megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+        print("MegBook module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
     def conf_replicate_exercise(self):
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            if salvus:
-                #salvus.file(fullpath_new,show=True,raw=True); print "\n"
-                print(fullpath_new)
-                print("salvus.open_tab(fullpath_new)")
-            else:
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([fullpath_new])
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("MegBook module say: gvim ",fullpath)
-            subprocess.Popen(["gvim",fullpath])
-        else:
-            print("megbook.py module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
+        print("MegBook module say: MEGUA_PLATFORM must be properly configured at $HOME/.megua/conf.py")
 
     def conf_catalog(self):
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            if salvus:
-                salvus.file(CATALOG_PDF_PATHNAME,show=True,raw=True); 
-                print("\n")
-                salvus.file(CATALOG_TEX_PATHNAME,show=True,raw=True); 
-                print("\n")
-                salvus.open_tab(CATALOG_PDF_PATHNAME)
-            else:
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([CATALOG_PDF_PATHNAME])
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("MegBook module say: evince ",CATALOG_PDF_PATHNAME)
-            subprocess.Popen(["evince",CATALOG_PDF_PATHNAME])
-        else:
-            print("megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
+        print("MegBook module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
     def conf_latex_document(self):
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            if salvus:
-                salvus.file(DOC_PDF_PATHNAME,show=True,raw=True); 
-                print("\n")
-                salvus.file(DOC_LATEX_PATHNAME,show=True,raw=True); 
-                print("\n")
-                salvus.open_tab(DOC_PDF_PATHNAME)
-            else:
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([DOC_PDF_PATHNAME])
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("MegBook module say: evince ",DOC_PDF_PATHNAME)
-            subprocess.Popen(["evince",DOC_PDF_PATHNAME])
-        else:
-            print("megbook.py module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
+        print("MegBook module say: MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
     def conf_fast_exam_siacu(self):
-        if MEGUA_PLATFORM=='SMC':
-            sys.path.append('/cocalc/lib/python2.7/site-packages')
-            from smc_sagews.sage_salvus import salvus
-            if salvus:
-                print("Check exam PDF file:")
-                salvus.file(EXAM_PDF_PATHNAME,show=True,raw=True);
-                print ("\n")
-                print("Save tex file to your computer to improve the text at",EXAM_TEX_PATHNAME)
-                salvus.file(EXAM_TEX_PATHNAME,show=True,raw=True);
-                print ("\n")
-                salvus.open_tab(EXAM_TEX_PATHNAME)
-            else:
-                sys.path.append('/usr/local/lib/python2.7/dist-packages')
-                from smc_pyutil import smc_open
-                smc_open.process([EXAM_TEX_PATHNAME])
-        elif MEGUA_PLATFORM=='DESKTOP':
-            print("MegBook module say: evince ",EXAM_PDF_PATHNAME)
-            subprocess.Popen(["evince",EXAM_PDF_PATHNAME])
-        else:
-            print("megbook.py module say: in context of megbook.fast_exam_siacua() the MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
+        print("MegBook module say: in context of megbook.fast_exam_siacua() the MEGUA_EXERCISE_CATALOGS must be properly configured at $HOME/.megua/conf.py")
 
     def set_current_exercise(self,pathname):
         """Receives a pathname. This pathname points to a file that
@@ -1838,7 +1741,7 @@ class MegBook(MegSiacua):
 
             ekey = uniquename_ekey[1]
 
-            print("megbook.py module say: generating exercise %s." % unique_name, "with ekey=",ekey, "\n\n")
+            print("MegBook module say: generating exercise %s." % unique_name, "with ekey=",ekey, "\n\n")
 
             ex = self.new(unique_name,ekey=ekey,returninstance=True)
 
