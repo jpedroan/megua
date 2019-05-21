@@ -23,7 +23,7 @@ def conf_set_current_exercise(self):
     sys.path.append('/cocalc/lib/python2.7/site-packages')
     from smc_sagews.sage_salvus import salvus
     salvus.html("<h4>{}&nbsp;&nbsp;{}</h4><p>{}</p>".format(
-            unique_name,
+            self._current_unique_name,
             "(The dog picture has been stolen. Reward of $100000, dead or alive.)",
             #DOGSVG, #'<img src="https://cloud.sagemath.com/4531e156-82ac-4387-8f19-b066e940b28b/raw/stationary/small_megua_dog.png"/>',
             '<a href="https://github.com/jpedroan/megua/wiki" target=_blank>MEGUA wiki for help</a> or email to dmat-siacua@ua.pt.'

@@ -15,7 +15,7 @@ def conf_siacuapreview(self):
     subprocess.Popen(["firefox","-new-tab", html_full_path])
 
 def conf_set_current_exercise(self):
-    print("Exercise {}".format(unique_name))
+    print("Exercise {}".format(self._current_unique_name))
 
 def conf_new_exercise(self):
     print("MegBook module say: gvim ",fullpath)
