@@ -32,7 +32,7 @@ if MEGUA_PLATFORM == "WINDOWS":
     MegBook.conf_latex_document = mwindows.conf_latex_document
     MegBook.conf_new_exercise = mwindows.conf_new_exercise
     MegBook.conf_replicate_exercise = mwindows.conf_replicate_exercise
-    MegBook.conf_set_current_exercise = mwindows.conf_set_current_exercise
+    MegBook.set_current_exercise = mwindows.set_current_exercise
     MegBook.conf_set_current_exercise = mwindows.conf_set_current_exercise
 
 elif MEGUA_PLATFORM == "SMC":
