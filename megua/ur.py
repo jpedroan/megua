@@ -397,7 +397,7 @@ Integer(6)/Integer(7), Integer(7)/Integer(8), Integer(8)/Integer(9)]
         """
 
         if (b-a+1) < num:
-            print("Cannot choose %d different elements from [%d,%d]" % (num,a,b))
+            print("Cannot choose %d different elements from [%d,%d]", num,a,b)
             assert(0)
 
         attempts = 0
