@@ -236,7 +236,7 @@ from megua.exbase import ExerciseBase
 from megua.jinjatemplates import templates
 from megua.platex import html2latex
 from megua.megoptions import *
-
+from megua.platex import pcompile, latexunderscore
 
 
 class ExSiacua(ExerciseBase):
@@ -482,6 +482,7 @@ class ExSiacua(ExerciseBase):
         siacuaoption_template = templates.get_template("exsiacua_previewoption.html")
 
         allexercises = u''
+        tex_file = u''
 
         for e_number in ekeys:
 
@@ -524,6 +525,34 @@ class ExSiacua(ExerciseBase):
 
             #Add one more instance with ekey
             allexercises += ex_text
+            tex_file += templates.render("megbook_catalog_instance.tex",
+                                    exformat="siacua",
+                                    unique_name=self.unique_name(),
+                                    unique_name_noslash = latexunderscore(self.unique_name()),
+                                    summary = self.summary(),
+                                    problem = ExSiacua.to_latex(self.problem()), #u'\\begin{verbatim}\n'+ex.problem()+'\n\\end{verbatim}\n',
+                                    answer = ExSiacua.to_latex(self.answer()) #u'\\begin{verbatim}\n'+ex.answer()+'\n\\end{verbatim}\n'
+                        )
+
+        tex_render = templates.render(
+                "megbook_catalog_latex.tex",
+                exerciseinstanceslatex = tex_file
+        )
+
+        CATALOG_TEX_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,self.unique_name()+".tex")
+        CATALOG_PDF_PATHNAME = os.path.join(MEGUA_EXERCISE_CATALOGS,self.unique_name()+".pdf")
+
+        #Compile two times because of TableOfContents  \toc
+        try:
+            pcompile(tex_render, MEGUA_EXERCISE_CATALOGS,self.unique_name()+".tex")
+            pcompile(tex_render, MEGUA_EXERCISE_CATALOGS,self.unique_name()+".pdf")
+        except error:
+            print("="*30)
+            print(error)
+            print("exsiacua.py: file catalog.tex need to be edited.")
+            print(CATALOG_TEX_PATHNAME)
+            print("="*30)
+            return
 
         html_string = templates.render(
                 "exsiacua_previewheader.html",
@@ -542,7 +571,7 @@ class ExSiacua(ExerciseBase):
         f.close()
 
 
-        self.conf_siacuapreview(html_full_path)
+        self.conf_siacuapreview(html_full_path,CATALOG_TEX_PATHNAME,CATALOG_PDF_PATHNAME)
 
     def _problem_whitoutmc(self):
         """

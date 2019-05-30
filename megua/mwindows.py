@@ -9,11 +9,12 @@ from megua.megoptions import *
 def conf__siacua_send(self, content):
     print("Not implemented windows: conf__siacua_send")
 
-def conf_siacuapreview(self, html_full_path):
+def conf_siacuapreview(self, html_full_path,CATALOG_TEX_PATHNAME,CATALOG_PDF_PATHNAME):
+    print(CATALOG_TEX_PATHNAME)
+    print(CATALOG_PDF_PATHNAME)
     import webbrowser
     url = os.path.join(self.wd_fullpath,self.unique_name()+'_siacuapreview.html')
     webbrowser.open(url)
-
 
 def set_current_exercise(self):
     import requests
@@ -21,6 +22,9 @@ def set_current_exercise(self):
     import re
     from notebook.notebookapp import list_running_servers
     from megbook import isidentifier
+    from IPython.display import Javascript
+
+    display(Javascript('IPython.notebook.save_notebook()'))
 
     TOKEN = next(list_running_servers())['token']
 
@@ -46,13 +50,13 @@ def set_current_exercise(self):
         #print "megbook.py: Corrected",pathname
 
     assert(ext) #See DEVEL notes above: ext<>''
-    self._current_unique_name = None
 
     if not isidentifier(unique_name):
         print("Megbook.py: Filename is not a valid Python identifier.")
         usage_new()
         raise SyntaxError
 
+    self._current_unique_name = None
 
     #get file contents 
     unique_name_changed = False
@@ -71,25 +75,18 @@ def set_current_exercise(self):
         self.megbook_store.rename(old_unique_name,unique_name,warn=False)
         #Change source code
         new_source_code = re.sub(old_unique_name,unique_name,source_code,re.U|re.M)
-        with codecs.open(pathname, mode='w', encoding='utf-8') as f:
-            f.write(new_source_code)
-        print("========================")
-        print("Please, ")
-        print("1. Execute the above comand again using shift-enter ('meg.set_current_exercise(__file__)').")
-        print("")
-        print("Explanation:")
-        print("1. The filename containing the exercise was renamed.")
-        print("2. The new name of the exercise is now: {}".format(unique_name))
-        print("3. Confirm the new <name_of_exercise> in the line 'class <name>(...)'.")
-        print("")
-        print("========================")
-        raise IOError
-
+        f = open(pathname, mode='w')
+        f.write(new_source_code.encode("utf-8"))
+        f.close()
+        
     #To be used in all megbook commands
     self._current_unique_name = unique_name
 
     self.conf_set_current_exercise()
 
+    if unique_name_changed:
+        display(Javascript('IPython.notebook.save_notebook()'))
+        display(Javascript('IPython.notebook.load_notebook("'+filename+'")'))
 
 def conf_set_current_exercise(self):
     print("Exercise {}".format(self._current_unique_name))
